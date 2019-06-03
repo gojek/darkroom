@@ -5,8 +5,10 @@ import (
 )
 
 type config struct {
-	logger  loggerConfig
-	appInfo appInfo
+	logger    loggerConfig
+	appInfo   appInfo
+	debugMode bool
+	port      int
 }
 
 var instance *config
@@ -21,6 +23,10 @@ func getConfig() *config {
 
 func newConfig() *config {
 	initViper()
+	port := getInt("port")
+	if port == 0 {
+		port = 3000 // Fallback to default port
+	}
 	return &config{
 		logger: loggerConfig{
 			level:  getString("log.level"),
@@ -31,6 +37,8 @@ func newConfig() *config {
 			version:     getString("app.version"),
 			description: getString("app.description"),
 		},
+		debugMode: getFeature("debug"),
+		port:      port,
 	}
 }
 
@@ -52,4 +60,12 @@ func AppVersion() string {
 
 func AppDescription() string {
 	return getConfig().appInfo.description
+}
+
+func DebugModeEnabled() bool {
+	return getConfig().debugMode
+}
+
+func Port() int {
+	return getConfig().port
 }

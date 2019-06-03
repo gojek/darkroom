@@ -38,3 +38,39 @@ func TestConfigCases(t *testing.T) {
 		assert.Equal(t, viper.GetString(c.key), c.callFunc())
 	}
 }
+
+func TestConfigCasesWithFeatureToggle(t *testing.T) {
+	initViper()
+	cases := []struct {
+		key      string
+		callFunc func() bool
+	}{
+		{
+			key:      "debug",
+			callFunc: DebugModeEnabled,
+		},
+	}
+	for _, c := range cases {
+		assert.Equal(t, viper.GetBool(c.key), c.callFunc())
+	}
+
+	assert.Equal(t, false, getFeature("nonexistingkey"))
+}
+
+func TestConfigCasesWithIntValues(t *testing.T) {
+	initViper()
+	cases := []struct {
+		key      string
+		callFunc func() int
+	}{
+		{
+			key:      "port",
+			callFunc: Port,
+		},
+	}
+	for _, c := range cases {
+		assert.Equal(t, viper.GetInt(c.key), c.callFunc())
+	}
+
+	assert.Equal(t, 0, getInt("nonexistingkey"))
+}

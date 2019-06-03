@@ -1,3 +1,5 @@
+debug: "true"
+
 log:
   level: "debug"
   format: "text"
