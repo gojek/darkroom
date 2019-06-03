@@ -156,3 +156,5 @@ honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWh
 ***REMOVED***/darkroom/storage v0.0.0-20190603134203-d2614126227f/go.mod h1:LaHb3RO7jv/jT6OIA4cB8aoBeWdp7FvfwKy0nKVWZ8o=
 ***REMOVED***/darkroom/storage v0.0.0-20190603144817-a6345016809e h1:EFo7RlJtArXoqfKaYXm+5YcaRCnFecTKt3M6Owrs0wo=
 ***REMOVED***/darkroom/storage v0.0.0-20190603144817-a6345016809e/go.mod h1:LaHb3RO7jv/jT6OIA4cB8aoBeWdp7FvfwKy0nKVWZ8o=
+***REMOVED***/darkroom/storage v0.0.0-20190603151746-6d3576fe0c96 h1:sVbaDm2p29qulICFw/av22oyAVtR13gEUhsxhURoY24=
+***REMOVED***/darkroom/storage v0.0.0-20190603151746-6d3576fe0c96/go.mod h1:LaHb3RO7jv/jT6OIA4cB8aoBeWdp7FvfwKy0nKVWZ8o=

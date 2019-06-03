@@ -12,7 +12,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := deps.Storage.Get(r.Context(), r.URL.Path)
 		if res.Error() != nil {
-			// TODO Handle error
+			w.WriteHeader(res.Status())
 			return
 		}
 

@@ -7,6 +7,6 @@ import (
 )
 
 func TestNewRouter(t *testing.T) {
-	router := NewRouter(service.Dependencies{})
+	router := NewRouter(&service.Dependencies{})
 	assert.NotNil(t, router)
 }

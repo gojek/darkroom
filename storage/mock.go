@@ -12,6 +12,6 @@ type MockBaseStorage struct {
 
 func (m *MockBaseStorage) Get(ctx context.Context, path string) storage.IResponse {
 	args := m.Called(ctx, path)
-	return storage.NewResponse(args[0].([]byte), args.Error(1))
+	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2))
 }
 

@@ -9,8 +9,8 @@ type Dependencies struct {
 	Storage base.Storage
 }
 
-func NewDependencies() Dependencies {
-	return Dependencies{
+func NewDependencies() *Dependencies {
+	return &Dependencies{
 		Storage: storage.NewS3Storage(),
 	}
 }

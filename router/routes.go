@@ -9,7 +9,7 @@ import (
 	"***REMOVED***/darkroom/server/service"
 )
 
-func NewRouter(deps service.Dependencies) *mux.Router {
+func NewRouter(deps *service.Dependencies) *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.Methods(http.MethodGet).Path("/ping").Handler(handler.Ping())
@@ -19,7 +19,7 @@ func NewRouter(deps service.Dependencies) *mux.Router {
 	}
 
 	// Catch all handler
-	r.Methods(http.MethodGet).PathPrefix("/").Handler(handler.ImageHandler(&deps))
+	r.Methods(http.MethodGet).PathPrefix("/").Handler(handler.ImageHandler(deps))
 
 	return r
 }
