@@ -1,0 +1,8 @@
+# IDE stuff
+.idea/
+
+# binaries
+out/
+
+# config files
+application.yaml

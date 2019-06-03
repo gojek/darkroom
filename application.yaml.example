@@ -1,0 +1,8 @@
+log:
+  level: "debug"
+  format: "text"
+
+app:
+  name: "darkroom"
+  version: "0.0.1"
+  description: "A realtime image processing service"
