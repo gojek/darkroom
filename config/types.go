@@ -13,6 +13,7 @@ type appInfo struct {
 
 type bucketInfo struct {
 	name       string
+	region     string
 	accessKey  string
 	secretKey  string
 	pathPrefix string

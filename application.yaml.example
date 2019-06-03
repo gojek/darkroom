@@ -11,9 +11,20 @@ app:
 
 bucket:
   name: "myAwesomeBucket"
+  region: "region"
   accessKey: "randomAccessKey"
   secretKey: "superSecret"
-  pathPrefix: "/path/to"
+  pathPrefix: "/prefixPath/to/folder"
 
 cache:
   time: 31536000    # One year
+
+hystrix:
+  command:
+    name: "S3_ADAPTER"
+  config:
+    timeout: 5000
+    maxConcurrentRequests: 100
+    requestVolumeThreshold: 10
+    sleepWindow: 10
+    errorPercentThreshold: 25

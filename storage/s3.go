@@ -22,7 +22,13 @@ func (s3s S3Storage) Get(ctx context.Context, path string) storage.IResponse {
 
 func NewS3Storage() storage.Storage {
 	return S3Storage{
-		base:       s3.NewStorage(config.BucketName(), config.BucketAccessKey(), config.BucketSecretKey()),
+		base: s3.NewStorage(
+			s3.WithBucketName(config.BucketName()),
+			s3.WithBucketRegion(config.BucketRegion()),
+			s3.WithAccessKey(config.BucketAccessKey()),
+			s3.WithSecretKey(config.BucketSecretKey()),
+			s3.WithHystrixCommand(config.HystrixCommand()),
+		),
 		pathPrefix: config.BucketPathPrefix(),
 	}
 }

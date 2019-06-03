@@ -1,6 +1,8 @@
 package config
 
 import (
+	"github.com/afex/hystrix-go/hystrix"
+	"***REMOVED***/darkroom/storage"
 	"sync"
 )
 
@@ -11,6 +13,7 @@ type config struct {
 	debugMode  bool
 	port       int
 	cacheTime  int
+	hystrixCmd storage.HystrixCommand
 }
 
 var instance *config
@@ -41,6 +44,7 @@ func newConfig() *config {
 		},
 		bucketInfo: bucketInfo{
 			name:       getString("bucket.name"),
+			region:     getString("bucket.region"),
 			accessKey:  getString("bucket.accessKey"),
 			secretKey:  getString("bucket.secretKey"),
 			pathPrefix: getString("bucket.pathPrefix"),
@@ -48,6 +52,16 @@ func newConfig() *config {
 		debugMode: getFeature("debug"),
 		port:      port,
 		cacheTime: getInt("cache.time"),
+		hystrixCmd: storage.HystrixCommand{
+			Name: getString("hystrix.command.name"),
+			Config: hystrix.CommandConfig{
+				Timeout:                getInt("hystrix.config.timeout"),
+				MaxConcurrentRequests:  getInt("hystrix.config.maxConcurrentRequests"),
+				RequestVolumeThreshold: getInt("hystrix.config.requestVolumeThreshold"),
+				SleepWindow:            getInt("hystrix.config.sleepWindow"),
+				ErrorPercentThreshold:  getInt("hystrix.config.errorPercentThreshold"),
+			},
+		},
 	}
 }
 
@@ -83,6 +97,10 @@ func BucketName() string {
 	return getConfig().bucketInfo.name
 }
 
+func BucketRegion() string {
+	return getConfig().bucketInfo.region
+}
+
 func BucketAccessKey() string {
 	return getConfig().bucketInfo.accessKey
 }
@@ -97,4 +115,8 @@ func BucketPathPrefix() string {
 
 func CacheTime() int {
 	return getConfig().cacheTime
+}
+
+func HystrixCommand() storage.HystrixCommand {
+	return getConfig().hystrixCmd
 }
