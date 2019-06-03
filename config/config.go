@@ -5,10 +5,12 @@ import (
 )
 
 type config struct {
-	logger    loggerConfig
-	appInfo   appInfo
-	debugMode bool
-	port      int
+	logger     loggerConfig
+	appInfo    appInfo
+	bucketInfo bucketInfo
+	debugMode  bool
+	port       int
+	cacheTime  int
 }
 
 var instance *config
@@ -37,8 +39,15 @@ func newConfig() *config {
 			version:     getString("app.version"),
 			description: getString("app.description"),
 		},
+		bucketInfo: bucketInfo{
+			name:       getString("bucket.name"),
+			accessKey:  getString("bucket.accessKey"),
+			secretKey:  getString("bucket.secretKey"),
+			pathPrefix: getString("bucket.pathPrefix"),
+		},
 		debugMode: getFeature("debug"),
 		port:      port,
+		cacheTime: getInt("cache.time"),
 	}
 }
 
@@ -68,4 +77,24 @@ func DebugModeEnabled() bool {
 
 func Port() int {
 	return getConfig().port
+}
+
+func BucketName() string {
+	return getConfig().bucketInfo.name
+}
+
+func BucketAccessKey() string {
+	return getConfig().bucketInfo.accessKey
+}
+
+func BucketSecretKey() string {
+	return getConfig().bucketInfo.secretKey
+}
+
+func BucketPathPrefix() string {
+	return getConfig().bucketInfo.pathPrefix
+}
+
+func CacheTime() int {
+	return getConfig().cacheTime
 }

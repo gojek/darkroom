@@ -10,3 +10,10 @@ type appInfo struct {
 	version     string
 	description string
 }
+
+type bucketInfo struct {
+	name       string
+	accessKey  string
+	secretKey  string
+	pathPrefix string
+}

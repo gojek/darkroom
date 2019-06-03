@@ -32,6 +32,22 @@ func TestConfigCases(t *testing.T) {
 			key:      "log.format",
 			callFunc: LogFormat,
 		},
+		{
+			key:      "bucket.name",
+			callFunc: BucketName,
+		},
+		{
+			key:      "bucket.accessKey",
+			callFunc: BucketAccessKey,
+		},
+		{
+			key:      "bucket.secretKey",
+			callFunc: BucketSecretKey,
+		},
+		{
+			key:      "bucket.pathPrefix",
+			callFunc: BucketPathPrefix,
+		},
 	}
 
 	for _, c := range cases {
@@ -66,6 +82,10 @@ func TestConfigCasesWithIntValues(t *testing.T) {
 		{
 			key:      "port",
 			callFunc: Port,
+		},
+		{
+			key:      "cache.time",
+			callFunc: CacheTime,
 		},
 	}
 	for _, c := range cases {

@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gorilla/mux"
+	"net/http"
 	"net/http/pprof"
 	"***REMOVED***/darkroom/server/config"
 	"***REMOVED***/darkroom/server/handler"
@@ -11,11 +12,14 @@ import (
 func NewRouter(deps service.Dependencies) *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 
-	r.Methods("GET").Path("/ping").Handler(handler.Ping())
+	r.Methods(http.MethodGet).Path("/ping").Handler(handler.Ping())
 
 	if config.DebugModeEnabled() {
 		setDebugRoutes(r)
 	}
+
+	// Catch all handler
+	r.Methods(http.MethodGet).PathPrefix("/").Handler(handler.ImageHandler(&deps))
 
 	return r
 }

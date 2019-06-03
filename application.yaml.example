@@ -8,3 +8,12 @@ app:
   name: "darkroom"
   version: "0.0.1"
   description: "A realtime image processing service"
+
+bucket:
+  name: "myAwesomeBucket"
+  accessKey: "randomAccessKey"
+  secretKey: "superSecret"
+  pathPrefix: "/path/to"
+
+cache:
+  time: 31536000    # One year

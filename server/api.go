@@ -38,7 +38,7 @@ func waitForShutdown(s *http.Server) {
 func Start() {
 	logger.Infof("Starting %s server", config.AppName())
 
-	muxRouter := router.NewRouter(service.Dependencies{})
+	muxRouter := router.NewRouter(service.NewDependencies())
 
 	portInfo := fmt.Sprintf(":%d", config.Port())
 	server := &http.Server{Addr: portInfo, Handler: muxRouter}
