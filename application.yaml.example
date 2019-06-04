@@ -16,6 +16,8 @@ bucket:
   secretKey: "superSecret"
   pathPrefix: "/prefixPath/to/folder"
 
+port: 3000
+
 cache:
   time: 31536000    # One year
 
