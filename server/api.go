@@ -13,6 +13,7 @@ import (
 
 type Server struct {
 	handler http.Handler
+	hook    *LifeCycleHook
 }
 
 func NewServer(opts ...Option) *Server {
@@ -23,10 +24,19 @@ func NewServer(opts ...Option) *Server {
 	return &s
 }
 
+func (s *Server) AddLifeCycleHook(hook *LifeCycleHook) {
+	s.hook = hook
+}
+
 func (s *Server) Start() {
 	logger.Infof("Starting %s server", config.AppName())
-	portInfo := fmt.Sprintf(":%d", config.Port())
 
+	if s.hook != nil {
+		s.hook.initFunc()
+		defer s.hook.deferFunc()
+	}
+
+	portInfo := fmt.Sprintf(":%d", config.Port())
 	server := &http.Server{Addr: portInfo, Handler: s.handler}
 
 	go listenServer(server)
@@ -52,5 +62,6 @@ func waitForShutdown(s *http.Server) {
 	if err != nil {
 		logger.Error(err.Error())
 	}
+	close(sig)
 	logger.Infof("%s server shutdown complete", config.AppName())
 }
