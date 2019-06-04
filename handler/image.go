@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"***REMOVED***/darkroom/server/config"
 	"***REMOVED***/darkroom/server/constants"
+	"***REMOVED***/darkroom/server/logger"
 	"***REMOVED***/darkroom/server/service"
 )
 
@@ -12,6 +13,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := deps.Storage.Get(r.Context(), r.URL.Path)
 		if res.Error() != nil {
+			logger.Errorf("error: %s", res.Error())
 			w.WriteHeader(res.Status())
 			return
 		}
