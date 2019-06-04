@@ -5,7 +5,9 @@ import (
 	"os"
 	"***REMOVED***/darkroom/server/config"
 	"***REMOVED***/darkroom/server/logger"
+	"***REMOVED***/darkroom/server/router"
 	"***REMOVED***/darkroom/server/server"
+	"***REMOVED***/darkroom/server/service"
 )
 
 func main() {
@@ -20,7 +22,9 @@ func main() {
 	a.Version = config.AppVersion()
 	a.Usage = config.AppDescription()
 	a.Action = func(c *cli.Context) error {
-		server.Start()
+		handler := router.NewRouter(service.NewDependencies())
+		s := server.NewServer(server.WithHandler(handler))
+		s.Start()
 		return nil
 	}
 

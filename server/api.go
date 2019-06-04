@@ -8,10 +8,30 @@ import (
 	"os/signal"
 	"***REMOVED***/darkroom/server/config"
 	"***REMOVED***/darkroom/server/logger"
-	"***REMOVED***/darkroom/server/router"
-	"***REMOVED***/darkroom/server/service"
 	"syscall"
 )
+
+type Server struct {
+	handler http.Handler
+}
+
+func NewServer(opts ...Option) *Server {
+	s := Server{}
+	for _, opt := range opts {
+		opt(&s)
+	}
+	return &s
+}
+
+func (s *Server) Start() {
+	logger.Infof("Starting %s server", config.AppName())
+	portInfo := fmt.Sprintf(":%d", config.Port())
+
+	server := &http.Server{Addr: portInfo, Handler: s.handler}
+
+	go listenServer(server)
+	waitForShutdown(server)
+}
 
 func listenServer(s *http.Server) {
 	err := s.ListenAndServe()
@@ -33,16 +53,4 @@ func waitForShutdown(s *http.Server) {
 		logger.Error(err.Error())
 	}
 	logger.Infof("%s server shutdown complete", config.AppName())
-}
-
-func Start() {
-	logger.Infof("Starting %s server", config.AppName())
-
-	muxRouter := router.NewRouter(service.NewDependencies())
-
-	portInfo := fmt.Sprintf(":%d", config.Port())
-	server := &http.Server{Addr: portInfo, Handler: muxRouter}
-
-	go listenServer(server)
-	waitForShutdown(server)
 }
