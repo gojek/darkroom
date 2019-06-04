@@ -1,7 +1,7 @@
 APP=darkroom
 APP_EXECUTABLE="./out/$(APP)"
 
-all: build test
+all: update-deps ci
 
 build-deps:
 	go install
@@ -20,3 +20,8 @@ vet:
 
 test:
 	go test ./...
+
+copy-config:
+	cp application.yaml.example application.yaml
+
+ci: copy-config test format vet compile
