@@ -9,14 +9,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"***REMOVED***/darkroom/server/service"
-	"***REMOVED***/darkroom/server/storage"
+	"***REMOVED***/darkroom/storage"
 	"testing"
 )
 
 type ImageHandlerTestSuite struct {
 	suite.Suite
 	deps        *service.Dependencies
-	storage     *storage.MockBaseStorage
+	storage     *mockStorage
 	manipulator *mockManipulator
 }
 
@@ -25,7 +25,7 @@ func TestImageHandlerSuite(t *testing.T) {
 }
 
 func (s *ImageHandlerTestSuite) SetupTest() {
-	s.storage = &storage.MockBaseStorage{}
+	s.storage = &mockStorage{}
 	s.manipulator = &mockManipulator{}
 	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator}
 }
@@ -96,4 +96,13 @@ func (m *mockManipulator) Process(ctx context.Context, data []byte, params map[s
 		return args.Get(0).([]byte), nil
 	}
 	return args.Get(0).([]byte), args.Get(1).(error)
+}
+
+type mockStorage struct {
+	mock.Mock
+}
+
+func (m *mockStorage) Get(ctx context.Context, path string) storage.IResponse {
+	args := m.Called(ctx, path)
+	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2))
 }

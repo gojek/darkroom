@@ -19,7 +19,11 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 	}
 
 	// Catch all handler
-	r.Methods(http.MethodGet).PathPrefix("/").Handler(handler.ImageHandler(deps))
+	if config.BucketPathPrefix() != "" {
+		r.Methods(http.MethodGet).PathPrefix(config.BucketPathPrefix()).Handler(handler.ImageHandler(deps))
+	} else {
+		r.Methods(http.MethodGet).PathPrefix("/").Handler(handler.ImageHandler(deps))
+	}
 
 	return r
 }
