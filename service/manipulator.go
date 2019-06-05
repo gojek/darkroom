@@ -27,7 +27,7 @@ func (m *manipulator) Process(ctx context.Context, data []byte, params map[strin
 	var err error
 	if params[fit] == crop {
 		data, err = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
-	} else if len(params[fit]) == 0 && CleanInt(params[width]) != 0 && CleanInt(params[height]) != 0 {
+	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		data, err = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
 	}
 	if params[mono] == blackHexCode {
