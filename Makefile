@@ -1,16 +1,23 @@
 APP=darkroom
 APP_EXECUTABLE="./out/$(APP)"
 
-all: update-deps ci
+all: ci
 
 build-deps:
 	go install
 
 update-deps: build-deps
 
+setup:
+	go get -u golang.org/x/lint/golint
+	go get -u github.com/axw/gocov/gocov
+
 compile:
 	mkdir -p out
 	go build -o $(APP_EXECUTABLE)
+
+lint: setup
+	golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
 
 format:
 	go fmt ./...
@@ -21,7 +28,16 @@ vet:
 test:
 	go test ./...
 
-copy-config:
-	cp application.yaml.example application.yaml
+test-cov:
+	gocov test ./... > coverage.json
 
-ci: copy-config test format vet compile
+test-cov-report:
+	@echo "\nGENERATING TEST REPORT."
+	gocov report coverage.json
+
+copy-config:
+	mkdir -p out
+	cp config.yaml.example config.yaml
+	cp config.yaml.example ./out/config.yaml
+
+ci: copy-config update-deps compile lint format vet test test-cov test-cov-report

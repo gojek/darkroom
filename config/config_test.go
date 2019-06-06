@@ -70,7 +70,7 @@ func TestConfigCasesWithFeatureToggle(t *testing.T) {
 		assert.Equal(t, viper.GetBool(c.key), c.callFunc())
 	}
 
-	assert.Equal(t, false, getFeature("nonexistingkey"))
+	assert.Equal(t, false, viper.GetBool("nonexistingkey"))
 }
 
 func TestConfigCasesWithIntValues(t *testing.T) {
@@ -92,5 +92,5 @@ func TestConfigCasesWithIntValues(t *testing.T) {
 		assert.Equal(t, viper.GetInt(c.key), c.callFunc())
 	}
 
-	assert.Equal(t, 0, getInt("nonexistingkey"))
+	assert.Equal(t, 0, viper.GetInt("nonexistingkey"))
 }

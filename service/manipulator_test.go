@@ -101,5 +101,3 @@ func (m *mockProcessor) GrayScale(input []byte) ([]byte, error) {
 	}
 	return args.Get(0).([]byte), args.Get(1).(error)
 }
-
-

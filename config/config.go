@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/afex/hystrix-go/hystrix"
+	"github.com/spf13/viper"
 	"***REMOVED***/darkroom/storage"
 	"sync"
 )
@@ -28,38 +29,38 @@ func getConfig() *config {
 
 func newConfig() *config {
 	initViper()
-	port := getInt("port")
+	port := viper.GetInt("port")
 	if port == 0 {
 		port = 3000 // Fallback to default port
 	}
 	return &config{
 		logger: loggerConfig{
-			level:  getString("log.level"),
-			format: getString("log.format"),
+			level:  viper.GetString("log.level"),
+			format: viper.GetString("log.format"),
 		},
 		appInfo: appInfo{
-			name:        getString("app.name"),
-			version:     getString("app.version"),
-			description: getString("app.description"),
+			name:        viper.GetString("app.name"),
+			version:     viper.GetString("app.version"),
+			description: viper.GetString("app.description"),
 		},
 		bucketInfo: bucketInfo{
-			name:       getString("bucket.name"),
-			region:     getString("bucket.region"),
-			accessKey:  getString("bucket.accessKey"),
-			secretKey:  getString("bucket.secretKey"),
-			pathPrefix: getString("bucket.pathPrefix"),
+			name:       viper.GetString("bucket.name"),
+			region:     viper.GetString("bucket.region"),
+			accessKey:  viper.GetString("bucket.accessKey"),
+			secretKey:  viper.GetString("bucket.secretKey"),
+			pathPrefix: viper.GetString("bucket.pathPrefix"),
 		},
-		debugMode: getFeature("debug"),
+		debugMode: viper.GetBool("debug"),
 		port:      port,
-		cacheTime: getInt("cache.time"),
+		cacheTime: viper.GetInt("cache.time"),
 		hystrixCmd: storage.HystrixCommand{
-			Name: getString("hystrix.command.name"),
+			Name: viper.GetString("hystrix.command.name"),
 			Config: hystrix.CommandConfig{
-				Timeout:                getInt("hystrix.config.timeout"),
-				MaxConcurrentRequests:  getInt("hystrix.config.maxConcurrentRequests"),
-				RequestVolumeThreshold: getInt("hystrix.config.requestVolumeThreshold"),
-				SleepWindow:            getInt("hystrix.config.sleepWindow"),
-				ErrorPercentThreshold:  getInt("hystrix.config.errorPercentThreshold"),
+				Timeout:                viper.GetInt("hystrix.config.timeout"),
+				MaxConcurrentRequests:  viper.GetInt("hystrix.config.maxConcurrentRequests"),
+				RequestVolumeThreshold: viper.GetInt("hystrix.config.requestVolumeThreshold"),
+				SleepWindow:            viper.GetInt("hystrix.config.sleepWindow"),
+				ErrorPercentThreshold:  viper.GetInt("hystrix.config.errorPercentThreshold"),
 			},
 		},
 	}

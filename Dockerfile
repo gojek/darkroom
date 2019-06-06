@@ -17,6 +17,6 @@ FROM alpine
 RUN apk update && apk add --no-cache ca-certificates
 COPY --from=builder /app/darkroom ./darkroom
 RUN chmod +x ./darkroom
-COPY ./application.yaml ./application.yaml
 ENV PORT 3000
 EXPOSE 3000
+ENTRYPOINT ["./darkroom"]

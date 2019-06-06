@@ -5,4 +5,4 @@
 out/
 
 # config files
-application.yaml
+config.yaml
