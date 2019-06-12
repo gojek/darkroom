@@ -1,4 +1,4 @@
-module ***REMOVED***/darkroom/server
+module ***REMOVED***/darkroom/core
 
 go 1.12
 
