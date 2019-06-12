@@ -4,7 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
-	"***REMOVED***/darkroom/server/config"
+	"***REMOVED***/darkroom/core/config"
 	"sync"
 )
 

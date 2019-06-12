@@ -3,11 +3,11 @@ package main
 import (
 	"github.com/urfave/cli"
 	"os"
-	"***REMOVED***/darkroom/server/config"
-	"***REMOVED***/darkroom/server/logger"
-	"***REMOVED***/darkroom/server/router"
-	"***REMOVED***/darkroom/server/server"
-	"***REMOVED***/darkroom/server/service"
+	"***REMOVED***/darkroom/core/config"
+	"***REMOVED***/darkroom/core/logger"
+	"***REMOVED***/darkroom/core/router"
+	"***REMOVED***/darkroom/core/server"
+	"***REMOVED***/darkroom/core/service"
 )
 
 func main() {

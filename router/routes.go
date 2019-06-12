@@ -4,9 +4,9 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/pprof"
-	"***REMOVED***/darkroom/server/config"
-	"***REMOVED***/darkroom/server/handler"
-	"***REMOVED***/darkroom/server/service"
+	"***REMOVED***/darkroom/core/config"
+	"***REMOVED***/darkroom/core/handler"
+	"***REMOVED***/darkroom/core/service"
 )
 
 func NewRouter(deps *service.Dependencies) *mux.Router {

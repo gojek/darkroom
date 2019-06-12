@@ -3,10 +3,10 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"***REMOVED***/darkroom/server/config"
-	"***REMOVED***/darkroom/server/constants"
-	"***REMOVED***/darkroom/server/logger"
-	"***REMOVED***/darkroom/server/service"
+	"***REMOVED***/darkroom/core/config"
+	"***REMOVED***/darkroom/core/constants"
+	"***REMOVED***/darkroom/core/logger"
+	"***REMOVED***/darkroom/core/service"
 )
 
 func ImageHandler(deps *service.Dependencies) http.HandlerFunc {

@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"net/http/httptest"
-	"***REMOVED***/darkroom/server/service"
+	"***REMOVED***/darkroom/core/service"
 	"***REMOVED***/darkroom/storage"
 	"testing"
 )

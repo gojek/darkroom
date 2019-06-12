@@ -2,7 +2,7 @@ package logger
 
 import (
 	"github.com/sirupsen/logrus"
-	"***REMOVED***/darkroom/server/config"
+	"***REMOVED***/darkroom/core/config"
 )
 
 func getLogLevel() logrus.Level {

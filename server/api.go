@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"***REMOVED***/darkroom/server/config"
-	"***REMOVED***/darkroom/server/logger"
+	"***REMOVED***/darkroom/core/config"
+	"***REMOVED***/darkroom/core/logger"
 	"syscall"
 )
 

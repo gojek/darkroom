@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/stretchr/testify/assert"
-	"***REMOVED***/darkroom/server/service"
+	"***REMOVED***/darkroom/core/service"
 	"testing"
 )
 

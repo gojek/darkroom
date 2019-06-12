@@ -1,8 +1,8 @@
 package service
 
 import (
+	"***REMOVED***/darkroom/core/config"
 	"***REMOVED***/darkroom/processor/native"
-	"***REMOVED***/darkroom/server/config"
 	base "***REMOVED***/darkroom/storage"
 	"***REMOVED***/darkroom/storage/s3"
 )
