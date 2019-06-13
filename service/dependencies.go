@@ -62,7 +62,7 @@ func NewCloudfrontStorage(c config.Cloudfront, hc base.HystrixCommand) *cloudfro
 
 func newHystrixClient(hc base.HystrixCommand) heimdall.Client {
 	return hystrix.NewClient(
-		hystrix.WithHTTPTimeout(time.Duration(hc.Config.Timeout)),
+		hystrix.WithHTTPTimeout(time.Duration(hc.Config.Timeout) * time.Millisecond),
 		hystrix.WithMaxConcurrentRequests(hc.Config.MaxConcurrentRequests),
 		hystrix.WithRequestVolumeThreshold(hc.Config.RequestVolumeThreshold),
 		hystrix.WithSleepWindow(hc.Config.SleepWindow),
