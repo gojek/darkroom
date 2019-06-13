@@ -39,6 +39,7 @@ func TestNewDependenciesWithS3Storage(t *testing.T) {
 func TestNewDependenciesWithCloudfrontStorage(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "Cloudfront")
+	v.Set("source.secureProtocol", "true")
 	config.Update()
 
 	deps := NewDependencies()

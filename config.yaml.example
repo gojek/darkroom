@@ -23,7 +23,7 @@ source:
     region: "region"
     accessKey: "randomAccessKey"
     secretKey: "superSecret"
-    pathPrefix: "/prefixPath/to/folder"
+  pathPrefix: "/prefixPath/to/folder"
 
 port: 3000
 

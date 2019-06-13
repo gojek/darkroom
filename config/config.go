@@ -43,6 +43,7 @@ func newConfig() *config {
 				SleepWindow:            v.GetInt("source.hystrix.sleepWindow"),
 				ErrorPercentThreshold:  v.GetInt("source.hystrix.errorPercentThreshold")},
 		},
+		PathPrefix: v.GetString("source.pathPrefix"),
 	}
 	s.readValue()
 

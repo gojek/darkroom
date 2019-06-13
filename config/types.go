@@ -17,11 +17,10 @@ type app struct {
 }
 
 type S3Bucket struct {
-	Name       string
-	Region     string
-	AccessKey  string
-	SecretKey  string
-	PathPrefix string
+	Name      string
+	Region    string
+	AccessKey string
+	SecretKey string
 }
 
 type WebFolder struct {
@@ -37,17 +36,17 @@ type source struct {
 	Kind           string
 	HystrixCommand storage.HystrixCommand
 	Value          interface{}
+	PathPrefix     string
 }
 
 func (s *source) readValue() {
 	v := Viper()
 	if constants.S3Matcher.MatchString(s.Kind) {
 		s.Value = S3Bucket{
-			Name:       v.GetString("source.bucket.name"),
-			Region:     v.GetString("source.bucket.region"),
-			AccessKey:  v.GetString("source.bucket.accessKey"),
-			SecretKey:  v.GetString("source.bucket.secretKey"),
-			PathPrefix: v.GetString("source.bucket.pathPrefix"),
+			Name:      v.GetString("source.bucket.name"),
+			Region:    v.GetString("source.bucket.region"),
+			AccessKey: v.GetString("source.bucket.accessKey"),
+			SecretKey: v.GetString("source.bucket.secretKey"),
 		}
 	} else if constants.CloudfrontMatcher.MatchString(s.Kind) {
 		s.Value = Cloudfront{

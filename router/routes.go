@@ -21,10 +21,10 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 
 	// Catch all handler
 	s := config.Source()
-	if constants.S3Matcher.MatchString(s.Kind) {
-		r.Methods(http.MethodGet).PathPrefix(
-			s.Value.(config.S3Bucket).PathPrefix,
-		).Handler(handler.ImageHandler(deps))
+	if (constants.S3Matcher.MatchString(s.Kind) ||
+		constants.CloudfrontMatcher.MatchString(s.Kind)) &&
+		s.PathPrefix != "" {
+		r.Methods(http.MethodGet).PathPrefix(s.PathPrefix).Handler(handler.ImageHandler(deps))
 	} else {
 		r.Methods(http.MethodGet).PathPrefix("/").Handler(handler.ImageHandler(deps))
 	}
