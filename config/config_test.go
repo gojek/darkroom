@@ -1,19 +1,18 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestConfigCases(t *testing.T) {
-	initViper()
+	v := Viper()
 	cases := []struct {
 		key      string
 		callFunc func() string
 	}{
 		{
-			key:      "app.name",
+			key:      "app.Name",
 			callFunc: AppName,
 		},
 		{
@@ -32,31 +31,15 @@ func TestConfigCases(t *testing.T) {
 			key:      "log.format",
 			callFunc: LogFormat,
 		},
-		{
-			key:      "bucket.name",
-			callFunc: BucketName,
-		},
-		{
-			key:      "bucket.accessKey",
-			callFunc: BucketAccessKey,
-		},
-		{
-			key:      "bucket.secretKey",
-			callFunc: BucketSecretKey,
-		},
-		{
-			key:      "bucket.pathPrefix",
-			callFunc: BucketPathPrefix,
-		},
 	}
 
 	for _, c := range cases {
-		assert.Equal(t, viper.GetString(c.key), c.callFunc())
+		assert.Equal(t, v.GetString(c.key), c.callFunc())
 	}
 }
 
 func TestConfigCasesWithFeatureToggle(t *testing.T) {
-	initViper()
+	v := Viper()
 	cases := []struct {
 		key      string
 		callFunc func() bool
@@ -67,14 +50,15 @@ func TestConfigCasesWithFeatureToggle(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		assert.Equal(t, viper.GetBool(c.key), c.callFunc())
+		assert.Equal(t, v.GetBool(c.key), c.callFunc())
 	}
 
-	assert.Equal(t, false, viper.GetBool("nonexistingkey"))
+	assert.Equal(t, false, v.GetBool("nonexistingkey"))
 }
 
 func TestConfigCasesWithIntValues(t *testing.T) {
-	initViper()
+	v := Viper()
+	v.Set("port", 3000)
 	cases := []struct {
 		key      string
 		callFunc func() int
@@ -89,8 +73,8 @@ func TestConfigCasesWithIntValues(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		assert.Equal(t, viper.GetInt(c.key), c.callFunc())
+		assert.Equal(t, v.GetInt(c.key), c.callFunc())
 	}
 
-	assert.Equal(t, 0, viper.GetInt("nonexistingkey"))
+	assert.Equal(t, 0, v.GetInt("nonexistingkey"))
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"***REMOVED***/darkroom/core/config"
+	"***REMOVED***/darkroom/core/constants"
 	"***REMOVED***/darkroom/core/handler"
 	"***REMOVED***/darkroom/core/service"
 )
@@ -19,8 +20,11 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 	}
 
 	// Catch all handler
-	if config.BucketPathPrefix() != "" {
-		r.Methods(http.MethodGet).PathPrefix(config.BucketPathPrefix()).Handler(handler.ImageHandler(deps))
+	s := config.Source()
+	if constants.S3Matcher.MatchString(s.Kind) {
+		r.Methods(http.MethodGet).PathPrefix(
+			s.Value.(config.S3Bucket).PathPrefix,
+		).Handler(handler.ImageHandler(deps))
 	} else {
 		r.Methods(http.MethodGet).PathPrefix("/").Handler(handler.ImageHandler(deps))
 	}

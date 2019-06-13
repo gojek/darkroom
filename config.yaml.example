@@ -9,24 +9,23 @@ app:
   version: "1.0.0"
   description: "A realtime image processing service"
 
-bucket:
-  name: "myAwesomeBucket"
-  region: "region"
-  accessKey: "randomAccessKey"
-  secretKey: "superSecret"
-  pathPrefix: "/prefixPath/to/folder"
-
-port: 3000
-
-cache:
-  time: 31536000    # One year
-
-hystrix:
-  command:
-    name: "S3_ADAPTER"
-  config:
+source:
+  type: "S3"
+  hystrix:
+    commandName: "S3_STORAGE"
     timeout: 5000
     maxConcurrentRequests: 100
     requestVolumeThreshold: 10
     sleepWindow: 10
     errorPercentThreshold: 25
+  bucket:
+    name: "myAwesomeBucket"
+    region: "region"
+    accessKey: "randomAccessKey"
+    secretKey: "superSecret"
+    pathPrefix: "/prefixPath/to/folder"
+
+port: 3000
+
+cache:
+  time: 31536000    # One year
