@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"net/http/pprof"
 	"***REMOVED***/darkroom/core/config"
@@ -11,6 +12,7 @@ import (
 )
 
 func NewRouter(deps *service.Dependencies) *mux.Router {
+	validateDependencies(deps)
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.Methods(http.MethodGet).Path("/ping").Handler(handler.Ping())
@@ -30,6 +32,12 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 	}
 
 	return r
+}
+
+func validateDependencies(deps *service.Dependencies) {
+	if deps.Storage == nil || deps.Manipulator == nil {
+		log.Fatal("handler dependencies are not valid")
+	}
 }
 
 func setDebugRoutes(r *mux.Router) {

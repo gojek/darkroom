@@ -10,7 +10,7 @@ app:
   description: "A realtime image processing service"
 
 source:
-  type: "S3"
+  kind: "S3"
   hystrix:
     commandName: "S3_STORAGE"
     timeout: 5000
