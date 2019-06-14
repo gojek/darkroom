@@ -6,7 +6,7 @@ import (
 
 	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/core/pkg/logger"
-	"***REMOVED***/darkroom/core/service"
+	"***REMOVED***/darkroom/core/pkg/service"
 )
 
 const (

@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"***REMOVED***/darkroom/core/pkg/config"
-	"***REMOVED***/darkroom/core/service"
+	"***REMOVED***/darkroom/core/pkg/service"
 	"***REMOVED***/darkroom/storage"
 )
 

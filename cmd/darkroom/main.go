@@ -8,7 +8,7 @@ import (
 	"***REMOVED***/darkroom/core/pkg/logger"
 	"***REMOVED***/darkroom/core/pkg/router"
 	"***REMOVED***/darkroom/core/pkg/server"
-	"***REMOVED***/darkroom/core/service"
+	"***REMOVED***/darkroom/core/pkg/service"
 )
 
 func main() {

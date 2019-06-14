@@ -3,14 +3,15 @@ package handler
 import (
 	"context"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"net/http"
-	"net/http/httptest"
-	"***REMOVED***/darkroom/core/service"
+	"***REMOVED***/darkroom/core/pkg/service"
 	"***REMOVED***/darkroom/storage"
-	"testing"
 )
 
 type ImageHandlerTestSuite struct {

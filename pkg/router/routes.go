@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"***REMOVED***/darkroom/core/internal/handler"
 	"***REMOVED***/darkroom/core/pkg/config"
-	"***REMOVED***/darkroom/core/service"
+	"***REMOVED***/darkroom/core/pkg/service"
 )
 
 func NewRouter(deps *service.Dependencies) *mux.Router {
