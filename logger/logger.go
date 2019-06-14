@@ -1,11 +1,12 @@
 package logger
 
 import (
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
-	"***REMOVED***/darkroom/core/config"
 	"sync"
+
+	"github.com/sirupsen/logrus"
+	"***REMOVED***/darkroom/core/pkg/config"
 )
 
 var instance *logrus.Logger

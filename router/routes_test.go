@@ -2,12 +2,13 @@ package router
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"net/http"
-	"***REMOVED***/darkroom/core/config"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/core/service"
 	"***REMOVED***/darkroom/storage"
-	"testing"
 )
 
 func TestNewRouter(t *testing.T) {

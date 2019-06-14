@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"***REMOVED***/darkroom/core/config"
-	"***REMOVED***/darkroom/core/logger"
 	"syscall"
+
+	"***REMOVED***/darkroom/core/logger"
+	"***REMOVED***/darkroom/core/pkg/config"
 )
 
 type Server struct {

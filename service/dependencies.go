@@ -5,7 +5,7 @@ import (
 
 	"github.com/gojektech/heimdall"
 	"github.com/gojektech/heimdall/hystrix"
-	"***REMOVED***/darkroom/core/config"
+	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/core/pkg/regex"
 	"***REMOVED***/darkroom/processor/native"
 	base "***REMOVED***/darkroom/storage"

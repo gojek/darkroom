@@ -8,8 +8,8 @@ import (
 	"***REMOVED***/darkroom/core/pkg/regex"
 
 	"github.com/gorilla/mux"
-	"***REMOVED***/darkroom/core/config"
 	"***REMOVED***/darkroom/core/handler"
+	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/core/service"
 )
 

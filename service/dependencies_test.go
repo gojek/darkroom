@@ -1,12 +1,13 @@
 package service
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
-	"***REMOVED***/darkroom/core/config"
+	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/storage/cloudfront"
 	"***REMOVED***/darkroom/storage/s3"
 	"***REMOVED***/darkroom/storage/webfolder"
-	"testing"
 )
 
 func TestNewDependencies(t *testing.T) {

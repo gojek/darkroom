@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"***REMOVED***/darkroom/core/config"
 	"***REMOVED***/darkroom/core/logger"
+	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/core/service"
 )
 

@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/urfave/cli"
 	"os"
-	"***REMOVED***/darkroom/core/config"
+
+	"github.com/urfave/cli"
 	"***REMOVED***/darkroom/core/logger"
-	"***REMOVED***/darkroom/core/router"
+	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/core/pkg/server"
+	"***REMOVED***/darkroom/core/router"
 	"***REMOVED***/darkroom/core/service"
 )
 
