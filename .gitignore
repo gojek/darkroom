@@ -3,6 +3,7 @@
 
 # binaries
 out/
+main
 
 # config files
 config.yaml
