@@ -3,10 +3,15 @@ package handler
 import (
 	"fmt"
 	"net/http"
+
 	"***REMOVED***/darkroom/core/config"
-	"***REMOVED***/darkroom/core/constants"
 	"***REMOVED***/darkroom/core/logger"
 	"***REMOVED***/darkroom/core/service"
+)
+
+const (
+	ContentLengthHeader = "Content-Length"
+	CacheControlHeader  = "Cache-Control"
 )
 
 func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
@@ -38,7 +43,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		}
 
 		cl, _ := w.Write([]byte(data))
-		w.Header().Set(constants.ContentLengthHeader, string(cl))
-		w.Header().Set(constants.CacheControlHeader, fmt.Sprintf("public,max-age=%d", config.CacheTime()))
+		w.Header().Set(ContentLengthHeader, string(cl))
+		w.Header().Set(CacheControlHeader, fmt.Sprintf("public,max-age=%d", config.CacheTime()))
 	}
 }

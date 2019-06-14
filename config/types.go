@@ -1,7 +1,7 @@
 package config
 
 import (
-	"***REMOVED***/darkroom/core/constants"
+	"***REMOVED***/darkroom/core/pkg/regex"
 	"***REMOVED***/darkroom/storage"
 )
 
@@ -41,19 +41,19 @@ type source struct {
 
 func (s *source) readValue() {
 	v := Viper()
-	if constants.S3Matcher.MatchString(s.Kind) {
+	if regex.S3Matcher.MatchString(s.Kind) {
 		s.Value = S3Bucket{
 			Name:      v.GetString("source.bucket.name"),
 			Region:    v.GetString("source.bucket.region"),
 			AccessKey: v.GetString("source.bucket.accessKey"),
 			SecretKey: v.GetString("source.bucket.secretKey"),
 		}
-	} else if constants.CloudfrontMatcher.MatchString(s.Kind) {
+	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
 		s.Value = Cloudfront{
 			Host:           v.GetString("source.host"),
 			SecureProtocol: v.GetBool("source.secureProtocol"),
 		}
-	} else if constants.WebFolderMatcher.MatchString(s.Kind) {
+	} else if regex.WebFolderMatcher.MatchString(s.Kind) {
 		s.Value = WebFolder{BaseURL: v.GetString("source.baseURL")}
 	}
 }

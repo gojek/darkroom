@@ -1,12 +1,14 @@
 package router
 
 import (
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"net/http/pprof"
+
+	"***REMOVED***/darkroom/core/pkg/regex"
+
+	"github.com/gorilla/mux"
 	"***REMOVED***/darkroom/core/config"
-	"***REMOVED***/darkroom/core/constants"
 	"***REMOVED***/darkroom/core/handler"
 	"***REMOVED***/darkroom/core/service"
 )
@@ -23,8 +25,8 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 
 	// Catch all handler
 	s := config.Source()
-	if (constants.S3Matcher.MatchString(s.Kind) ||
-		constants.CloudfrontMatcher.MatchString(s.Kind)) &&
+	if (regex.S3Matcher.MatchString(s.Kind) ||
+		regex.CloudfrontMatcher.MatchString(s.Kind)) &&
 		s.PathPrefix != "" {
 		r.Methods(http.MethodGet).PathPrefix(s.PathPrefix).Handler(handler.ImageHandler(deps))
 	} else {

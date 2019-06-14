@@ -6,7 +6,7 @@ import (
 	"***REMOVED***/darkroom/core/config"
 	"***REMOVED***/darkroom/core/logger"
 	"***REMOVED***/darkroom/core/router"
-	"***REMOVED***/darkroom/core/server"
+	"***REMOVED***/darkroom/core/pkg/server"
 	"***REMOVED***/darkroom/core/service"
 )
 

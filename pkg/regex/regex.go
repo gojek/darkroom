@@ -1,4 +1,4 @@
-package constants
+package regex
 
 import "regexp"
 

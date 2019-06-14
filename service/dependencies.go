@@ -1,16 +1,17 @@
 package service
 
 import (
+	"time"
+
 	"github.com/gojektech/heimdall"
 	"github.com/gojektech/heimdall/hystrix"
 	"***REMOVED***/darkroom/core/config"
-	"***REMOVED***/darkroom/core/constants"
+	"***REMOVED***/darkroom/core/pkg/regex"
 	"***REMOVED***/darkroom/processor/native"
 	base "***REMOVED***/darkroom/storage"
 	"***REMOVED***/darkroom/storage/cloudfront"
 	"***REMOVED***/darkroom/storage/s3"
 	"***REMOVED***/darkroom/storage/webfolder"
-	"time"
 )
 
 type Dependencies struct {
@@ -21,11 +22,11 @@ type Dependencies struct {
 func NewDependencies() *Dependencies {
 	s := config.Source()
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor())}
-	if constants.WebFolderMatcher.MatchString(s.Kind) {
+	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
-	} else if constants.S3Matcher.MatchString(s.Kind) {
+	} else if regex.S3Matcher.MatchString(s.Kind) {
 		deps.Storage = NewS3Storage(s.Value.(config.S3Bucket), s.HystrixCommand)
-	} else if constants.CloudfrontMatcher.MatchString(s.Kind) {
+	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
 		deps.Storage = NewCloudfrontStorage(s.Value.(config.Cloudfront), s.HystrixCommand)
 	}
 	return deps
@@ -62,7 +63,7 @@ func NewCloudfrontStorage(c config.Cloudfront, hc base.HystrixCommand) *cloudfro
 
 func newHystrixClient(hc base.HystrixCommand) heimdall.Client {
 	return hystrix.NewClient(
-		hystrix.WithHTTPTimeout(time.Duration(hc.Config.Timeout) * time.Millisecond),
+		hystrix.WithHTTPTimeout(time.Duration(hc.Config.Timeout)*time.Millisecond),
 		hystrix.WithMaxConcurrentRequests(hc.Config.MaxConcurrentRequests),
 		hystrix.WithRequestVolumeThreshold(hc.Config.RequestVolumeThreshold),
 		hystrix.WithSleepWindow(hc.Config.SleepWindow),
