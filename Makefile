@@ -14,7 +14,7 @@ setup:
 
 compile:
 	mkdir -p out
-	go build -o $(APP_EXECUTABLE)
+	go build -o $(APP_EXECUTABLE) ./cmd/darkroom/main.go
 
 lint: setup
 	golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
