@@ -21,6 +21,17 @@ func getLogger() *logrus.Logger {
 	return instance
 }
 
+func getLogLevel() logrus.Level {
+	if config.LogLevel() == "" {
+		return logrus.DebugLevel
+	}
+	level, err := logrus.ParseLevel(config.LogLevel())
+	if err != nil {
+		panic(err)
+	}
+	return level
+}
+
 func newLogger() *logrus.Logger {
 	logger := &logrus.Logger{
 		Out:   os.Stdout,

@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"***REMOVED***/darkroom/core/logger"
 	"***REMOVED***/darkroom/core/pkg/config"
+	"***REMOVED***/darkroom/core/pkg/logger"
 )
 
 type Server struct {
