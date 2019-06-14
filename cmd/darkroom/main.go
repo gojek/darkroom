@@ -6,8 +6,8 @@ import (
 	"github.com/urfave/cli"
 	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/core/pkg/logger"
+	"***REMOVED***/darkroom/core/pkg/router"
 	"***REMOVED***/darkroom/core/pkg/server"
-	"***REMOVED***/darkroom/core/router"
 	"***REMOVED***/darkroom/core/service"
 )
 
