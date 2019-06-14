@@ -3,11 +3,6 @@ APP_EXECUTABLE="./out/$(APP)"
 
 all: ci
 
-build-deps:
-	go install
-
-update-deps: build-deps
-
 setup:
 	go get -u golang.org/x/lint/golint
 	go get -u github.com/axw/gocov/gocov
@@ -38,6 +33,5 @@ test-cov-report:
 copy-config:
 	mkdir -p out
 	cp config.yaml.example config.yaml
-	cp config.yaml.example ./out/config.yaml
 
-ci: copy-config update-deps compile lint format vet test test-cov test-cov-report
+ci: copy-config compile lint format vet test test-cov test-cov-report
