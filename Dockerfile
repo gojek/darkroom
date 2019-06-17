@@ -10,7 +10,7 @@ RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa
 RUN chmod 400 /root/.ssh/id_rsa
 RUN touch /root/.ssh/known_hosts
 RUN ssh-keyscan ***REMOVED*** >> /root/.ssh/known_hosts
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o darkroom
+RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o darkroom cmd/darkroom/main.go
 RUN rm /root/.ssh/id_rsa
 
 FROM alpine
