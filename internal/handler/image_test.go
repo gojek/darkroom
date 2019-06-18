@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"***REMOVED***/darkroom/core/pkg/service"
-	"***REMOVED***/darkroom/storage"
+	"***REMOVED***/darkroom/core/pkg/storage"
 )
 
 type ImageHandlerTestSuite struct {

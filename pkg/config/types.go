@@ -2,7 +2,7 @@ package config
 
 import (
 	"***REMOVED***/darkroom/core/pkg/regex"
-	"***REMOVED***/darkroom/storage"
+	"***REMOVED***/darkroom/core/pkg/storage"
 )
 
 type loggerConfig struct {

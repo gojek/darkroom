@@ -3,7 +3,7 @@
 [![coverage report](https://***REMOVED***/darkroom/core/badges/master/coverage.svg)](https://***REMOVED***/darkroom/core/commits/master)
 
 #### About
-This project combines the darkroom [storage backend](https://***REMOVED***/darkroom/storage) and the [image processor](https://***REMOVED***/darkroom/processor) and acts as an `Image Proxy` on your image source.  
+This project combines the darkroom [storage backend](pkg/storage) and the [image processor](pkg/processor) and acts as an `Image Proxy` on your image source.  
 You may implement your own `Storage` and `Processor` interfaces to gain custom functionality while still keeping other Darkroom Server functionality.
 
 #### Installation
@@ -40,7 +40,7 @@ SOURCE_HYSTRIX_ERRORPERCENTTHRESHOLD=25
 ```
 Build the docker image and run it with the config created.
 ```bash
-docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t ${USER}/darkroom:latest .
+docker build -t ${USER}/darkroom:latest .
 docker run -p 80:3000 --env-file ./config.env ${USER}/darkroom:latest
 ```
 

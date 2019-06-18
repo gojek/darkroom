@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"***REMOVED***/darkroom/core/pkg/config"
-	"***REMOVED***/darkroom/storage/cloudfront"
-	"***REMOVED***/darkroom/storage/s3"
-	"***REMOVED***/darkroom/storage/webfolder"
+	"***REMOVED***/darkroom/core/pkg/storage/aws/cloudfront"
+	"***REMOVED***/darkroom/core/pkg/storage/aws/s3"
+	"***REMOVED***/darkroom/core/pkg/storage/webfolder"
 )
 
 func TestNewDependencies(t *testing.T) {

@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/afex/hystrix-go/hystrix"
-	"***REMOVED***/darkroom/storage"
+	"***REMOVED***/darkroom/core/pkg/storage"
 	"sync"
 )
 

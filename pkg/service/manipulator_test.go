@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"***REMOVED***/darkroom/processor"
-	"***REMOVED***/darkroom/processor/native"
+	"***REMOVED***/darkroom/core/pkg/processor"
+	"***REMOVED***/darkroom/core/pkg/processor/native"
 	"testing"
 )
 

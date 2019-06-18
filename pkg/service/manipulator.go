@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"***REMOVED***/darkroom/processor"
+	"***REMOVED***/darkroom/core/pkg/processor"
 	"strconv"
 )
 
