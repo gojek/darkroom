@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"github.com/cactus/go-statsd-client/statsd"
+	"time"
 )
 
 type StatsdCollectorClient struct {
@@ -17,12 +18,19 @@ type StatsdCollectorConfig struct {
 	Prefix string
 	// StatsdSampleRate sets statsd sampling. If 0, defaults to 1.0. (no sampling)
 	SampleRate float32
+	// FlushBytes sets message size for statsd packets.
+	FlushBytes int
 }
 
 func InitializeStatsdCollector(config *StatsdCollectorConfig) (*StatsdCollectorClient, error) {
+	flushBytes := config.FlushBytes
+
 	sampleRate := config.SampleRate
 	if sampleRate == 0 {
 		sampleRate = 1
 	}
-	return &StatsdCollectorClient{sampleRate: sampleRate}, nil
+
+	c, _ := statsd.NewBufferedClient(config.StatsdAddr, config.Prefix, 1*time.Second, flushBytes)
+
+	return &StatsdCollectorClient{client: c, sampleRate: sampleRate}, nil
 }

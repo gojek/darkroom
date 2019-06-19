@@ -22,6 +22,12 @@ func TestInitializeStatsdCollector(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, scc)
 	assert.Equal(t, float32(1), scc.sampleRate)
+
+	// Test Statter client
+	scc, err = InitializeStatsdCollector(&StatsdCollectorConfig{})
+	assert.Nil(t, err)
+	assert.NotNil(t, scc)
+	assert.NotNil(t, scc.client)
 }
 
 type mockStatsdClient struct {
