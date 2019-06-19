@@ -7,6 +7,7 @@ require (
 	github.com/anthonynsimon/bild v0.10.0
 	github.com/aws/aws-sdk-go v1.20.0
 	github.com/axw/gocov v0.0.0-20170322000131-3a69a0d2a4ef // indirect
+	github.com/cactus/go-statsd-client/statsd v0.0.0-20190501063751-9a7692639588
 	github.com/gojektech/heimdall v5.0.2+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20190430165422-3e4dfb77656c // indirect
 	github.com/gorilla/mux v1.7.2
