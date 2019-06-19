@@ -1,6 +1,5 @@
 package plugins
 
-
 import (
 	"github.com/cactus/go-statsd-client/statsd"
 )
@@ -21,5 +20,6 @@ type StatsdCollectorConfig struct {
 }
 
 func InitializeStatsdCollector(config *StatsdCollectorConfig) (*StatsdCollectorClient, error) {
-	return &StatsdCollectorClient{}, nil
+	sampleRate := config.SampleRate
+	return &StatsdCollectorClient{sampleRate: sampleRate}, nil
 }
