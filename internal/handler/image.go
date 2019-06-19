@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"***REMOVED***/darkroom/core/pkg/metrics"
 
 	"***REMOVED***/darkroom/core/pkg/config"
 	"***REMOVED***/darkroom/core/pkg/logger"
@@ -12,6 +13,8 @@ import (
 const (
 	ContentLengthHeader = "Content-Length"
 	CacheControlHeader  = "Cache-Control"
+	StorageGetErrorKey  = "handler.storage.get.error"
+	ProcessorErrorKey   = "handler.processor.error"
 )
 
 func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
@@ -19,6 +22,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		res := deps.Storage.Get(r.Context(), r.URL.Path)
 		if res.Error() != nil {
 			logger.Errorf("error: %s", res.Error())
+			metrics.Update(metrics.UpdateOption{Name: StorageGetErrorKey, Type: metrics.Counter})
 			w.WriteHeader(res.Status())
 			return
 		}
@@ -37,6 +41,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 			data, err = deps.Manipulator.Process(r.Context(), data, params)
 			if err != nil {
 				logger.Errorf("error: %s", res.Error())
+				metrics.Update(metrics.UpdateOption{Name: ProcessorErrorKey, Type: metrics.Counter})
 				w.WriteHeader(http.StatusUnprocessableEntity)
 				return
 			}
