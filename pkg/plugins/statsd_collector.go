@@ -41,6 +41,6 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) (*StatsdCollectorC
 	}
 
 	c, _ := statsd.NewBufferedClient(config.StatsdAddr, config.Prefix, 1*time.Second, flushBytes)
-
+	// TODO Add logger for error
 	return &StatsdCollectorClient{client: c, sampleRate: sampleRate}, nil
 }
