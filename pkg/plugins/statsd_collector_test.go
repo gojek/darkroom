@@ -24,7 +24,7 @@ func TestInitializeStatsdCollector(t *testing.T) {
 	assert.Equal(t, float32(1), scc.sampleRate)
 
 	// Test Statter client
-	scc, err = InitializeStatsdCollector(&StatsdCollectorConfig{})
+	scc, err = InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0})
 	assert.Nil(t, err)
 	assert.NotNil(t, scc)
 	assert.NotNil(t, scc.client)
