@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"github.com/cactus/go-statsd-client/statsd"
+	"***REMOVED***/darkroom/core/pkg/plugins/metrics"
 	"time"
 )
 
@@ -11,6 +12,19 @@ const (
 	LANStatsdFlushBytes     = 1432
 	GigabitStatsdFlushBytes = 8932
 )
+
+type StatsdCollector struct {
+	client             statsd.Statter
+	processingDuration string
+	downloadDuration   string
+	totalDuration      string
+	readDuration       string
+	writeDuration      string
+	cropDuration       string
+	resizeDuration     string
+	monoDuration       string
+	sampleRate         float32
+}
 
 type StatsdCollectorClient struct {
 	client     statsd.Statter
@@ -43,4 +57,29 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) *StatsdCollectorCl
 	c, _ := statsd.NewBufferedClient(config.StatsdAddr, config.Prefix, 1*time.Second, flushBytes)
 	// TODO Add logger for error
 	return &StatsdCollectorClient{client: c, sampleRate: sampleRate}
+}
+
+// NewStatsdMetricCollector creates a collector with specific name. The
+// prefix given to these stats will be {config.Prefix}.{name}.{metric}.
+func (s *StatsdCollectorClient) NewStatsdMetricCollector(name string) metrics.MetricCollector {
+	return &StatsdCollector{
+		client:             s.client,
+		processingDuration: name + ".processingDuration",
+		downloadDuration:   name + ".downloadDuration",
+		totalDuration:      name + ".totalDuration",
+		readDuration:       name + ".readDuration",
+		writeDuration:      name + ".writeDuration",
+		cropDuration:       name + ".cropDuration",
+		resizeDuration:     name + ".resizeDuration",
+		monoDuration:       name + ".monoDuration",
+		sampleRate:         s.sampleRate,
+	}
+}
+
+func (sc *StatsdCollector) Update(metrics.MetricResult) {
+	// TODO ("implement me")
+}
+
+func (sc *StatsdCollector) Reset() {
+	// TODO ("implement me")
 }

@@ -26,6 +26,12 @@ func TestInitializeStatsdCollector(t *testing.T) {
 	assert.NotNil(t, scc.client)
 }
 
+func TestNewStatsdMetricCollector(t *testing.T) {
+	scc := InitializeStatsdCollector(&StatsdCollectorConfig{Prefix: "darkroom"})
+	mc := scc.NewStatsdMetricCollector("app-name")
+	assert.NotNil(t, mc)
+}
+
 type mockStatsdClient struct {
 }
 
