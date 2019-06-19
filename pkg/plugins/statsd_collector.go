@@ -21,5 +21,8 @@ type StatsdCollectorConfig struct {
 
 func InitializeStatsdCollector(config *StatsdCollectorConfig) (*StatsdCollectorClient, error) {
 	sampleRate := config.SampleRate
+	if sampleRate == 0 {
+		sampleRate = 1
+	}
 	return &StatsdCollectorClient{sampleRate: sampleRate}, nil
 }

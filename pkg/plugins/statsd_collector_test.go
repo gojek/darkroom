@@ -17,6 +17,11 @@ func TestInitializeStatsdCollector(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, scc)
 	assert.Equal(t, float32(5), scc.sampleRate)
+
+	scc, err = InitializeStatsdCollector(&StatsdCollectorConfig{})
+	assert.Nil(t, err)
+	assert.NotNil(t, scc)
+	assert.Equal(t, float32(1), scc.sampleRate)
 }
 
 type mockStatsdClient struct {
