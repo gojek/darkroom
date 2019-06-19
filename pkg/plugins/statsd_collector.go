@@ -29,7 +29,7 @@ type StatsdCollectorConfig struct {
 	FlushBytes int
 }
 
-func InitializeStatsdCollector(config *StatsdCollectorConfig) (*StatsdCollectorClient, error) {
+func InitializeStatsdCollector(config *StatsdCollectorConfig) *StatsdCollectorClient {
 	flushBytes := config.FlushBytes
 	if flushBytes == 0 {
 		flushBytes = LANStatsdFlushBytes
@@ -42,5 +42,5 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) (*StatsdCollectorC
 
 	c, _ := statsd.NewBufferedClient(config.StatsdAddr, config.Prefix, 1*time.Second, flushBytes)
 	// TODO Add logger for error
-	return &StatsdCollectorClient{client: c, sampleRate: sampleRate}, nil
+	return &StatsdCollectorClient{client: c, sampleRate: sampleRate}
 }

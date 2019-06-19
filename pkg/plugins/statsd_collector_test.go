@@ -8,24 +8,20 @@ import (
 )
 
 func TestInitializeStatsdCollector(t *testing.T) {
-	scc, err := InitializeStatsdCollector(&StatsdCollectorConfig{})
-	assert.Nil(t, err)
+	scc := InitializeStatsdCollector(&StatsdCollectorConfig{})
 	assert.NotNil(t, scc)
 
 	// Test sampleRate
-	scc, err = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5})
-	assert.Nil(t, err)
+	scc = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5})
 	assert.NotNil(t, scc)
 	assert.Equal(t, float32(5), scc.sampleRate)
 
-	scc, err = InitializeStatsdCollector(&StatsdCollectorConfig{})
-	assert.Nil(t, err)
+	scc = InitializeStatsdCollector(&StatsdCollectorConfig{})
 	assert.NotNil(t, scc)
 	assert.Equal(t, float32(1), scc.sampleRate)
 
 	// Test Statter client
-	scc, err = InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0})
-	assert.Nil(t, err)
+	scc = InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0})
 	assert.NotNil(t, scc)
 	assert.NotNil(t, scc.client)
 }
