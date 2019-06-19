@@ -3,36 +3,56 @@ package metrics
 import (
 	"github.com/cactus/go-statsd-client/statsd"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
 )
 
 func TestInitializeStatsdCollector(t *testing.T) {
-	scc := InitializeStatsdCollector(&StatsdCollectorConfig{})
-	assert.NotNil(t, scc)
+	// Test Statter client
+	err := InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0}, "app-name")
+	assert.Nil(t, err)
+	assert.NotNil(t, instance)
+	assert.NotNil(t, instance.client)
 
 	// Test sampleRate
-	scc = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5})
-	assert.NotNil(t, scc)
-	assert.Equal(t, float32(5), scc.sampleRate)
+	err = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5}, "app-name")
+	assert.Nil(t, err)
+	assert.Equal(t, float32(5), instance.sampleRate)
 
-	scc = InitializeStatsdCollector(&StatsdCollectorConfig{})
-	assert.NotNil(t, scc)
-	assert.Equal(t, float32(1), scc.sampleRate)
-
-	// Test Statter client
-	scc = InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0})
-	assert.NotNil(t, scc)
-	assert.NotNil(t, scc.client)
+	err = InitializeStatsdCollector(&StatsdCollectorConfig{}, "app-name")
+	assert.Nil(t, err)
+	assert.Equal(t, float32(1), instance.sampleRate)
 }
 
-func TestNewStatsdMetricCollector(t *testing.T) {
-	scc := InitializeStatsdCollector(&StatsdCollectorConfig{Prefix: "darkroom"})
-	mc := scc.NewStatsdMetricCollector("app-name")
-	assert.NotNil(t, mc)
+func TestUpdate(t *testing.T) {
+	// Test when instance is nil
+	instance = nil
+	Update(UpdateOption{})
+
+	_ = InitializeStatsdCollector(&StatsdCollectorConfig{}, "app-name")
+
+	mc := &mockStatsdClient{}
+	instance.client = mc
+
+	now := time.Now()
+	mc.On("TimingDuration",
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("time.Duration"),
+		mock.AnythingOfType("float32")).Return(nil)
+	Update(UpdateOption{Type: Duration, Duration: time.Since(now)})
+
+	mc.On("Gauge",
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("int64"),
+		mock.AnythingOfType("float32")).Return(nil)
+	Update(UpdateOption{Type: Guage, NumValue: 500})
+
+	mc.AssertExpectations(t)
 }
 
 type mockStatsdClient struct {
+	mock.Mock
 }
 
 func (msc *mockStatsdClient) Inc(string, int64, float32) error {
@@ -43,8 +63,9 @@ func (msc *mockStatsdClient) Dec(string, int64, float32) error {
 	panic("implement me")
 }
 
-func (msc *mockStatsdClient) Gauge(string, int64, float32) error {
-	panic("implement me")
+func (msc *mockStatsdClient) Gauge(str string, i int64, sr float32) error {
+	args := msc.Called(str, i, sr)
+	return args.Error(0)
 }
 
 func (msc *mockStatsdClient) GaugeDelta(string, int64, float32) error {
@@ -55,8 +76,9 @@ func (msc *mockStatsdClient) Timing(string, int64, float32) error {
 	panic("implement me")
 }
 
-func (msc *mockStatsdClient) TimingDuration(string, time.Duration, float32) error {
-	panic("implement me")
+func (msc *mockStatsdClient) TimingDuration(str string, t time.Duration, sr float32) error {
+	args := msc.Called(str, t, sr)
+	return args.Error(0)
 }
 
 func (msc *mockStatsdClient) Set(string, string, float32) error {

@@ -1,7 +1,9 @@
 package metrics
 
 import (
+	"fmt"
 	"github.com/cactus/go-statsd-client/statsd"
+	"***REMOVED***/darkroom/core/pkg/logger"
 	"time"
 )
 
@@ -12,22 +14,12 @@ const (
 	GigabitStatsdFlushBytes = 8932
 )
 
-type StatsdCollector struct {
-	client             statsd.Statter
-	processingDuration string
-	downloadDuration   string
-	totalDuration      string
-	readDuration       string
-	writeDuration      string
-	cropDuration       string
-	resizeDuration     string
-	monoDuration       string
-	sampleRate         float32
-}
+var instance *statsdClient
 
-type StatsdCollectorClient struct {
-	client     statsd.Statter
-	sampleRate float32
+type statsdClient struct {
+	client        statsd.Statter
+	collectorName string
+	sampleRate    float32
 }
 
 // StatsdCollectorConfig provides configuration that the Statsd client will need.
@@ -42,7 +34,8 @@ type StatsdCollectorConfig struct {
 	FlushBytes int
 }
 
-func InitializeStatsdCollector(config *StatsdCollectorConfig) *StatsdCollectorClient {
+// InitializeStatsdCollector will start publishing metrics in the form {config.Prefix}.{name}.{updateOption.Name}
+func InitializeStatsdCollector(config *StatsdCollectorConfig, name string) error {
 	flushBytes := config.FlushBytes
 	if flushBytes == 0 {
 		flushBytes = LANStatsdFlushBytes
@@ -55,30 +48,25 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) *StatsdCollectorCl
 
 	c, _ := statsd.NewBufferedClient(config.StatsdAddr, config.Prefix, 1*time.Second, flushBytes)
 	// TODO Add logger for error
-	return &StatsdCollectorClient{client: c, sampleRate: sampleRate}
+	instance = &statsdClient{client: c, collectorName: name, sampleRate: sampleRate}
+	return nil
 }
 
-// NewStatsdMetricCollector creates a collector with specific name. The
-// prefix given to these stats will be {config.Prefix}.{name}.{metric}.
-func (s *StatsdCollectorClient) NewStatsdMetricCollector(name string) MetricCollector {
-	return &StatsdCollector{
-		client:             s.client,
-		processingDuration: name + ".processingDuration",
-		downloadDuration:   name + ".downloadDuration",
-		totalDuration:      name + ".totalDuration",
-		readDuration:       name + ".readDuration",
-		writeDuration:      name + ".writeDuration",
-		cropDuration:       name + ".cropDuration",
-		resizeDuration:     name + ".resizeDuration",
-		monoDuration:       name + ".monoDuration",
-		sampleRate:         s.sampleRate,
+var formatter = func(on string) string {
+	return fmt.Sprintf("%s.%s", instance.collectorName, on)
+}
+
+func Update(updateOption UpdateOption) {
+	if instance == nil {
+		return
 	}
-}
-
-func (sc *StatsdCollector) Update(MetricResult) {
-	// TODO ("implement me")
-}
-
-func (sc *StatsdCollector) Reset() {
-	// TODO ("implement me")
+	var err error
+	switch updateOption.Type {
+	case Duration:
+		err = instance.client.TimingDuration(formatter(updateOption.Name), updateOption.Duration, instance.sampleRate)
+		break
+	case Guage:
+		err = instance.client.Gauge(formatter(updateOption.Name), int64(updateOption.NumValue), instance.sampleRate)
+	}
+	logger.Error(err)
 }
