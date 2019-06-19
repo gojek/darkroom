@@ -1,6 +1,22 @@
 package metrics
 
-import "time"
+import (
+	"sync"
+	"time"
+)
+
+type metricCollectorRegistry struct {
+	lock     *sync.RWMutex
+	registry []func(name string) MetricCollector
+}
+
+// Register places a MetricCollector Initializer in the registry maintained by this metricCollectorRegistry.
+func (m *metricCollectorRegistry) Register(initMetricCollector func(string) MetricCollector) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	m.registry = append(m.registry, initMetricCollector)
+}
 
 type MetricResult struct {
 	ProcessingDuration time.Duration

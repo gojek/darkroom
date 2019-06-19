@@ -1,8 +1,7 @@
-package plugins
+package metrics
 
 import (
 	"github.com/cactus/go-statsd-client/statsd"
-	"***REMOVED***/darkroom/core/pkg/plugins/metrics"
 	"time"
 )
 
@@ -61,7 +60,7 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) *StatsdCollectorCl
 
 // NewStatsdMetricCollector creates a collector with specific name. The
 // prefix given to these stats will be {config.Prefix}.{name}.{metric}.
-func (s *StatsdCollectorClient) NewStatsdMetricCollector(name string) metrics.MetricCollector {
+func (s *StatsdCollectorClient) NewStatsdMetricCollector(name string) MetricCollector {
 	return &StatsdCollector{
 		client:             s.client,
 		processingDuration: name + ".processingDuration",
@@ -76,7 +75,7 @@ func (s *StatsdCollectorClient) NewStatsdMetricCollector(name string) metrics.Me
 	}
 }
 
-func (sc *StatsdCollector) Update(metrics.MetricResult) {
+func (sc *StatsdCollector) Update(MetricResult) {
 	// TODO ("implement me")
 }
 

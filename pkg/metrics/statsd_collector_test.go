@@ -1,4 +1,4 @@
-package plugins
+package metrics
 
 import (
 	"github.com/cactus/go-statsd-client/statsd"
