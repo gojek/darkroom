@@ -68,5 +68,7 @@ func Update(updateOption UpdateOption) {
 	case Guage:
 		err = instance.client.Gauge(formatter(updateOption.Name), int64(updateOption.NumValue), instance.sampleRate)
 	}
-	logger.Error(err)
+	if err != nil {
+		logger.Error(err)
+	}
 }

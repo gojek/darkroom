@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"errors"
 	"github.com/cactus/go-statsd-client/statsd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -42,11 +43,12 @@ func TestUpdate(t *testing.T) {
 		mock.AnythingOfType("float32")).Return(nil)
 	Update(UpdateOption{Type: Duration, Duration: time.Since(now)})
 
+	// error case
 	mc.On("Gauge",
 		mock.AnythingOfType("string"),
 		mock.AnythingOfType("int64"),
-		mock.AnythingOfType("float32")).Return(nil)
-	Update(UpdateOption{Type: Guage, NumValue: 500})
+		mock.AnythingOfType("float32")).Return(errors.New("error"))
+	Update(UpdateOption{Type: Guage, NumValue: -500})
 
 	mc.AssertExpectations(t)
 }
@@ -65,6 +67,9 @@ func (msc *mockStatsdClient) Dec(string, int64, float32) error {
 
 func (msc *mockStatsdClient) Gauge(str string, i int64, sr float32) error {
 	args := msc.Called(str, i, sr)
+	if args.Get(0) != nil {
+		return args.Get(0).(error)
+	}
 	return args.Error(0)
 }
 
