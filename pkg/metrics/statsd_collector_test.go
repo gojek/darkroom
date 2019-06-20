@@ -48,7 +48,7 @@ func TestUpdate(t *testing.T) {
 		mock.AnythingOfType("string"),
 		mock.AnythingOfType("int64"),
 		mock.AnythingOfType("float32")).Return(errors.New("error"))
-	Update(UpdateOption{Type: Guage, NumValue: -500})
+	Update(UpdateOption{Type: Gauge, NumValue: -500})
 
 	mc.AssertExpectations(t)
 }

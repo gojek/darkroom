@@ -65,7 +65,7 @@ func Update(updateOption UpdateOption) {
 	case Duration:
 		err = instance.client.TimingDuration(formatter(updateOption.Name), updateOption.Duration, instance.sampleRate)
 		break
-	case Guage:
+	case Gauge:
 		err = instance.client.Gauge(formatter(updateOption.Name), int64(updateOption.NumValue), instance.sampleRate)
 	}
 	if err != nil {

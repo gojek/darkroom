@@ -6,7 +6,7 @@ type Type int
 
 const (
 	Duration Type = 0
-	Guage    Type = 1
+	Gauge    Type = 1
 	Counter  Type = 2
 )
 
