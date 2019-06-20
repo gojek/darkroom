@@ -43,6 +43,12 @@ func TestUpdate(t *testing.T) {
 		mock.AnythingOfType("float32")).Return(nil)
 	Update(UpdateOption{Type: Duration, Duration: time.Since(now)})
 
+	mc.On("Inc",
+		mock.AnythingOfType("string"),
+		mock.AnythingOfType("int64"),
+		mock.AnythingOfType("float32")).Return(nil)
+	Update(UpdateOption{Type: Count})
+
 	// error case
 	mc.On("Gauge",
 		mock.AnythingOfType("string"),
@@ -57,8 +63,9 @@ type mockStatsdClient struct {
 	mock.Mock
 }
 
-func (msc *mockStatsdClient) Inc(string, int64, float32) error {
-	panic("implement me")
+func (msc *mockStatsdClient) Inc(str string, i int64, sr float32) error {
+	args := msc.Called(str, i, sr)
+	return args.Error(0)
 }
 
 func (msc *mockStatsdClient) Dec(string, int64, float32) error {
