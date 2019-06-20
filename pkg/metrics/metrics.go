@@ -7,7 +7,7 @@ type Type int
 const (
 	Duration Type = 0
 	Gauge    Type = 1
-	Counter  Type = 2
+	Count    Type = 2
 )
 
 type UpdateOption struct {
