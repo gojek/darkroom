@@ -55,7 +55,7 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig, collectorName stri
 	return nil
 }
 
-var formatter = func(on string) string {
+func formatter(on string) string {
 	return fmt.Sprintf("%s.%s", instance.collectorName, on)
 }
 
@@ -70,6 +70,10 @@ func Update(updateOption UpdateOption) {
 		break
 	case Gauge:
 		err = instance.client.Gauge(formatter(updateOption.Name), int64(updateOption.NumValue), instance.sampleRate)
+		break
+	case Count:
+		err = instance.client.Inc(formatter(updateOption.Name), 1, instance.sampleRate)
+		break
 	}
 	if err != nil {
 		logger.Error(err)
