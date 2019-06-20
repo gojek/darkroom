@@ -35,7 +35,7 @@ type StatsdCollectorConfig struct {
 }
 
 // InitializeStatsdCollector will start publishing metrics in the form {config.Prefix}.{name}.{updateOption.Name}
-func InitializeStatsdCollector(config *StatsdCollectorConfig, name string) error {
+func InitializeStatsdCollector(config *StatsdCollectorConfig, collectorName string) error {
 	flushBytes := config.FlushBytes
 	if flushBytes == 0 {
 		flushBytes = LANStatsdFlushBytes
@@ -48,7 +48,7 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig, name string) error
 
 	c, _ := statsd.NewBufferedClient(config.StatsdAddr, config.Prefix, 1*time.Second, flushBytes)
 	// TODO Add logger for error
-	instance = &statsdClient{client: c, collectorName: name, sampleRate: sampleRate}
+	instance = &statsdClient{client: c, collectorName: collectorName, sampleRate: sampleRate}
 	return nil
 }
 
