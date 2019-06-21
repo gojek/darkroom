@@ -76,6 +76,6 @@ func Update(updateOption UpdateOption) {
 		break
 	}
 	if err != nil {
-		logger.Error(err)
+		logger.Errorf("metrics.Update got an error: %s", err)
 	}
 }

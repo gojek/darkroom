@@ -7,7 +7,7 @@ import (
 )
 
 type config struct {
-	logger    loggerConfig
+	logLevel  string
 	app       app
 	debugMode bool
 	port      int
@@ -48,10 +48,7 @@ func newConfig() *config {
 	s.readValue()
 
 	return &config{
-		logger: loggerConfig{
-			level:  v.GetString("log.level"),
-			format: v.GetString("log.format"),
-		},
+		logLevel: v.GetString("log.level"),
 		app: app{
 			name:        v.GetString("app.Name"),
 			version:     v.GetString("app.version"),
@@ -69,11 +66,7 @@ func Update() {
 }
 
 func LogLevel() string {
-	return getConfig().logger.level
-}
-
-func LogFormat() string {
-	return getConfig().logger.format
+	return getConfig().logLevel
 }
 
 func AppName() string {

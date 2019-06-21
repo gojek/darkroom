@@ -6,3 +6,6 @@ out/
 
 # config files
 config.yaml
+
+coverage.json
+config.env

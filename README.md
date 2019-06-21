@@ -14,7 +14,6 @@ Create a file containing the environment variables mentioned in [`config.yaml.ex
 ```bash
 DEBUG=true
 LOG_LEVEL=debug
-LOG_FORMAT=json
 
 APP_NAME=darkroom
 APP_VERSION=0.0.1

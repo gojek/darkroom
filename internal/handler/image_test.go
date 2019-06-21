@@ -93,10 +93,7 @@ type mockManipulator struct {
 
 func (m *mockManipulator) Process(ctx context.Context, data []byte, params map[string]string) ([]byte, error) {
 	args := m.Called(ctx, data, params)
-	if args.Get(1) == nil {
-		return args.Get(0).([]byte), nil
-	}
-	return args.Get(0).([]byte), args.Get(1).(error)
+	return args.Get(0).([]byte), args.Error(1)
 }
 
 type mockStorage struct {

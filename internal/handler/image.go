@@ -19,9 +19,10 @@ const (
 
 func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		l := logger.SugaredWithRequest(r)
 		res := deps.Storage.Get(r.Context(), r.URL.Path)
 		if res.Error() != nil {
-			logger.Errorf("error: %s", res.Error())
+			l.Errorf("error from Storage.Get: %s", res.Error())
 			metrics.Update(metrics.UpdateOption{Name: StorageGetErrorKey, Type: metrics.Count})
 			w.WriteHeader(res.Status())
 			return
@@ -40,7 +41,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 			}
 			data, err = deps.Manipulator.Process(r.Context(), data, params)
 			if err != nil {
-				logger.Errorf("error: %s", res.Error())
+				l.Errorf("error from Manipulator.Process: %s", err)
 				metrics.Update(metrics.UpdateOption{Name: ProcessorErrorKey, Type: metrics.Count})
 				w.WriteHeader(http.StatusUnprocessableEntity)
 				return

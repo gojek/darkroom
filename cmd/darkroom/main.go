@@ -30,6 +30,7 @@ func main() {
 	}
 
 	if err := a.Run(os.Args); err != nil {
+		logger.Errorf("got an error while running main with error: %s", err)
 		panic(err)
 	}
 }

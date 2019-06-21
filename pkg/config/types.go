@@ -5,11 +5,6 @@ import (
 	"***REMOVED***/darkroom/core/pkg/storage"
 )
 
-type loggerConfig struct {
-	level  string
-	format string
-}
-
 type app struct {
 	name        string
 	version     string

@@ -1,152 +1,133 @@
 package logger
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/sirupsen/logrus/hooks/test"
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"net/http"
 	"testing"
 )
 
+func makeLogsStorageHooks() (func(zapcore.Entry) error, **[]zapcore.Entry) {
+	var pointerToStorage *[]zapcore.Entry
+	initialStorage := make([]zapcore.Entry, 0)
+	pointerToStorage = &initialStorage
+	return func(entry zapcore.Entry) error {
+		newStorage := append(*pointerToStorage, entry)
+		pointerToStorage = &newStorage
+		return nil
+	}, &pointerToStorage
+}
+
 func TestLogger(t *testing.T) {
-	hook := test.NewLocal(getLogger())
+	hook, ptr := makeLogsStorageHooks()
 	AddHook(hook)
 
 	cases := []struct {
 		message  string
-		level    logrus.Level
-		callFunc func(args ...interface{})
+		level    zapcore.Level
+		callFunc func(message string, fields ...zap.Field)
 	}{
 		{
 			message:  "warning message",
-			level:    logrus.WarnLevel,
+			level:    zap.WarnLevel,
 			callFunc: Warn,
 		},
 		{
-			message:  "warning message in new line",
-			level:    logrus.WarnLevel,
-			callFunc: Warnln,
-		},
-		{
 			message:  "debug message",
-			level:    logrus.DebugLevel,
+			level:    zap.DebugLevel,
 			callFunc: Debug,
 		},
 		{
-			message:  "debug message in new line",
-			level:    logrus.DebugLevel,
-			callFunc: Debugln,
-		},
-		{
 			message:  "error message",
-			level:    logrus.ErrorLevel,
+			level:    zap.ErrorLevel,
 			callFunc: Error,
 		},
 		{
-			message:  "debug message in new line",
-			level:    logrus.ErrorLevel,
-			callFunc: Errorln,
-		},
-		{
 			message:  "info message",
-			level:    logrus.InfoLevel,
+			level:    zap.InfoLevel,
 			callFunc: Info,
-		},
-		{
-			message:  "info message in new line",
-			level:    logrus.InfoLevel,
-			callFunc: Infoln,
 		},
 	}
 
 	for i, c := range cases {
 		c.callFunc(c.message)
-		assert.Equal(t, (i+1)*2, len(hook.Entries))
-		assert.Equal(t, c.level, hook.LastEntry().Level)
-		assert.Equal(t, c.message, hook.LastEntry().Message)
+		logsStorage := **ptr
+		assert.Equal(t, i+1, len(logsStorage))
+		assert.Equal(t, c.level, logsStorage[len(logsStorage)-1].Level)
+		assert.Equal(t, c.message, logsStorage[len(logsStorage)-1].Message)
 	}
 }
 
 func TestLoggerFormatter(t *testing.T) {
-	hook := test.NewLocal(getLogger())
+	hook, ptr := makeLogsStorageHooks()
 	AddHook(hook)
 
 	cases := []struct {
-		format   string
-		level    logrus.Level
+		template string
+		level    zapcore.Level
 		args     []string
 		callFunc func(format string, args ...interface{})
 	}{
 		{
-			format:   "warning message: %s",
-			level:    logrus.WarnLevel,
+			template: "warning message: %s",
+			level:    zap.WarnLevel,
 			args:     []string{"WARNING"},
 			callFunc: Warnf,
 		},
 		{
-			format:   "debug message: %s",
-			level:    logrus.DebugLevel,
+			template: "debug message: %s",
+			level:    zap.DebugLevel,
 			args:     []string{"DEBUG"},
 			callFunc: Debugf,
 		},
 		{
-			format:   "error message: %s",
-			level:    logrus.ErrorLevel,
+			template: "error message: %s",
+			level:    zap.ErrorLevel,
 			args:     []string{"ERROR"},
 			callFunc: Errorf,
 		},
 		{
-			format:   "info message: %s",
-			level:    logrus.InfoLevel,
+			template: "info message: %s",
+			level:    zap.InfoLevel,
 			args:     []string{"INFO"},
 			callFunc: Infof,
 		},
 	}
 
 	for i, c := range cases {
-		c.callFunc(c.format, c.args)
-		assert.Equal(t, (i+1)*2, len(hook.Entries))
-		assert.Equal(t, c.level, hook.LastEntry().Level)
+		c.callFunc(c.template, c.args)
+		logsStorage := **ptr
+		assert.Equal(t, i+1, len(logsStorage))
+		assert.Equal(t, c.level, logsStorage[len(logsStorage)-1].Level)
 	}
 }
 
-func TestLoggerWithFields(t *testing.T) {
-	hook := test.NewLocal(getLogger())
-	AddHook(hook)
-
-	msg := "WithFields"
-
-	fields := make(map[string]interface{})
-	fields["key"] = "value"
-	WithFields(fields).Warn(msg)
-
-	assert.Equal(t, 2, len(hook.Entries))
-	assert.Equal(t, logrus.WarnLevel, hook.LastEntry().Level)
-	assert.Equal(t, msg, hook.LastEntry().Message)
-}
-
-func TestLoggerWithField(t *testing.T) {
-	hook := test.NewLocal(getLogger())
-	AddHook(hook)
-
-	msg := "WithField"
-
-	WithField("key", "value").Warn(msg)
-
-	assert.Equal(t, 2, len(hook.Entries))
-	assert.Equal(t, logrus.WarnLevel, hook.LastEntry().Level)
-	assert.Equal(t, msg, hook.LastEntry().Message)
-}
-
 func TestLoggerWithRequest(t *testing.T) {
-	hook := test.NewLocal(getLogger())
+	hook, pointerToLogsStorage := makeLogsStorageHooks()
 	AddHook(hook)
 	msg := "success"
 	req, _ := http.NewRequest(http.MethodGet, "https://example.com/path/to/resource", nil)
 
 	WithRequest(req).Info(msg)
 
-	assert.Equal(t, 2, len(hook.Entries))
-	assert.Equal(t, logrus.InfoLevel, hook.LastEntry().Level)
-	assert.Equal(t, msg, hook.LastEntry().Message)
+	storage := **pointerToLogsStorage
+	assert.Equal(t, 1, len(storage))
+	assert.Equal(t, zap.InfoLevel, storage[0].Level)
+	assert.Equal(t, msg, storage[0].Message)
+}
+
+func TestSugaredLoggerWithRequest(t *testing.T) {
+	hook, pointerToLogsStorage := makeLogsStorageHooks()
+	AddHook(hook)
+	url := "https://example.com/path/to/resource"
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
+
+	SugaredWithRequest(req).Infof("success getting %s", url)
+
+	storage := **pointerToLogsStorage
+	assert.Equal(t, 1, len(storage))
+	assert.Equal(t, zap.InfoLevel, storage[0].Level)
+	assert.Equal(t, fmt.Sprintf("success getting %s", url), storage[0].Message)
 }

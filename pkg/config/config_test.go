@@ -27,10 +27,6 @@ func TestConfigCases(t *testing.T) {
 			key:      "log.level",
 			callFunc: LogLevel,
 		},
-		{
-			key:      "log.format",
-			callFunc: LogFormat,
-		},
 	}
 
 	for _, c := range cases {

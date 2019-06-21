@@ -2,7 +2,6 @@ debug: "true"
 
 log:
   level: "debug"
-  format: "text"
 
 app:
   name: "darkroom"

@@ -2,126 +2,114 @@ package logger
 
 import (
 	"net/http"
-	"os"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"***REMOVED***/darkroom/core/pkg/config"
 )
 
-var instance *logrus.Logger
+var instance *zap.Logger
+var sugarInstance *zap.SugaredLogger
 var once sync.Once
 
-const jsonLoggerType = "json"
-
-func getLogger() *logrus.Logger {
+func getLogger() *zap.Logger {
 	once.Do(func() {
 		instance = newLogger()
 	})
 	return instance
 }
 
-func getLogLevel() logrus.Level {
-	if config.LogLevel() == "" {
-		return logrus.DebugLevel
+func getSugaredLogger() *zap.SugaredLogger {
+	if sugarInstance == nil {
+		sugarInstance = getLogger().Sugar()
 	}
-	level, err := logrus.ParseLevel(config.LogLevel())
-	if err != nil {
+	return sugarInstance
+}
+
+func getLogLevel() zapcore.Level {
+	if config.LogLevel() == "" {
+		return zap.DebugLevel
+	}
+	var level zapcore.Level
+	if err := level.UnmarshalText([]byte(config.LogLevel())); err != nil {
+		Errorf("failed to parse log level from config with error: %s", err)
 		panic(err)
 	}
 	return level
 }
 
-func newLogger() *logrus.Logger {
-	logger := &logrus.Logger{
-		Out:   os.Stdout,
-		Hooks: make(logrus.LevelHooks),
-		Level: getLogLevel(),
-	}
-	if config.LogFormat() == jsonLoggerType {
-		logger.Formatter = &logrus.JSONFormatter{}
+func newLogger() *zap.Logger {
+	loggerConfig := zap.NewProductionConfig()
+	loggerConfig.Level = zap.NewAtomicLevelAt(getLogLevel())
+	loggerConfig.Encoding = "json"
+	loggerConfig.DisableCaller = true
+	loggerConfig.OutputPaths = []string{"stdout"}
+	if logger, err := loggerConfig.Build(); err != nil {
+		Errorf("failed to create new logger with error: %s", err)
+		panic(err)
 	} else {
-		logger.Formatter = &logrus.TextFormatter{}
+		return logger
 	}
-	return logger
 }
 
-func AddHook(hook logrus.Hook) {
-	getLogger().Hooks.Add(hook)
+func Debug(message string, fields ...zap.Field) {
+	getLogger().Debug(message, fields...)
 }
 
-func Debug(args ...interface{}) {
-	getLogger().Debug(args...)
+func Debugf(template string, args ...interface{}) {
+	getSugaredLogger().Debugf(template, args)
 }
 
-func Debugf(format string, args ...interface{}) {
-	getLogger().Debugf(format, args...)
+func Error(message string, fields ...zap.Field) {
+	getLogger().Error(message, fields...)
 }
 
-func Debugln(args ...interface{}) {
-	getLogger().Debugln(args...)
+func Errorf(template string, args ...interface{}) {
+	getSugaredLogger().Errorf(template, args)
 }
 
-func Error(args ...interface{}) {
-	getLogger().Error(args...)
+func Fatal(message string, fields ...zap.Field) {
+	getLogger().Fatal(message, fields...)
 }
 
-func Errorf(format string, args ...interface{}) {
-	getLogger().Errorf(format, args...)
+func Fatalf(template string, args ...interface{}) {
+	getSugaredLogger().Fatalf(template, args)
 }
 
-func Errorln(args ...interface{}) {
-	getLogger().Errorln(args...)
+func Info(message string, fields ...zap.Field) {
+	getLogger().Info(message, fields...)
 }
 
-func Fatal(args ...interface{}) {
-	getLogger().Fatal(args...)
+func Infof(template string, args ...interface{}) {
+	getSugaredLogger().Infof(template, args)
 }
 
-func Fatalf(format string, args ...interface{}) {
-	getLogger().Fatalf(format, args...)
+func Warn(message string, fields ...zap.Field) {
+	getLogger().Warn(message, fields...)
 }
 
-func Fatalln(args ...interface{}) {
-	getLogger().Fatalln(args...)
+func Warnf(template string, args ...interface{}) {
+	getSugaredLogger().Warnf(template, args)
 }
 
-func Info(args ...interface{}) {
-	getLogger().Info(args...)
+func AddHook(hook func(zapcore.Entry) error) {
+	instance = getLogger().WithOptions(zap.Hooks(hook))
+	sugarInstance = instance.Sugar()
 }
 
-func Infof(format string, args ...interface{}) {
-	getLogger().Infof(format, args...)
+func WithRequest(r *http.Request) *zap.Logger {
+	return getLogger().With(
+		zap.Any("method", r.Method),
+		zap.Any("host", r.Host),
+		zap.Any("path", r.URL.Path),
+	)
 }
 
-func Infoln(args ...interface{}) {
-	getLogger().Infoln(args...)
-}
-
-func Warn(args ...interface{}) {
-	getLogger().Warn(args...)
-}
-
-func Warnf(format string, args ...interface{}) {
-	getLogger().Warnf(format, args...)
-}
-
-func Warnln(args ...interface{}) {
-	getLogger().Warnln(args...)
-}
-
-func WithField(key string, value interface{}) *logrus.Entry {
-	return getLogger().WithField(key, value)
-}
-
-func WithFields(fields logrus.Fields) *logrus.Entry {
-	return getLogger().WithFields(fields)
-}
-
-func WithRequest(r *http.Request) *logrus.Entry {
-	return getLogger().WithFields(logrus.Fields{
-		"Method": r.Method,
-		"Host":   r.Host,
-		"Path":   r.URL.Path,
-	})
+func SugaredWithRequest(r *http.Request) *zap.SugaredLogger {
+	return getSugaredLogger().With(
+		zap.Any("method", r.Method),
+		zap.Any("host", r.Host),
+		zap.Any("path", r.URL.Path),
+	)
 }
