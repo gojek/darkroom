@@ -39,7 +39,7 @@ SOURCE_HYSTRIX_ERRORPERCENTTHRESHOLD=25
 ```
 Build the docker image and run it with the config created.
 ```bash
-docker build -t ${USER}/darkroom:latest .
+make docker-image
 docker run -p 80:3000 --env-file ./config.env ${USER}/darkroom:latest
 ```
 

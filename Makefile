@@ -34,4 +34,7 @@ copy-config:
 	mkdir -p out
 	cp config.yaml.example config.yaml
 
+docker-image:
+	docker build -t ${USER}/darkroom:latest -f build/Dockerfile .
+
 ci: copy-config compile lint format vet test test-cov test-cov-report
