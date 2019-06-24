@@ -19,10 +19,7 @@ const (
 	pngType = "png"
 	jpgType = "jpeg"
 
-	cropDurationKey      = "cropDuration"
-	resizeDurationKey    = "resizeDuration"
 	watermarkDurationKey = "watermarkDuration"
-	grayScaleDurationKey = "grayScaleDuration"
 	decodeDurationKey    = "decodeDuration"
 	encodeDurationKey    = "encodeDuration"
 )
@@ -39,12 +36,10 @@ func (bp *BildProcessor) Crop(input []byte, width, height int, point processor.C
 
 	w, h := getResizeWidthAndHeightForCrop(width, height, img.Bounds().Dx(), img.Bounds().Dy())
 
-	t := time.Now()
 	img = transform.Resize(img, w, h, transform.Linear)
 	x0, y0 := getStartingPointForCrop(w, h, width, height, point)
 	rect := image.Rect(x0, y0, width+x0, height+y0)
 	img = (clone.AsRGBA(img)).SubImage(rect)
-	metrics.Update(metrics.UpdateOption{Name: cropDurationKey, Type: metrics.Duration, Duration: time.Since(t)})
 
 	return bp.encode(img, f)
 }
@@ -60,9 +55,7 @@ func (bp *BildProcessor) Resize(input []byte, width, height int) ([]byte, error)
 
 	w, h := getResizeWidthAndHeight(width, height, initW, initH)
 	if w != initW || h != initH {
-		t := time.Now()
 		img = transform.Resize(img, w, h, transform.Linear)
-		metrics.Update(metrics.UpdateOption{Name: resizeDurationKey, Type: metrics.Duration, Duration: time.Since(t)})
 	}
 
 	return bp.encode(img, f)
@@ -106,9 +99,7 @@ func (bp *BildProcessor) GrayScale(input []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	t := time.Now()
 	img = effect.Grayscale(img)
-	metrics.Update(metrics.UpdateOption{Name: grayScaleDurationKey, Type: metrics.Duration, Duration: time.Since(t)})
 
 	return bp.encode(img, f)
 }

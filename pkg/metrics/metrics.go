@@ -11,6 +11,7 @@ const (
 )
 
 type UpdateOption struct {
+	Scope    string
 	Name     string
 	Type     Type
 	NumValue float64

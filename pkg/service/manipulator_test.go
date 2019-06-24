@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"***REMOVED***/darkroom/core/pkg/processor"
@@ -24,7 +23,10 @@ func TestManipulator_Process(t *testing.T) {
 	params[fit] = crop
 	params[width] = "100"
 	params[height] = "100"
-	data, err := m.Process(context.TODO(), []byte("toCrop"), params)
+	data, err := m.Process(ProcessSpec{
+		ImageData: []byte("toCrop"),
+		Params:    params,
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, []byte("cropped"), data)
 
@@ -33,7 +35,10 @@ func TestManipulator_Process(t *testing.T) {
 	params = make(map[string]string)
 	params[width] = "100"
 	params[height] = "100"
-	data, err = m.Process(context.TODO(), []byte("toResize"), params)
+	data, err = m.Process(ProcessSpec{
+		ImageData: []byte("toResize"),
+		Params:    params,
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, []byte("reSized"), data)
 
@@ -41,7 +46,10 @@ func TestManipulator_Process(t *testing.T) {
 
 	params = make(map[string]string)
 	params[mono] = blackHexCode
-	data, err = m.Process(context.TODO(), []byte("toGrayScale"), params)
+	data, err = m.Process(ProcessSpec{
+		ImageData: []byte("toGrayScale"),
+		Params:    params,
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, []byte("grayScaled"), data)
 }

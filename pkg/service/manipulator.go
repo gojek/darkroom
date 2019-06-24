@@ -1,9 +1,10 @@
 package service
 
 import (
-	"context"
+	"***REMOVED***/darkroom/core/pkg/metrics"
 	"***REMOVED***/darkroom/core/pkg/processor"
 	"strconv"
+	"time"
 )
 
 const (
@@ -13,25 +14,52 @@ const (
 	crop         = "crop"
 	mono         = "mono"
 	blackHexCode = "000000"
+
+	cropDurationKey      = "cropDuration"
+	resizeDurationKey    = "resizeDuration"
+	watermarkDurationKey = "watermarkDuration"
+	grayScaleDurationKey = "grayScaleDuration"
+	decodeDurationKey    = "decodeDuration"
+	encodeDurationKey    = "encodeDuration"
 )
 
 type Manipulator interface {
-	Process(ctx context.Context, data []byte, params map[string]string) ([]byte, error)
+	Process(spec ProcessSpec) ([]byte, error)
 }
 
 type manipulator struct {
 	processor processor.Processor
 }
 
-func (m *manipulator) Process(ctx context.Context, data []byte, params map[string]string) ([]byte, error) {
+type ProcessSpec struct {
+	Scope     string
+	ImageData []byte
+	Params    map[string]string
+}
+
+func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
+	params := spec.Params
+	data := spec.ImageData
 	var err error
 	if params[fit] == crop {
+		t := time.Now()
 		data, err = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
+		if err == nil {
+			metrics.Update(metrics.UpdateOption{Name: cropDurationKey, Type: metrics.Duration, Duration: time.Since(t), Scope: spec.Scope})
+		}
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
+		t := time.Now()
 		data, err = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
+		if err == nil {
+			metrics.Update(metrics.UpdateOption{Name: resizeDurationKey, Type: metrics.Duration, Duration: time.Since(t), Scope: spec.Scope})
+		}
 	}
 	if params[mono] == blackHexCode {
+		t := time.Now()
 		data, err = m.processor.GrayScale(data)
+		if err == nil {
+			metrics.Update(metrics.UpdateOption{Name: grayScaleDurationKey, Type: metrics.Duration, Duration: time.Since(t), Scope: spec.Scope})
+		}
 	}
 	return data, err
 }

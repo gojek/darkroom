@@ -39,7 +39,10 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 					params[v] = values.Get(v)
 				}
 			}
-			data, err = deps.Manipulator.Process(r.Context(), data, params)
+			data, err = deps.Manipulator.Process(service.ProcessSpec{
+				ImageData: data,
+				Params:    params,
+			})
 			if err != nil {
 				l.Errorf("error from Manipulator.Process: %s", err)
 				metrics.Update(metrics.UpdateOption{Name: ProcessorErrorKey, Type: metrics.Count})

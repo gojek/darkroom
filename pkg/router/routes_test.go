@@ -45,6 +45,6 @@ func (m *mockStorage) Get(ctx context.Context, path string) storage.IResponse {
 type mockManipulator struct {
 }
 
-func (m *mockManipulator) Process(ctx context.Context, data []byte, params map[string]string) ([]byte, error) {
+func (m *mockManipulator) Process(spec service.ProcessSpec) ([]byte, error) {
 	return nil, nil
 }

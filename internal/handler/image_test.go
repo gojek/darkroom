@@ -63,7 +63,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParameters() {
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.Anything, []byte("validData"), params).Return([]byte("processedData"), nil)
+	s.manipulator.On("Process", mock.AnythingOfType("ProcessSpec")).Return([]byte("processedData"), nil)
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
@@ -79,7 +79,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessing
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.Anything, []byte("validData"), params).Return([]byte(nil), errors.New("error"))
+	s.manipulator.On("Process", mock.AnythingOfType("ProcessSpec")).Return([]byte(nil), errors.New("error"))
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
@@ -91,8 +91,8 @@ type mockManipulator struct {
 	mock.Mock
 }
 
-func (m *mockManipulator) Process(ctx context.Context, data []byte, params map[string]string) ([]byte, error) {
-	args := m.Called(ctx, data, params)
+func (m *mockManipulator) Process(spec service.ProcessSpec) ([]byte, error) {
+	args := m.Called(spec)
 	return args.Get(0).([]byte), args.Error(1)
 }
 

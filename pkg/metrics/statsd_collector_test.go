@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"errors"
+	"fmt"
 	"github.com/cactus/go-statsd-client/statsd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -11,17 +12,17 @@ import (
 
 func TestInitializeStatsdCollector(t *testing.T) {
 	// Test Statter client
-	err := InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0}, "app-name")
+	err := InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0})
 	assert.Nil(t, err)
 	assert.NotNil(t, instance)
 	assert.NotNil(t, instance.client)
 
 	// Test sampleRate
-	err = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5}, "app-name")
+	err = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5})
 	assert.Nil(t, err)
 	assert.Equal(t, float32(5), instance.sampleRate)
 
-	err = InitializeStatsdCollector(&StatsdCollectorConfig{}, "app-name")
+	err = InitializeStatsdCollector(&StatsdCollectorConfig{})
 	assert.Nil(t, err)
 	assert.Equal(t, float32(1), instance.sampleRate)
 }
@@ -31,7 +32,7 @@ func TestUpdate(t *testing.T) {
 	instance = nil
 	Update(UpdateOption{})
 
-	_ = InitializeStatsdCollector(&StatsdCollectorConfig{}, "app-name")
+	_ = InitializeStatsdCollector(&StatsdCollectorConfig{})
 
 	mc := &mockStatsdClient{}
 	instance.client = mc
@@ -57,6 +58,64 @@ func TestUpdate(t *testing.T) {
 	Update(UpdateOption{Type: Gauge, NumValue: -500})
 
 	mc.AssertExpectations(t)
+}
+
+func TestFormatter(t *testing.T) {
+	cases := []struct {
+		updateOption   UpdateOption
+		expectedOutput string
+	}{
+		{
+			updateOption: UpdateOption{
+				Scope: "process_image",
+				Name:  "duration",
+				Type:  Duration,
+			},
+			expectedOutput: "process_image.duration",
+		},
+		{
+			updateOption: UpdateOption{
+				Name: "duration",
+				Type: Duration,
+			},
+			expectedOutput: fmt.Sprintf("%s.%s", DefaultScope, "duration"),
+		},
+		{
+			updateOption: UpdateOption{
+				Scope: ".scope",
+				Name:  "duration",
+				Type:  Duration,
+			},
+			expectedOutput: "scope.duration",
+		},
+		{
+			updateOption: UpdateOption{
+				Scope: ".scope.",
+				Name:  "duration",
+				Type:  Duration,
+			},
+			expectedOutput: "scope.duration",
+		},
+		{
+			updateOption: UpdateOption{
+				Scope: "scope.name",
+				Name:  "duration",
+				Type:  Duration,
+			},
+			expectedOutput: "scope.name.duration",
+		},
+		{
+			updateOption: UpdateOption{
+				Scope: ".scope.name.",
+				Name:  ".duration.time.",
+				Type:  Duration,
+			},
+			expectedOutput: "scope.name.duration.time",
+		},
+	}
+	for _, c := range cases {
+		assert.Equal(t, c.expectedOutput, formatter(c.updateOption))
+	}
 }
 
 type mockStatsdClient struct {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cactus/go-statsd-client/statsd"
 	"***REMOVED***/darkroom/core/pkg/logger"
+	"strings"
 	"time"
 )
 
@@ -12,14 +13,14 @@ const (
 	WANStatsdFlushBytes     = 512
 	LANStatsdFlushBytes     = 1432
 	GigabitStatsdFlushBytes = 8932
+	DefaultScope            = "default"
 )
 
 var instance *statsdClient
 
 type statsdClient struct {
-	client        statsd.Statter
-	collectorName string
-	sampleRate    float32
+	client     statsd.Statter
+	sampleRate float32
 }
 
 // StatsdCollectorConfig provides configuration that the Statsd client will need.
@@ -35,7 +36,7 @@ type StatsdCollectorConfig struct {
 }
 
 // InitializeStatsdCollector will start publishing metrics in the form {config.Prefix}.{name}.{updateOption.Name}
-func InitializeStatsdCollector(config *StatsdCollectorConfig, collectorName string) error {
+func InitializeStatsdCollector(config *StatsdCollectorConfig) error {
 	flushBytes := config.FlushBytes
 	if flushBytes == 0 {
 		flushBytes = LANStatsdFlushBytes
@@ -51,12 +52,16 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig, collectorName stri
 		// TODO Add logger for error
 		c = &statsd.NoopClient{}
 	}
-	instance = &statsdClient{client: c, collectorName: collectorName, sampleRate: sampleRate}
+	instance = &statsdClient{client: c, sampleRate: sampleRate}
 	return nil
 }
 
-func formatter(on string) string {
-	return fmt.Sprintf("%s.%s", instance.collectorName, on)
+func formatter(updateOption UpdateOption) string {
+	scope := strings.Trim(updateOption.Scope, ".")
+	if updateOption.Scope == "" {
+		scope = DefaultScope
+	}
+	return fmt.Sprintf("%s.%s", scope, strings.Trim(updateOption.Name, "."))
 }
 
 func Update(updateOption UpdateOption) {
@@ -66,13 +71,13 @@ func Update(updateOption UpdateOption) {
 	var err error
 	switch updateOption.Type {
 	case Duration:
-		err = instance.client.TimingDuration(formatter(updateOption.Name), updateOption.Duration, instance.sampleRate)
+		err = instance.client.TimingDuration(formatter(updateOption), updateOption.Duration, instance.sampleRate)
 		break
 	case Gauge:
-		err = instance.client.Gauge(formatter(updateOption.Name), int64(updateOption.NumValue), instance.sampleRate)
+		err = instance.client.Gauge(formatter(updateOption), int64(updateOption.NumValue), instance.sampleRate)
 		break
 	case Count:
-		err = instance.client.Inc(formatter(updateOption.Name), 1, instance.sampleRate)
+		err = instance.client.Inc(formatter(updateOption), 1, instance.sampleRate)
 		break
 	}
 	if err != nil {
