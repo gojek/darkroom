@@ -3,7 +3,7 @@ package native
 import (
 	"bytes"
 	"github.com/anthonynsimon/bild/clone"
-	"github.com/anthonynsimon/bild/effect"
+	"github.com/anthonynsimon/bild/parallel"
 	"github.com/anthonynsimon/bild/transform"
 	"image"
 	"image/color"
@@ -98,10 +98,28 @@ func (bp *BildProcessor) GrayScale(input []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	img = effect.Grayscale(img)
+	img = grayScale(img)
 
 	return bp.encode(img, f)
+}
+
+func grayScale(img image.Image) image.Image {
+	src := clone.AsRGBA(img)
+	bounds := src.Bounds()
+	if bounds.Empty() {
+		return &image.RGBA{}
+	}
+	dst := image.NewRGBA(bounds)
+	parallel.Line(bounds.Dy(), func(start, end int) {
+		for y := start; y < end; y++ {
+			for x := 0; x < bounds.Dx(); x++ {
+				srcPix := src.At(x, y).(color.RGBA)
+				g := color.GrayModel.Convert(srcPix).(color.Gray).Y
+				dst.Set(x, y, color.RGBA{R: g, G: g, B: g, A: srcPix.A})
+			}
+		}
+	})
+	return dst
 }
 
 func (bp *BildProcessor) decode(data []byte) (image.Image, string, error) {

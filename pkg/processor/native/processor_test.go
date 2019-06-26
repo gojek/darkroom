@@ -20,8 +20,8 @@ type BildProcessorSuite struct {
 
 func (s *BildProcessorSuite) SetupSuite() {
 	s.processor = NewBildProcessor()
-	s.srcData, _ = ioutil.ReadFile("test.png")
-	s.watermarkData, _ = ioutil.ReadFile("overlay.png")
+	s.srcData, _ = ioutil.ReadFile("_testdata/test.png")
+	s.watermarkData, _ = ioutil.ReadFile("_testdata/overlay.png")
 	s.badData = []byte("badImage.ext")
 }
 
@@ -52,11 +52,17 @@ func (s *BildProcessorSuite) TestBildProcessor_Crop() {
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Grayscale() {
-	output, err := s.processor.GrayScale(s.srcData)
-
-	assert.NotNil(s.T(), output)
+	var actual, expected []byte
+	var err error
+	actual, err = s.processor.GrayScale(s.srcData)
+	assert.NotNil(s.T(), actual)
 	assert.Nil(s.T(), err)
-	assert.NotEqual(s.T(), s.srcData, output)
+
+	expected, err = ioutil.ReadFile("_testdata/test_grayscaled.png")
+	assert.NotNil(s.T(), expected)
+	assert.Nil(s.T(), err)
+
+	assert.EqualValues(s.T(), actual, expected)
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Watermark() {
