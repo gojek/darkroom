@@ -21,10 +21,10 @@ vet:
 	go vet ./...
 
 test:
-	go test ./...
+	go test ./... -covermode=count -coverprofile=profile.cov
 
 coverage:
-	goveralls -service=travis-ci
+	goveralls -coverprofile=profile.cov -service=travis-ci
 
 copy-config:
 	cp config.yaml.example config.yaml

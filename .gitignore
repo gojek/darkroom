@@ -12,3 +12,4 @@ config.yaml
 
 coverage.json
 config.env
+profile.cov
