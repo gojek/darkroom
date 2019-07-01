@@ -4,8 +4,8 @@ APP_EXECUTABLE="./out/$(APP)"
 all: test-ci
 
 setup:
-	go get -u golang.org/x/lint/golint
-	go get -u github.com/axw/gocov/gocov
+	go get golang.org/x/lint/golint
+	go get github.com/mattn/goveralls
 
 compile:
 	mkdir -p out
@@ -23,12 +23,8 @@ vet:
 test:
 	go test ./...
 
-test-cov:
-	gocov test ./... > coverage.json
-
-test-cov-report:
-	@echo "\nGENERATING TEST REPORT."
-	gocov report coverage.json
+coverage:
+	goveralls -service=travis-ci
 
 copy-config:
 	cp config.yaml.example config.yaml
@@ -36,4 +32,4 @@ copy-config:
 docker-image:
 	docker build -t ${USER}/darkroom:latest -f build/Dockerfile .
 
-test-ci: copy-config compile lint format vet test test-cov test-cov-report
+test-ci: copy-config compile lint format vet test coverage
