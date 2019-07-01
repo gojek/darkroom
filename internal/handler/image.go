@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"net/http"
 	"github.com/gojek/darkroom/pkg/metrics"
+	"net/http"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"

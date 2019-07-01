@@ -5,13 +5,13 @@ import (
 	"github.com/anthonynsimon/bild/clone"
 	"github.com/anthonynsimon/bild/parallel"
 	"github.com/anthonynsimon/bild/transform"
+	"github.com/gojek/darkroom/pkg/metrics"
+	"github.com/gojek/darkroom/pkg/processor"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
 	"image/png"
-	"github.com/gojek/darkroom/pkg/metrics"
-	"github.com/gojek/darkroom/pkg/processor"
 	"time"
 )
 

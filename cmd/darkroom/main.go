@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 
-	"github.com/urfave/cli"
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"
 	"github.com/gojek/darkroom/pkg/router"
 	"github.com/gojek/darkroom/pkg/server"
 	"github.com/gojek/darkroom/pkg/service"
+	"github.com/urfave/cli"
 )
 
 func main() {

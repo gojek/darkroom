@@ -1,10 +1,10 @@
 package service
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/gojek/darkroom/pkg/processor/native"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"testing"
 )
 

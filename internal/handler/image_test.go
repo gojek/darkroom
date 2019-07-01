@@ -7,11 +7,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gojek/darkroom/pkg/service"
+	"github.com/gojek/darkroom/pkg/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/gojek/darkroom/pkg/service"
-	"github.com/gojek/darkroom/pkg/storage"
 )
 
 type ImageHandlerTestSuite struct {

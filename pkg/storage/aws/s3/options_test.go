@@ -2,8 +2,8 @@ package s3
 
 import (
 	"github.com/afex/hystrix-go/hystrix"
-	"github.com/stretchr/testify/assert"
 	"github.com/gojek/darkroom/pkg/storage"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 

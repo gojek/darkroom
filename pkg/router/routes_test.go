@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/service"
 	"github.com/gojek/darkroom/pkg/storage"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewRouter(t *testing.T) {

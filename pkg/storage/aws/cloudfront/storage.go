@@ -3,11 +3,11 @@ package cloudfront
 import (
 	"context"
 	"fmt"
+	"github.com/gojek/darkroom/pkg/storage"
 	"github.com/gojektech/heimdall"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
-	"github.com/gojek/darkroom/pkg/storage"
 )
 
 type Storage struct {

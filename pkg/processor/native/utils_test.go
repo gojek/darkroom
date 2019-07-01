@@ -1,10 +1,10 @@
 package native
 
 import (
+	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/stretchr/testify/assert"
 	"image"
 	"image/color"
-	"github.com/gojek/darkroom/pkg/processor"
 	"testing"
 )
 

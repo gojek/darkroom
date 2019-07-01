@@ -2,11 +2,11 @@ package native
 
 import (
 	"bytes"
+	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"image"
 	"io/ioutil"
-	"github.com/gojek/darkroom/pkg/processor"
 	"testing"
 )
 

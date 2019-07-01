@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/gojek/darkroom/pkg/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"github.com/gojek/darkroom/pkg/config"
 )
 
 var instance *zap.Logger

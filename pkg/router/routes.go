@@ -7,10 +7,10 @@ import (
 
 	"github.com/gojek/darkroom/pkg/regex"
 
-	"github.com/gorilla/mux"
 	"github.com/gojek/darkroom/internal/handler"
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/service"
+	"github.com/gorilla/mux"
 )
 
 func NewRouter(deps *service.Dependencies) *mux.Router {

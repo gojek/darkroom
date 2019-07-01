@@ -3,8 +3,6 @@ package service
 import (
 	"time"
 
-	"github.com/gojektech/heimdall"
-	"github.com/gojektech/heimdall/hystrix"
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/processor/native"
 	"github.com/gojek/darkroom/pkg/regex"
@@ -12,6 +10,8 @@ import (
 	"github.com/gojek/darkroom/pkg/storage/aws/cloudfront"
 	"github.com/gojek/darkroom/pkg/storage/aws/s3"
 	"github.com/gojek/darkroom/pkg/storage/webfolder"
+	"github.com/gojektech/heimdall"
+	"github.com/gojektech/heimdall/hystrix"
 )
 
 type Dependencies struct {

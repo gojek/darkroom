@@ -3,11 +3,11 @@ package service
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/storage/aws/cloudfront"
 	"github.com/gojek/darkroom/pkg/storage/aws/s3"
 	"github.com/gojek/darkroom/pkg/storage/webfolder"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewDependencies(t *testing.T) {

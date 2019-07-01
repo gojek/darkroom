@@ -1,8 +1,8 @@
 package native
 
 import (
-	"image"
 	"github.com/gojek/darkroom/pkg/processor"
+	"image"
 )
 
 func isOpaque(im image.Image) bool {
