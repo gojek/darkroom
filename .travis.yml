@@ -12,8 +12,8 @@ env:
   global:
     - GO111MODULE=on
 
-install: echo "Skip global `install` ..."
-script: echo "Skip global `script` ..."
+install: echo "Skip global install..."
+script: echo "Skip global script..."
 
 build_docker_image: &build_docker_image
   before_script:
@@ -27,6 +27,7 @@ build_docker_image: &build_docker_image
 jobs:
   include:
     - stage: test
+    - name: "Tests"
       install: make setup
       script: make test-ci
 
@@ -34,8 +35,8 @@ jobs:
     - name: "Release Builds"
       script: curl -sL https://git.io/goreleaser | bash -s -- --rm-dist --skip-validate
     - name: "Docker Builds"
-     <<: *build_docker_image
-     script: docker push gojek/darkroom:$TRAVIS_TAG && docker push gojek/darkroom:$DOCKER_LATEST
+      <<: *build_docker_image
+      script: docker push gojek/darkroom:$TRAVIS_TAG && docker push gojek/darkroom:$DOCKER_LATEST
 
 notifications:
   email: false
