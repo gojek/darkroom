@@ -1,6 +1,9 @@
-# Application Server for Darkroom
-[![build status](https://travis-ci.com/gojek/darkroom)](https://travis-ci.com/gojek/darkroom)
-[![coverage report](https://coveralls.io/github/gojek/darkroom?branch=master)](https://coveralls.io/github/gojek/darkroom?branch=master)
+# Darkroom
+[![build status](https://travis-ci.com/gojek/darkroom.svg?branch=master)](https://travis-ci.com/gojek/darkroom)
+[![Coverage Status](https://coveralls.io/repos/github/gojek/darkroom/badge.svg?branch=master)](https://coveralls.io/github/gojek/darkroom?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gojek/darkroom)](https://goreportcard.com/report/github.com/gojek/darkroom)
+[![GolangCI](https://golangci.com/badges/github.com/gojek/darkroom.svg)](https://golangci.com)
+[![GitHub Release](https://img.shields.io/github/release/gojek/darkroom.svg?style=flat)](https://github.com/gojek/darkroom/releases)
 
 #### About
 This project combines the darkroom [storage backend](pkg/storage) and the [image processor](pkg/processor) and acts as an `Image Proxy` on your image source.  
