@@ -1,7 +1,7 @@
 # Image Processor for Darkroom
 
 #### About
-This module holds the logic to process images. It is used by the Darkroom [Application Server](https://***REMOVED***/darkroom/core).  
+This module holds the logic to process images. It is used by the Darkroom [Application Server](https://github.com/gojek/darkroom).  
 You may implement the `Processor` interface to gain custom functionality while still keeping other Darkroom functionality.
 
 #### Interface

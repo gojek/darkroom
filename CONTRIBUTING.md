@@ -1,6 +1,6 @@
 # Darkroom - Contributing
 
-Darkroom `***REMOVED***/darkroom/core` is an open-source project. 
+Darkroom `github.com/gojek/darkroom` is an open-source project. 
 It is licensed using the [MIT License][1]. 
 We appreciate pull requests; here are our guidelines:
 

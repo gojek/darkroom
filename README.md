@@ -1,6 +1,6 @@
 # Application Server for Darkroom
-[![build status](https://***REMOVED***/darkroom/core/badges/master/build.svg)](https://***REMOVED***/darkroom/core/commits/master)
-[![coverage report](https://***REMOVED***/darkroom/core/badges/master/coverage.svg)](https://***REMOVED***/darkroom/core/commits/master)
+[![build status](https://travis-ci.com/gojek/darkroom)](https://travis-ci.com/gojek/darkroom)
+[![coverage report](https://coveralls.io/github/gojek/darkroom?branch=master)](https://coveralls.io/github/gojek/darkroom?branch=master)
 
 #### About
 This project combines the darkroom [storage backend](pkg/storage) and the [image processor](pkg/processor) and acts as an `Image Proxy` on your image source.  
