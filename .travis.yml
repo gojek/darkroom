@@ -1,7 +1,5 @@
 language: go
 go: '1.12.x'
-services:
-  - docker
 
 stages:
   - test
@@ -15,15 +13,6 @@ env:
 install: echo "Skip global install..."
 script: echo "Skip global script..."
 
-build_docker_image: &build_docker_image
-  before_script:
-    - |
-      docker build -f build/Dockerfile .
-      [ ! -z $TRAVIS_TAG ] && docker tag gojek/darkroom:$DOCKER_LATEST gojek/darkroom:$TRAVIS_TAG
-      [ ! -z $TRAVIS_TAG ] && docker tag gojek/darkroom:$TRAVIS_TAG gojek/darkroom:$DOCKER_LATEST
-      [ ! -z $DOCKER_PASSWORD ] && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      docker images
-
 jobs:
   include:
     - stage: test
@@ -33,10 +22,11 @@ jobs:
 
     - stage: release
     - name: "Release Builds"
+      services: docker
+      before_script:
+        - |
+          [ ! -z $DOCKER_PASSWORD ] && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       script: curl -sL https://git.io/goreleaser | bash -s -- --rm-dist --skip-validate
-    - name: "Docker Builds"
-      <<: *build_docker_image
-      script: docker push gojek/darkroom:$TRAVIS_TAG && docker push gojek/darkroom:$DOCKER_LATEST
 
 notifications:
   email: false
