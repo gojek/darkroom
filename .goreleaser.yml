@@ -1,0 +1,32 @@
+before:
+  hooks:
+    - go mod download
+builds:
+  - main: ./cmd/darkroom/
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - 386
+env:
+  - CGO_ENABLED=0
+archives:
+- replacements:
+    darwin: macOS
+    linux: Linux
+    windows: Windows
+    386: 32-bit
+    amd64: 64-bit
+  format: zip
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'

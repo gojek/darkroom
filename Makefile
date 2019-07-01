@@ -1,7 +1,7 @@
 APP=darkroom
 APP_EXECUTABLE="./out/$(APP)"
 
-all: ci
+all: test-ci
 
 setup:
 	go get -u golang.org/x/lint/golint
@@ -11,7 +11,7 @@ compile:
 	mkdir -p out
 	go build -o $(APP_EXECUTABLE) ./cmd/darkroom/main.go
 
-lint: setup
+lint:
 	golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
 
 format:
@@ -31,10 +31,9 @@ test-cov-report:
 	gocov report coverage.json
 
 copy-config:
-	mkdir -p out
 	cp config.yaml.example config.yaml
 
 docker-image:
 	docker build -t ${USER}/darkroom:latest -f build/Dockerfile .
 
-ci: copy-config compile lint format vet test test-cov test-cov-report
+test-ci: copy-config compile lint format vet test test-cov test-cov-report

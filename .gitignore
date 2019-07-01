@@ -4,6 +4,9 @@
 # binaries
 out/
 
+# releases
+dist/
+
 # config files
 config.yaml
 
