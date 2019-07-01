@@ -6,7 +6,7 @@ import (
 	"github.com/gojektech/heimdall"
 	"io/ioutil"
 	"net/http"
-	"***REMOVED***/darkroom/core/pkg/storage"
+	"github.com/gojek/darkroom/pkg/storage"
 )
 
 type Storage struct {

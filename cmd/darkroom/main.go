@@ -4,11 +4,11 @@ import (
 	"os"
 
 	"github.com/urfave/cli"
-	"***REMOVED***/darkroom/core/pkg/config"
-	"***REMOVED***/darkroom/core/pkg/logger"
-	"***REMOVED***/darkroom/core/pkg/router"
-	"***REMOVED***/darkroom/core/pkg/server"
-	"***REMOVED***/darkroom/core/pkg/service"
+	"github.com/gojek/darkroom/pkg/config"
+	"github.com/gojek/darkroom/pkg/logger"
+	"github.com/gojek/darkroom/pkg/router"
+	"github.com/gojek/darkroom/pkg/server"
+	"github.com/gojek/darkroom/pkg/service"
 )
 
 func main() {

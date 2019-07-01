@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"net/http/pprof"
 
-	"***REMOVED***/darkroom/core/pkg/regex"
+	"github.com/gojek/darkroom/pkg/regex"
 
 	"github.com/gorilla/mux"
-	"***REMOVED***/darkroom/core/internal/handler"
-	"***REMOVED***/darkroom/core/pkg/config"
-	"***REMOVED***/darkroom/core/pkg/service"
+	"github.com/gojek/darkroom/internal/handler"
+	"github.com/gojek/darkroom/pkg/config"
+	"github.com/gojek/darkroom/pkg/service"
 )
 
 func NewRouter(deps *service.Dependencies) *mux.Router {

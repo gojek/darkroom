@@ -4,7 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"image"
 	"image/color"
-	"***REMOVED***/darkroom/core/pkg/processor"
+	"github.com/gojek/darkroom/pkg/processor"
 	"testing"
 )
 

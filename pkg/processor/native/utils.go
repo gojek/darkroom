@@ -2,7 +2,7 @@ package native
 
 import (
 	"image"
-	"***REMOVED***/darkroom/core/pkg/processor"
+	"github.com/gojek/darkroom/pkg/processor"
 )
 
 func isOpaque(im image.Image) bool {

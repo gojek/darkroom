@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
-	"***REMOVED***/darkroom/core/pkg/storage"
+	"github.com/gojek/darkroom/pkg/storage"
 )
 
 type Storage struct {

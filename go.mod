@@ -1,4 +1,4 @@
-module ***REMOVED***/darkroom/core
+module github.com/gojek/darkroom
 
 go 1.12
 

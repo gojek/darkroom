@@ -3,7 +3,7 @@ package s3
 import (
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/stretchr/testify/assert"
-	"***REMOVED***/darkroom/core/pkg/storage"
+	"github.com/gojek/darkroom/pkg/storage"
 	"testing"
 )
 

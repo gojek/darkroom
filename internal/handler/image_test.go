@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"***REMOVED***/darkroom/core/pkg/service"
-	"***REMOVED***/darkroom/core/pkg/storage"
+	"github.com/gojek/darkroom/pkg/service"
+	"github.com/gojek/darkroom/pkg/storage"
 )
 
 type ImageHandlerTestSuite struct {

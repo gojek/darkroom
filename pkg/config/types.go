@@ -1,8 +1,8 @@
 package config
 
 import (
-	"***REMOVED***/darkroom/core/pkg/regex"
-	"***REMOVED***/darkroom/core/pkg/storage"
+	"github.com/gojek/darkroom/pkg/regex"
+	"github.com/gojek/darkroom/pkg/storage"
 )
 
 type app struct {

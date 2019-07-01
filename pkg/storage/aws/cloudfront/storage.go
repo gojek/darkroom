@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
-	"***REMOVED***/darkroom/core/pkg/storage"
+	"github.com/gojek/darkroom/pkg/storage"
 )
 
 type Storage struct {

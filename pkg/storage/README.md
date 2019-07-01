@@ -1,7 +1,7 @@
 # Storage Backend for Darkroom
 
 #### About
-This module holds the logic to get an image blob from a source. It is used by the Darkroom [Application Server](https://***REMOVED***/darkroom/core).  
+This module holds the logic to get an image blob from a source. It is used by the Darkroom [Application Server](https://github.com/gojek/darkroom).  
 You may implement the `Storage` interface to gain custom functionality while still keeping other Darkroom functionality.  
 You may write custom backend for downloading images from a hosting provider or a web proxy.
 

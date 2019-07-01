@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"***REMOVED***/darkroom/core/pkg/config"
-	"***REMOVED***/darkroom/core/pkg/service"
-	"***REMOVED***/darkroom/core/pkg/storage"
+	"github.com/gojek/darkroom/pkg/config"
+	"github.com/gojek/darkroom/pkg/service"
+	"github.com/gojek/darkroom/pkg/storage"
 )
 
 func TestNewRouter(t *testing.T) {

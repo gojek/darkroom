@@ -1,8 +1,8 @@
 package service
 
 import (
-	"***REMOVED***/darkroom/core/pkg/metrics"
-	"***REMOVED***/darkroom/core/pkg/processor"
+	"github.com/gojek/darkroom/pkg/metrics"
+	"github.com/gojek/darkroom/pkg/processor"
 	"strconv"
 	"time"
 )

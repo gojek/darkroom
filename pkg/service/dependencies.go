@@ -5,13 +5,13 @@ import (
 
 	"github.com/gojektech/heimdall"
 	"github.com/gojektech/heimdall/hystrix"
-	"***REMOVED***/darkroom/core/pkg/config"
-	"***REMOVED***/darkroom/core/pkg/processor/native"
-	"***REMOVED***/darkroom/core/pkg/regex"
-	base "***REMOVED***/darkroom/core/pkg/storage"
-	"***REMOVED***/darkroom/core/pkg/storage/aws/cloudfront"
-	"***REMOVED***/darkroom/core/pkg/storage/aws/s3"
-	"***REMOVED***/darkroom/core/pkg/storage/webfolder"
+	"github.com/gojek/darkroom/pkg/config"
+	"github.com/gojek/darkroom/pkg/processor/native"
+	"github.com/gojek/darkroom/pkg/regex"
+	base "github.com/gojek/darkroom/pkg/storage"
+	"github.com/gojek/darkroom/pkg/storage/aws/cloudfront"
+	"github.com/gojek/darkroom/pkg/storage/aws/s3"
+	"github.com/gojek/darkroom/pkg/storage/webfolder"
 )
 
 type Dependencies struct {

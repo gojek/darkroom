@@ -3,7 +3,7 @@ package metrics
 import (
 	"fmt"
 	"github.com/cactus/go-statsd-client/statsd"
-	"***REMOVED***/darkroom/core/pkg/logger"
+	"github.com/gojek/darkroom/pkg/logger"
 	"strings"
 	"time"
 )

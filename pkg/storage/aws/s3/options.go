@@ -1,6 +1,6 @@
 package s3
 
-import "***REMOVED***/darkroom/core/pkg/storage"
+import "github.com/gojek/darkroom/pkg/storage"
 
 // Option represents the S3 storage options
 type Option func(s *Storage)

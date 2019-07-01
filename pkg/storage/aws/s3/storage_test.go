@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"io"
 	"net/http"
-	"***REMOVED***/darkroom/core/pkg/storage"
+	"github.com/gojek/darkroom/pkg/storage"
 	"testing"
 )
 

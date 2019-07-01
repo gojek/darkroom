@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"***REMOVED***/darkroom/core/pkg/processor"
-	"***REMOVED***/darkroom/core/pkg/processor/native"
+	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/gojek/darkroom/pkg/processor/native"
 	"testing"
 )
 

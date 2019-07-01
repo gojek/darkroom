@@ -3,11 +3,11 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"***REMOVED***/darkroom/core/pkg/metrics"
+	"github.com/gojek/darkroom/pkg/metrics"
 
-	"***REMOVED***/darkroom/core/pkg/config"
-	"***REMOVED***/darkroom/core/pkg/logger"
-	"***REMOVED***/darkroom/core/pkg/service"
+	"github.com/gojek/darkroom/pkg/config"
+	"github.com/gojek/darkroom/pkg/logger"
+	"github.com/gojek/darkroom/pkg/service"
 )
 
 const (

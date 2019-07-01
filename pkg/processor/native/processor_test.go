@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"image"
 	"io/ioutil"
-	"***REMOVED***/darkroom/core/pkg/processor"
+	"github.com/gojek/darkroom/pkg/processor"
 	"testing"
 )
 

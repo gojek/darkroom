@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"***REMOVED***/darkroom/core/pkg/config"
+	"github.com/gojek/darkroom/pkg/config"
 )
 
 var instance *zap.Logger
