@@ -1,0 +1,21 @@
+language: go
+go: '1.12.x'
+
+stages:
+  - test
+
+env:
+  global:
+    - GO111MODULE=on
+
+install: echo "Skip global `install` ..."
+script: echo "Skip global `script` ..."
+
+jobs:
+  include:
+    - stage: test
+      install: make setup
+      script: make ci
+
+notifications:
+  email: false
