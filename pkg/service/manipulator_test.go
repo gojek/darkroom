@@ -1,11 +1,14 @@
 package service
 
 import (
+	"fmt"
 	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/gojek/darkroom/pkg/processor/native"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"io/ioutil"
 	"testing"
+	"time"
 )
 
 func TestNewManipulator(t *testing.T) {
@@ -75,6 +78,23 @@ func TestCleanInt(t *testing.T) {
 	assert.Equal(t, 0, CleanInt("0"))
 	assert.Equal(t, 0, CleanInt("garbage"))
 	assert.Equal(t, 0, CleanInt("-234"))
+}
+
+func Test_trackDuration(t *testing.T) {
+	imageData, err := ioutil.ReadFile("../processor/native/_testdata/test.png")
+	if err != nil {
+		panic(err)
+	}
+
+	updateOption := trackDuration(cropDurationKey, time.Now(), ProcessSpec{
+		ImageData: imageData,
+	})
+	assert.Equal(t, fmt.Sprintf("%s.%s.%s", cropDurationKey, "<=128KB", "png"), updateOption.Name)
+
+	updateOption = trackDuration(cropDurationKey, time.Now(), ProcessSpec{
+		ImageData: make([]byte, 10, 10),
+	})
+	assert.Equal(t, fmt.Sprintf("%s.%s.%s", cropDurationKey, "<=128KB", "octet-stream"), updateOption.Name)
 }
 
 type mockProcessor struct {
