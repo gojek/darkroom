@@ -50,20 +50,20 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		t := time.Now()
 		data, err = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
 		if err == nil {
-			metrics.Update(metrics.UpdateOption{Name: cropDurationKey, Type: metrics.Duration, Duration: time.Since(t), Scope: spec.Scope})
+			trackDuration(cropDurationKey, t, spec.Scope)
 		}
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		t := time.Now()
 		data, err = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
 		if err == nil {
-			metrics.Update(metrics.UpdateOption{Name: resizeDurationKey, Type: metrics.Duration, Duration: time.Since(t), Scope: spec.Scope})
+			trackDuration(resizeDurationKey, t, spec.Scope)
 		}
 	}
 	if params[mono] == blackHexCode {
 		t := time.Now()
 		data, err = m.processor.GrayScale(data)
 		if err == nil {
-			metrics.Update(metrics.UpdateOption{Name: grayScaleDurationKey, Type: metrics.Duration, Duration: time.Since(t), Scope: spec.Scope})
+			trackDuration(grayScaleDurationKey, t, spec.Scope)
 		}
 	}
 	return data, err
@@ -100,6 +100,15 @@ func GetCropPoint(input string) processor.CropPoint {
 	default:
 		return processor.CropCenter
 	}
+}
+
+func trackDuration(name string, start time.Time, scope string) {
+	metrics.Update(metrics.UpdateOption{
+		Name:     name,
+		Type:     metrics.Duration,
+		Duration: time.Since(start),
+		Scope:    scope,
+	})
 }
 
 // NewManipulator takes in a Processor interface and returns a new manipulator
