@@ -1,9 +1,12 @@
 package service
 
 import (
+	"fmt"
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor"
+	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -33,11 +36,11 @@ type manipulator struct {
 // ProcessSpec defines the specification for a image manipulation job
 type ProcessSpec struct {
 	// Scope defines a scope for the image manipulation job, it can be used for logging/mertrics collection purposes
-	Scope     string
+	Scope string
 	// ImageData holds the actual image contents to processed
 	ImageData []byte
 	// Params hold the key-value pairs for the processing job and tells the manipulator what to do with the image
-	Params    map[string]string
+	Params map[string]string
 }
 
 // Process takes ProcessSpec as an argument and returns []byte, error
@@ -50,20 +53,20 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		t := time.Now()
 		data, err = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
 		if err == nil {
-			trackDuration(cropDurationKey, t, spec.Scope)
+			trackDuration(cropDurationKey, t, spec)
 		}
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		t := time.Now()
 		data, err = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
 		if err == nil {
-			trackDuration(resizeDurationKey, t, spec.Scope)
+			trackDuration(resizeDurationKey, t, spec)
 		}
 	}
 	if params[mono] == blackHexCode {
 		t := time.Now()
 		data, err = m.processor.GrayScale(data)
 		if err == nil {
-			trackDuration(grayScaleDurationKey, t, spec.Scope)
+			trackDuration(grayScaleDurationKey, t, spec)
 		}
 	}
 	return data, err
@@ -102,13 +105,16 @@ func GetCropPoint(input string) processor.CropPoint {
 	}
 }
 
-func trackDuration(name string, start time.Time, scope string) {
-	metrics.Update(metrics.UpdateOption{
-		Name:     name,
+func trackDuration(name string, start time.Time, spec ProcessSpec) *metrics.UpdateOption {
+	ext := strings.Split(http.DetectContentType(spec.ImageData), "/")[1]
+	updateOption := metrics.UpdateOption{
+		Name:     fmt.Sprintf("%s.%s.%s", name, metrics.GetImageSizeCluster(spec.ImageData), ext),
 		Type:     metrics.Duration,
 		Duration: time.Since(start),
-		Scope:    scope,
-	})
+		Scope:    spec.Scope,
+	}
+	metrics.Update(updateOption)
+	return &updateOption
 }
 
 // NewManipulator takes in a Processor interface and returns a new manipulator
