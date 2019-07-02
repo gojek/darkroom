@@ -62,7 +62,7 @@ func Debug(message string, fields ...zap.Field) {
 
 // Debugf allows Sprintf style formatting and logs at debug level
 func Debugf(template string, args ...interface{}) {
-	getSugaredLogger().Debugf(template, args)
+	getSugaredLogger().Debugf(template, args...)
 }
 
 // Error logs the message at error level and prints stacktrace with additional fields, if any
@@ -82,7 +82,7 @@ func Fatal(message string, fields ...zap.Field) {
 
 // Fatalf allows Sprintf style formatting, logs at fatal level and exits
 func Fatalf(template string, args ...interface{}) {
-	getSugaredLogger().Fatalf(template, args)
+	getSugaredLogger().Fatalf(template, args...)
 }
 
 // Info logs the message at info level with additional fields, if any
@@ -92,7 +92,7 @@ func Info(message string, fields ...zap.Field) {
 
 // Infof allows Sprintf style formatting and logs at info level
 func Infof(template string, args ...interface{}) {
-	getSugaredLogger().Infof(template, args)
+	getSugaredLogger().Infof(template, args...)
 }
 
 // Warn logs the message at warn level with additional fields, if any
@@ -102,7 +102,7 @@ func Warn(message string, fields ...zap.Field) {
 
 // Warnf allows Sprintf style formatting and logs at warn level
 func Warnf(template string, args ...interface{}) {
-	getSugaredLogger().Warnf(template, args)
+	getSugaredLogger().Warnf(template, args...)
 }
 
 // AddHook adds func(zapcore.Entry) error) to the logger lifecycle
