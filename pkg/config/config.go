@@ -61,38 +61,47 @@ func newConfig() *config {
 	}
 }
 
+// Update creates a new instance of the configuration and reads all values again
 func Update() {
 	instance = newConfig()
 }
 
+// LogLevel returns the log level for logger from the environment
 func LogLevel() string {
 	return getConfig().logLevel
 }
 
+// AppName returns the application name from the environment
 func AppName() string {
 	return getConfig().app.name
 }
 
+// AppVersion returns the application version from the environment
 func AppVersion() string {
 	return getConfig().app.version
 }
 
+// AppDescription returns the application description from the environment
 func AppDescription() string {
 	return getConfig().app.description
 }
 
+// DebugModeEnabled returns the debug mode bool from the environment
 func DebugModeEnabled() bool {
 	return getConfig().debugMode
 }
 
+// Port returns the application port to be used from the environment
 func Port() int {
 	return getConfig().port
 }
 
+// CacheTime returns the time to set the cache-time in image handler from the environment
 func CacheTime() int {
 	return getConfig().cacheTime
 }
 
+// Source returns the source struct after it is initialised from the environment values
 func Source() *source {
 	return &getConfig().source
 }

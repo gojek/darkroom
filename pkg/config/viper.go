@@ -14,6 +14,7 @@ const (
 var viperInstance *viper.Viper
 var viperInit sync.Once
 
+// Viper creates a new singleton instance of viper.Viper
 func Viper() *viper.Viper {
 	viperInit.Do(func() {
 		viperInstance = viper.New()

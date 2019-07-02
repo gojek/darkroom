@@ -35,7 +35,7 @@ type StatsdCollectorConfig struct {
 	FlushBytes int
 }
 
-// InitializeStatsdCollector will start publishing metrics in the form {config.Prefix}.{name}.{updateOption.Name}
+// InitializeStatsdCollector will start publishing metrics in the form {config.Prefix}.{updateOption.Scope|default}.{updateOption.Name}
 func InitializeStatsdCollector(config *StatsdCollectorConfig) error {
 	flushBytes := config.FlushBytes
 	if flushBytes == 0 {
@@ -64,6 +64,7 @@ func formatter(updateOption UpdateOption) string {
 	return fmt.Sprintf("%s.%s", scope, strings.Trim(updateOption.Name, "."))
 }
 
+// Update takes an UpdateOption and pushes the metrics to the statd client if initialised
 func Update(updateOption UpdateOption) {
 	if instance == nil {
 		return

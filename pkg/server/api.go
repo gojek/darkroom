@@ -12,11 +12,13 @@ import (
 	"github.com/gojek/darkroom/pkg/logger"
 )
 
+// Server struct wraps a http.Handler and the LifeCycleHook
 type Server struct {
 	handler http.Handler
 	hook    *LifeCycleHook
 }
 
+// NewServer returns a new Server configurable with Options
 func NewServer(opts ...Option) *Server {
 	s := Server{}
 	for _, opt := range opts {
@@ -25,10 +27,12 @@ func NewServer(opts ...Option) *Server {
 	return &s
 }
 
+// AddLifeCycleHook sets the passed LifeCycleHook to the Server struct
 func (s *Server) AddLifeCycleHook(hook *LifeCycleHook) {
 	s.hook = hook
 }
 
+// Start is used to start a http.Server and wait for a kill signal to gracefully shutdown the server
 func (s *Server) Start() {
 	logger.Infof("Starting %s server", config.AppName())
 

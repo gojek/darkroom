@@ -1,3 +1,4 @@
+// Package router has the default routes information
 package router
 
 import (
@@ -13,6 +14,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// NewRouter takes in handler Dependencies and returns mux.Router with default routes
+// and if debug mode is enabled then it also adds pprof routes.
+// It also, adds a PathPrefix to the catch all router if config.Source().PathPrefix is set
 func NewRouter(deps *service.Dependencies) *mux.Router {
 	validateDependencies(deps)
 	r := mux.NewRouter().StrictSlash(true)

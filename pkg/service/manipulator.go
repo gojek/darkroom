@@ -17,13 +17,12 @@ const (
 
 	cropDurationKey      = "cropDuration"
 	resizeDurationKey    = "resizeDuration"
-	watermarkDurationKey = "watermarkDuration"
 	grayScaleDurationKey = "grayScaleDuration"
-	decodeDurationKey    = "decodeDuration"
-	encodeDurationKey    = "encodeDuration"
 )
 
+// Manipulator interface sets the contract on the implementation for common processing support in darkroom
 type Manipulator interface {
+	// Process takes ProcessSpec as an argument and returns []byte, error
 	Process(spec ProcessSpec) ([]byte, error)
 }
 
@@ -31,12 +30,18 @@ type manipulator struct {
 	processor processor.Processor
 }
 
+// ProcessSpec defines the specification for a image manipulation job
 type ProcessSpec struct {
+	// Scope defines a scope for the image manipulation job, it can be used for logging/mertrics collection purposes
 	Scope     string
+	// ImageData holds the actual image contents to processed
 	ImageData []byte
+	// Params hold the key-value pairs for the processing job and tells the manipulator what to do with the image
 	Params    map[string]string
 }
 
+// Process takes ProcessSpec as an argument and returns []byte, error
+// This manipulator uses bild to do the actual image manipulations
 func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	params := spec.Params
 	data := spec.ImageData
@@ -64,6 +69,7 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	return data, err
 }
 
+// CleanInt takes a string and return an int not greater than 9999
 func CleanInt(input string) int {
 	val, _ := strconv.Atoi(input)
 	if val <= 0 {
@@ -72,6 +78,7 @@ func CleanInt(input string) int {
 	return val % 10000 // Never return value greater than 9999
 }
 
+// GetCropPoint takes a string and returns the type CropPoint
 func GetCropPoint(input string) processor.CropPoint {
 	switch input {
 	case "top":
@@ -95,6 +102,7 @@ func GetCropPoint(input string) processor.CropPoint {
 	}
 }
 
+// NewManipulator takes in a Processor interface and returns a new manipulator
 func NewManipulator(processor processor.Processor) *manipulator {
 	return &manipulator{processor: processor}
 }

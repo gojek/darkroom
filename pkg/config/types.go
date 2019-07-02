@@ -11,26 +11,41 @@ type app struct {
 	description string
 }
 
+// S3Bucket contains the configuration values for S3 source
 type S3Bucket struct {
+	// Name of the bucket
 	Name      string
+	// Region of the bucket
 	Region    string
+	// Access key that should be used to access the bucket
 	AccessKey string
+	// Secret key that should be used to access the bucket
 	SecretKey string
 }
 
+// WebFolder contains the configuration for a directory available on the public internet
 type WebFolder struct {
+	// BaseURL that should be appended to the path
+	// Eg: https://example.com/web-folder/{path} will map to https://host.com/{path}
 	BaseURL string
 }
 
+// Cloudfront contains the configuration for cloudfront which can be used with an S3 bucket
 type Cloudfront struct {
+	// Host is the FQDN for the cloudfront integration on the S3 bucket
 	Host           string
+	// SecureProtocol designates whether to use http or https protocol for requests
 	SecureProtocol bool
 }
 
 type source struct {
+	// Kind tells which type of Storage backend should be used
 	Kind           string
+	// HystrixCommand provides the hystrix config to be used with the source to add resiliency
 	HystrixCommand storage.HystrixCommand
+	// Value is and interface which holds the actual kind of the object
 	Value          interface{}
+	// PathPrefix is used to restrict access to specific paths only via the image proxy
 	PathPrefix     string
 }
 

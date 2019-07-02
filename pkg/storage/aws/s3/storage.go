@@ -11,6 +11,7 @@ import (
 	"github.com/gojek/darkroom/pkg/storage"
 )
 
+// Storage holds the fields used by S3 storage implementation
 type Storage struct {
 	bucketName   string
 	bucketRegion string
@@ -20,6 +21,8 @@ type Storage struct {
 	downloader   s3manageriface.DownloaderAPI
 }
 
+// Get takes in the Context and path as an argument and returns an IResponse interface implementation.
+// This method figures out how to get the data from the S3 storage backend.
 func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	buff := &aws.WriteAtBuffer{}
 
@@ -40,6 +43,7 @@ func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	return storage.NewResponse([]byte(buff.Bytes()), getStatusCodeFromError(s3Err), s3Err)
 }
 
+// NewStorage returns a new s3.Storage instance
 func NewStorage(opts ...Option) *Storage {
 	s := Storage{}
 	for _, opt := range opts {

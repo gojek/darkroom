@@ -28,6 +28,7 @@ const (
 type BildProcessor struct {
 }
 
+// Crop takes an input byte array, width, height and a CropPoint and returns the cropped image bytes or error
 func (bp *BildProcessor) Crop(input []byte, width, height int, point processor.CropPoint) ([]byte, error) {
 	img, f, err := bp.decode(input)
 	if err != nil {
@@ -44,6 +45,7 @@ func (bp *BildProcessor) Crop(input []byte, width, height int, point processor.C
 	return bp.encode(img, f)
 }
 
+// Resize takes an input byte array, width and height and returns the re-sized image bytes or error
 func (bp *BildProcessor) Resize(input []byte, width, height int) ([]byte, error) {
 	img, f, err := bp.decode(input)
 	if err != nil {
@@ -61,6 +63,8 @@ func (bp *BildProcessor) Resize(input []byte, width, height int) ([]byte, error)
 	return bp.encode(img, f)
 }
 
+// Watermark takes an input byte array, overlay byte array and opacity value
+// and returns the watermarked image bytes or error
 func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error) {
 	baseImg, f, err := bp.decode(base)
 	if err != nil {
@@ -93,6 +97,7 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 	return bp.encode(baseImg, f)
 }
 
+// GrayScale takes an input byte array and returns the grayscaled byte array or error
 func (bp *BildProcessor) GrayScale(input []byte) ([]byte, error) {
 	img, f, err := bp.decode(input)
 	if err != nil {
@@ -148,6 +153,7 @@ func (bp *BildProcessor) encode(img image.Image, format string) ([]byte, error) 
 	return buff.Bytes(), err
 }
 
+// NewBildProcessor creates a new BildProcessor
 func NewBildProcessor() *BildProcessor {
 	return &BildProcessor{}
 }

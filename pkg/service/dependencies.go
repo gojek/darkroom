@@ -1,3 +1,4 @@
+// Package service contains the service definitions used by the handler
 package service
 
 import (
@@ -14,11 +15,14 @@ import (
 	"github.com/gojektech/heimdall/hystrix"
 )
 
+// Dependencies struct holds the reference to the Storage and the Manipulator interface implementations
 type Dependencies struct {
 	Storage     base.Storage
 	Manipulator Manipulator
 }
 
+// NewDependencies constructs new Dependencies based on the config.Source().Kind
+// Currently, it supports only one Manipulator
 func NewDependencies() *Dependencies {
 	s := config.Source()
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor())}
@@ -32,6 +36,7 @@ func NewDependencies() *Dependencies {
 	return deps
 }
 
+// NewS3Storage create a new s3.Storage struct from the config.S3Bucket and the HystrixCommand
 func NewS3Storage(b config.S3Bucket, hc base.HystrixCommand) *s3.Storage {
 	return s3.NewStorage(
 		s3.WithBucketName(b.Name),
@@ -42,6 +47,7 @@ func NewS3Storage(b config.S3Bucket, hc base.HystrixCommand) *s3.Storage {
 	)
 }
 
+// NewWebFolderStorage create a new webfolder.Storage struct from the config.WebFolder and the HystrixCommand
 func NewWebFolderStorage(wf config.WebFolder, hc base.HystrixCommand) *webfolder.Storage {
 	return webfolder.NewStorage(
 		webfolder.WithBaseURL(wf.BaseURL),
@@ -49,6 +55,7 @@ func NewWebFolderStorage(wf config.WebFolder, hc base.HystrixCommand) *webfolder
 	)
 }
 
+// NewCloudfrontStorage create a new cloudfront.Storage struct from the config.Cloudfront and the HystrixCommand
 func NewCloudfrontStorage(c config.Cloudfront, hc base.HystrixCommand) *cloudfront.Storage {
 	var opts []cloudfront.Option
 	if c.SecureProtocol {
