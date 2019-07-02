@@ -66,7 +66,7 @@ func Error(message string, fields ...zap.Field) {
 }
 
 func Errorf(template string, args ...interface{}) {
-	getSugaredLogger().Errorf(template, args)
+	getSugaredLogger().Errorf(template, args...)
 }
 
 func Fatal(message string, fields ...zap.Field) {
