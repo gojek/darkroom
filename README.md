@@ -1,4 +1,7 @@
-# Darkroom
+# Darkroom - Yet Another Image Proxy
+
+<p align="center"><img src="docs/darkroom-logo.png" width="360"></p>
+
 [![build status](https://travis-ci.com/gojek/darkroom.svg?branch=master)](https://travis-ci.com/gojek/darkroom)
 [![Coverage Status](https://coveralls.io/repos/github/gojek/darkroom/badge.svg?branch=master)](https://coveralls.io/github/gojek/darkroom?branch=master)
 [![GoDoc](https://godoc.org/github.com/gojek/darkroom?status.svg)](https://godoc.org/github.com/gojek/darkroom)
@@ -7,8 +10,9 @@
 [![GitHub Release](https://img.shields.io/github/release/gojek/darkroom.svg?style=flat)](https://github.com/gojek/darkroom/releases)
 
 #### About
-This project combines the darkroom [storage backend](pkg/storage) and the [image processor](pkg/processor) and acts as an `Image Proxy` on your image source.  
-You may implement your own `Storage` and `Processor` interfaces to gain custom functionality while still keeping other Darkroom Server functionality.
+Darkroom combines the [storage backend](pkg/storage) and the [image processor](pkg/processor) and acts as an `Image Proxy` on your image source.  
+You may implement your own `Storage` and `Processor` interfaces to gain custom functionality while still keeping other Darkroom Server functionality.  
+The native implementations focus on speed and resiliency.
 
 #### Installation
 The project has docker images available. They can be tested locally or can be be deployed to production.
