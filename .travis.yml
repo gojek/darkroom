@@ -1,32 +1,24 @@
 language: go
 go: '1.12.x'
 
-stages:
-  - test
-  - name: release
-    if: (repo == gojek/darkroom) AND (branch == master) AND (tag IS present)
-
 env:
   global:
     - GO111MODULE=on
 
-install: echo "Skip global install..."
-script: echo "Skip global script..."
+install: make setup
+script: make test-ci
 
-jobs:
-  include:
-    - stage: test
-    - name: "Tests"
-      install: make setup
-      script: make test-ci
+before_deploy:
+  - |
+    [ ! -z $DOCKER_PASSWORD ] && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
-    - stage: release
-    - name: "Release Builds"
-      services: docker
-      before_script:
-        - |
-          [ ! -z $DOCKER_PASSWORD ] && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      script: curl -sL https://git.io/goreleaser | bash -s -- --rm-dist --skip-validate
+deploy:
+  provider: script
+  script: curl -sL https://git.io/goreleaser | bash -s -- --rm-dist --skip-validate
+  skip_cleanup: true
+  on:
+    tags: true
+    branch: master
 
 notifications:
   email: false
