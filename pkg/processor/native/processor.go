@@ -103,27 +103,22 @@ func (bp *BildProcessor) GrayScale(input []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	img = grayScale(img)
-
-	return bp.encode(img, f)
-}
-
-func grayScale(img image.Image) image.Image {
 	src := clone.AsRGBA(img)
 	bounds := src.Bounds()
 	if bounds.Empty() {
-		return &image.RGBA{}
-	}
-	parallel.Line(bounds.Dy(), func(start, end int) {
-		for y := start; y < end; y++ {
-			for x := 0; x < bounds.Dx(); x++ {
-				srcPix := src.At(x, y).(color.RGBA)
-				g := color.GrayModel.Convert(srcPix).(color.Gray).Y
-				src.Set(x, y, color.RGBA{R: g, G: g, B: g, A: srcPix.A})
+		src = &image.RGBA{}
+	} else {
+		parallel.Line(bounds.Dy(), func(start, end int) {
+			for y := start; y < end; y++ {
+				for x := 0; x < bounds.Dx(); x++ {
+					srcPix := src.At(x, y).(color.RGBA)
+					g := color.GrayModel.Convert(srcPix).(color.Gray).Y
+					src.Set(x, y, color.RGBA{R: g, G: g, B: g, A: srcPix.A})
+				}
 			}
-		}
-	})
-	return src
+		})
+	}
+	return bp.encode(src, f)
 }
 
 func (bp *BildProcessor) decode(data []byte) (image.Image, string, error) {
