@@ -114,17 +114,16 @@ func grayScale(img image.Image) image.Image {
 	if bounds.Empty() {
 		return &image.RGBA{}
 	}
-	dst := image.NewRGBA(bounds)
 	parallel.Line(bounds.Dy(), func(start, end int) {
 		for y := start; y < end; y++ {
 			for x := 0; x < bounds.Dx(); x++ {
 				srcPix := src.At(x, y).(color.RGBA)
 				g := color.GrayModel.Convert(srcPix).(color.Gray).Y
-				dst.Set(x, y, color.RGBA{R: g, G: g, B: g, A: srcPix.A})
+				src.Set(x, y, color.RGBA{R: g, G: g, B: g, A: srcPix.A})
 			}
 		}
 	})
-	return dst
+	return src
 }
 
 func (bp *BildProcessor) decode(data []byte) (image.Image, string, error) {
