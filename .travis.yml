@@ -10,7 +10,7 @@ script: make test-ci
 
 before_deploy:
   - |
-    docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    docker login docker.io -u $DOCKER_USER -p $DOCKER_PASSWORD
 
 deploy:
   provider: script
