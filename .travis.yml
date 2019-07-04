@@ -10,7 +10,7 @@ script: make test-ci
 
 before_deploy:
   - |
-    [ ! -z $DOCKER_PASSWORD ] && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+    docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
 deploy:
   provider: script
