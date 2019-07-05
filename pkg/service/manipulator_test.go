@@ -6,6 +6,7 @@ import (
 	"github.com/gojek/darkroom/pkg/processor/native"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"image"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -21,40 +22,45 @@ func TestManipulator_Process(t *testing.T) {
 	m := NewManipulator(mp)
 	params := make(map[string]string)
 
-	mp.On("Crop", []byte("toCrop"), 100, 100, processor.CropCenter).Return([]byte("cropped"), nil)
+	input := []byte("inputData")
+	decoded := &image.RGBA{Pix: []uint8{1, 2, 3, 4}}
+
+	mp.On("Decode", input).Return(decoded, "png", nil)
+	mp.On("Encode", decoded, "png").Return(input, nil)
+	mp.On("Crop", decoded, 100, 100, processor.CropCenter).Return(decoded, nil)
 
 	params[fit] = crop
 	params[width] = "100"
 	params[height] = "100"
 	data, err := m.Process(ProcessSpec{
-		ImageData: []byte("toCrop"),
+		ImageData: input,
 		Params:    params,
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, []byte("cropped"), data)
+	assert.Equal(t, input, data)
 
-	mp.On("Resize", []byte("toResize"), 100, 100).Return([]byte("reSized"), nil)
+	mp.On("Resize", decoded, 100, 100).Return(decoded, nil)
 
 	params = make(map[string]string)
 	params[width] = "100"
 	params[height] = "100"
 	data, err = m.Process(ProcessSpec{
-		ImageData: []byte("toResize"),
+		ImageData: input,
 		Params:    params,
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, []byte("reSized"), data)
+	assert.Equal(t, input, data)
 
-	mp.On("GrayScale", []byte("toGrayScale")).Return([]byte("grayScaled"), nil)
+	mp.On("GrayScale", decoded).Return(decoded, nil)
 
 	params = make(map[string]string)
 	params[mono] = blackHexCode
 	data, err = m.Process(ProcessSpec{
-		ImageData: []byte("toGrayScale"),
+		ImageData: input,
 		Params:    params,
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, []byte("grayScaled"), data)
+	assert.Equal(t, input, data)
 }
 
 func TestGetCropPoint(t *testing.T) {
@@ -101,20 +107,14 @@ type mockProcessor struct {
 	mock.Mock
 }
 
-func (m *mockProcessor) Crop(input []byte, width, height int, point processor.CropPoint) ([]byte, error) {
-	args := m.Called(input, width, height, point)
-	if args.Get(1) == nil {
-		return args.Get(0).([]byte), nil
-	}
-	return args.Get(0).([]byte), args.Get(1).(error)
+func (m *mockProcessor) Crop(img image.Image, width, height int, point processor.CropPoint) image.Image {
+	args := m.Called(img, width, height, point)
+	return args.Get(0).(image.Image)
 }
 
-func (m *mockProcessor) Resize(input []byte, width, height int) ([]byte, error) {
-	args := m.Called(input, width, height)
-	if args.Get(1) == nil {
-		return args.Get(0).([]byte), nil
-	}
-	return args.Get(0).([]byte), args.Get(1).(error)
+func (m *mockProcessor) Resize(img image.Image, width, height int) image.Image {
+	args := m.Called(img, width, height)
+	return args.Get(0).(image.Image)
 }
 
 func (m *mockProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error) {
@@ -122,10 +122,26 @@ func (m *mockProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([
 	return args.Get(0).([]byte), args.Get(1).(error)
 }
 
-func (m *mockProcessor) GrayScale(input []byte) ([]byte, error) {
-	args := m.Called(input)
-	if args.Get(1) == nil {
-		return args.Get(0).([]byte), nil
+func (m *mockProcessor) GrayScale(img image.Image) image.Image {
+	args := m.Called(img)
+	return args.Get(0).(image.Image)
+}
+
+func (m *mockProcessor) Decode(data []byte) (image.Image, string, error) {
+	args := m.Called(data)
+	img := args.Get(0).(image.Image)
+	ext := args.Get(1).(string)
+	if args.Get(2) == nil {
+		return img, ext, nil
 	}
-	return args.Get(0).([]byte), args.Get(1).(error)
+	return img, ext, args.Get(2).(error)
+}
+
+func (m *mockProcessor) Encode(img image.Image, format string) ([]byte, error) {
+	args := m.Called(img, format)
+	b := args.Get(0).([]byte)
+	if args.Get(1) == nil {
+		return b, nil
+	}
+	return b, args.Get(1).(error)
 }

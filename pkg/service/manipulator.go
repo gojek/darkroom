@@ -47,29 +47,31 @@ type ProcessSpec struct {
 // This manipulator uses bild to do the actual image manipulations
 func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	params := spec.Params
-	data := spec.ImageData
+	//data := spec.ImageData
 	var err error
+	data, f, err := m.processor.Decode(spec.ImageData)
 	if params[fit] == crop {
 		t := time.Now()
-		data, err = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
+		data = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
 		if err == nil {
 			trackDuration(cropDurationKey, t, spec)
 		}
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		t := time.Now()
-		data, err = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
+		data = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
 		if err == nil {
 			trackDuration(resizeDurationKey, t, spec)
 		}
 	}
 	if params[mono] == blackHexCode {
 		t := time.Now()
-		data, err = m.processor.GrayScale(data)
+		data = m.processor.GrayScale(data)
 		if err == nil {
 			trackDuration(grayScaleDurationKey, t, spec)
 		}
 	}
-	return data, err
+	src, err := m.processor.Encode(data, f)
+	return src, err
 }
 
 // CleanInt takes a string and return an int not greater than 9999
