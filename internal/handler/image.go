@@ -13,12 +13,12 @@ import (
 const (
 	// ContentLengthHeader is the response header key used to set content length
 	ContentLengthHeader = "Content-Length"
-	// CacheControlHeader is the response header key used to set cache controll
-	CacheControlHeader  = "Cache-Control"
+	// CacheControlHeader is the response header key used to set cache control
+	CacheControlHeader = "Cache-Control"
 	// StorageGetErrorKey is the key used while pushing metrics update to statsd
-	StorageGetErrorKey  = "handler.storage.get.error"
+	StorageGetErrorKey = "handler.storage.get.error"
 	// ProcessorErrorKey is the key used while pushing metrics update to statsd
-	ProcessorErrorKey   = "handler.processor.error"
+	ProcessorErrorKey = "handler.processor.error"
 )
 
 // ImageHandler is responsible for fetching the path from the storage backend and processing it if required
