@@ -5,23 +5,17 @@ import (
 	"github.com/anthonynsimon/bild/clone"
 	"github.com/anthonynsimon/bild/parallel"
 	"github.com/anthonynsimon/bild/transform"
-	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
 	"image/png"
-	"time"
 )
 
 const (
 	pngType = "png"
 	jpgType = "jpeg"
-
-	watermarkDurationKey = "watermarkDuration"
-	decodeDurationKey    = "decodeDuration"
-	encodeDurationKey    = "encodeDuration"
 )
 
 // BildProcessor uses bild library to process images using native Golang image.Image interface
@@ -66,7 +60,6 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 		return nil, err
 	}
 
-	t := time.Now()
 	ratio := float64(overlayImg.Bounds().Dy()) / float64(overlayImg.Bounds().Dx())
 	dWidth := float64(baseImg.Bounds().Dx()) / 2.0
 
@@ -83,7 +76,6 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 
 	// Performing overlay
 	draw.DrawMask(baseImg.(draw.Image), overlayImg.Bounds().Add(offset), overlayImg, image.ZP, mask, image.ZP, draw.Over)
-	metrics.Update(metrics.UpdateOption{Name: watermarkDurationKey, Type: metrics.Duration, Duration: time.Since(t)})
 
 	return bp.Encode(baseImg, f)
 }
@@ -109,16 +101,11 @@ func (bp *BildProcessor) GrayScale(img image.Image) image.Image {
 }
 
 func (bp *BildProcessor) Decode(data []byte) (image.Image, string, error) {
-	t := time.Now()
 	img, f, err := image.Decode(bytes.NewReader(data))
-	if err == nil {
-		metrics.Update(metrics.UpdateOption{Name: decodeDurationKey, Type: metrics.Duration, Duration: time.Since(t)})
-	}
 	return img, f, err
 }
 
 func (bp *BildProcessor) Encode(img image.Image, format string) ([]byte, error) {
-	t := time.Now()
 	if format == pngType && isOpaque(img) {
 		format = jpgType
 	}
@@ -130,7 +117,6 @@ func (bp *BildProcessor) Encode(img image.Image, format string) ([]byte, error) 
 	} else {
 		err = jpeg.Encode(buff, img, nil)
 	}
-	metrics.Update(metrics.UpdateOption{Name: encodeDurationKey, Type: metrics.Duration, Duration: time.Since(t)})
 	return buff.Bytes(), err
 }
 

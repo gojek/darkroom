@@ -19,8 +19,10 @@ const (
 	blackHexCode = "000000"
 
 	cropDurationKey      = "cropDuration"
-	resizeDurationKey    = "resizeDuration"
+	decodeDurationKey    = "decodeDuration"
+	encodeDurationKey    = "encodeDuration"
 	grayScaleDurationKey = "grayScaleDuration"
+	resizeDurationKey    = "resizeDuration"
 )
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
@@ -48,22 +50,31 @@ type ProcessSpec struct {
 func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	params := spec.Params
 	var err error
+	t := time.Now()
 	data, f, err := m.processor.Decode(spec.ImageData)
+	if err != nil {
+		return nil, err
+	}
+	trackDuration(decodeDurationKey, t, spec)
 	if params[fit] == crop {
-		t := time.Now()
+		t = time.Now()
 		data = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
 		trackDuration(cropDurationKey, t, spec)
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
-		t := time.Now()
+		t = time.Now()
 		data = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
 		trackDuration(resizeDurationKey, t, spec)
 	}
 	if params[mono] == blackHexCode {
-		t := time.Now()
+		t = time.Now()
 		data = m.processor.GrayScale(data)
 		trackDuration(grayScaleDurationKey, t, spec)
 	}
+	t = time.Now()
 	src, err := m.processor.Encode(data, f)
+	if err == nil {
+		trackDuration(encodeDurationKey, t, spec)
+	}
 	return src, err
 }
 
