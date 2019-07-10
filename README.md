@@ -15,6 +15,17 @@ You may implement your own `Storage` and `Processor` interfaces to gain custom f
 The native implementations focus on speed and resiliency.
 
 #### Installation
+```bash
+go get -u github.com/gojek/darkroom
+```
+
+### Features
+Darkroom acts as an image proxy and currently support several image processing operations such as:
+- Cropping based on given anchor points (top, left, right, bottom)
+- Resizing
+- Grayscaling
+
+### Running the Image Proxy Service
 The project has docker images available. They can be tested locally or can be be deployed to production.
 
 Create a file containing the environment variables mentioned in [`config.yaml.example`](./config.yaml.example) and save it as `config.env`
@@ -57,10 +68,12 @@ Or might want to create an image processor that uses GPU acceleration to speed u
 #### Available Interfaces
 ```go
 type Processor interface {
-	Crop(input []byte, width, height int, point CropPoint) ([]byte, error)
-	Resize(input []byte, width, height int) ([]byte, error)
+	Crop(img image.Image, width, height int, point CropPoint) (image.Image, error)
+	Decode(data []byte) (image.Image, string, error)
+	Encode(img image.Image, format string) ([]byte, error)
+	GrayScale(img image.Image) (image.Image, error)
+	Resize(img image.Image, width, height int) (image.Image, error)
 	Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error)
-	GrayScale(input []byte) ([]byte, error)
 }
 ```
 ```go
