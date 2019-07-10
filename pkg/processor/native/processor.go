@@ -29,12 +29,7 @@ type BildProcessor struct {
 }
 
 // Crop takes an input byte array, width, height and a CropPoint and returns the cropped image bytes or error
-func (bp *BildProcessor) Crop(input []byte, width, height int, point processor.CropPoint) ([]byte, error) {
-	img, f, err := bp.decode(input)
-	if err != nil {
-		return nil, err
-	}
-
+func (bp *BildProcessor) Crop(img image.Image, width, height int, point processor.CropPoint) image.Image {
 	w, h := getResizeWidthAndHeightForCrop(width, height, img.Bounds().Dx(), img.Bounds().Dy())
 
 	img = transform.Resize(img, w, h, transform.Linear)
@@ -42,15 +37,11 @@ func (bp *BildProcessor) Crop(input []byte, width, height int, point processor.C
 	rect := image.Rect(x0, y0, width+x0, height+y0)
 	img = (clone.AsRGBA(img)).SubImage(rect)
 
-	return bp.encode(img, f)
+	return img
 }
 
 // Resize takes an input byte array, width and height and returns the re-sized image bytes or error
-func (bp *BildProcessor) Resize(input []byte, width, height int) ([]byte, error) {
-	img, f, err := bp.decode(input)
-	if err != nil {
-		return nil, err
-	}
+func (bp *BildProcessor) Resize(img image.Image, width, height int) image.Image {
 
 	initW := img.Bounds().Dx()
 	initH := img.Bounds().Dy()
@@ -60,17 +51,17 @@ func (bp *BildProcessor) Resize(input []byte, width, height int) ([]byte, error)
 		img = transform.Resize(img, w, h, transform.Linear)
 	}
 
-	return bp.encode(img, f)
+	return img
 }
 
 // Watermark takes an input byte array, overlay byte array and opacity value
 // and returns the watermarked image bytes or error
 func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error) {
-	baseImg, f, err := bp.decode(base)
+	baseImg, f, err := bp.Decode(base)
 	if err != nil {
 		return nil, err
 	}
-	overlayImg, _, err := bp.decode(overlay)
+	overlayImg, _, err := bp.Decode(overlay)
 	if err != nil {
 		return nil, err
 	}
@@ -94,40 +85,30 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 	draw.DrawMask(baseImg.(draw.Image), overlayImg.Bounds().Add(offset), overlayImg, image.ZP, mask, image.ZP, draw.Over)
 	metrics.Update(metrics.UpdateOption{Name: watermarkDurationKey, Type: metrics.Duration, Duration: time.Since(t)})
 
-	return bp.encode(baseImg, f)
+	return bp.Encode(baseImg, f)
 }
 
 // GrayScale takes an input byte array and returns the grayscaled byte array or error
-func (bp *BildProcessor) GrayScale(input []byte) ([]byte, error) {
-	img, f, err := bp.decode(input)
-	if err != nil {
-		return nil, err
-	}
-	img = grayScale(img)
-
-	return bp.encode(img, f)
-}
-
-func grayScale(img image.Image) image.Image {
+func (bp *BildProcessor) GrayScale(img image.Image) image.Image {
 	src := clone.AsRGBA(img)
 	bounds := src.Bounds()
 	if bounds.Empty() {
-		return &image.RGBA{}
-	}
-	dst := image.NewRGBA(bounds)
-	parallel.Line(bounds.Dy(), func(start, end int) {
-		for y := start; y < end; y++ {
-			for x := 0; x < bounds.Dx(); x++ {
-				srcPix := src.At(x, y).(color.RGBA)
-				g := color.GrayModel.Convert(srcPix).(color.Gray).Y
-				dst.Set(x, y, color.RGBA{R: g, G: g, B: g, A: srcPix.A})
+		src = &image.RGBA{}
+	} else {
+		parallel.Line(bounds.Dy(), func(start, end int) {
+			for y := start; y < end; y++ {
+				for x := 0; x < bounds.Dx(); x++ {
+					srcPix := src.At(x, y).(color.RGBA)
+					g := color.GrayModel.Convert(srcPix).(color.Gray).Y
+					src.Set(x, y, color.RGBA{R: g, G: g, B: g, A: srcPix.A})
+				}
 			}
-		}
-	})
-	return dst
+		})
+	}
+	return src
 }
 
-func (bp *BildProcessor) decode(data []byte) (image.Image, string, error) {
+func (bp *BildProcessor) Decode(data []byte) (image.Image, string, error) {
 	t := time.Now()
 	img, f, err := image.Decode(bytes.NewReader(data))
 	if err == nil {
@@ -136,7 +117,7 @@ func (bp *BildProcessor) decode(data []byte) (image.Image, string, error) {
 	return img, f, err
 }
 
-func (bp *BildProcessor) encode(img image.Image, format string) ([]byte, error) {
+func (bp *BildProcessor) Encode(img image.Image, format string) ([]byte, error) {
 	t := time.Now()
 	if format == pngType && isOpaque(img) {
 		format = jpgType
