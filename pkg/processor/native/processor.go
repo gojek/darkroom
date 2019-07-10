@@ -9,17 +9,11 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"image/jpeg"
-	"image/png"
-)
-
-const (
-	pngType = "png"
-	jpgType = "jpeg"
 )
 
 // BildProcessor uses bild library to process images using native Golang image.Image interface
 type BildProcessor struct {
+	encoders *Encoders
 }
 
 // Crop takes an input image, width, height and a CropPoint and returns the cropped image
@@ -92,24 +86,25 @@ func (bp *BildProcessor) Decode(data []byte) (image.Image, string, error) {
 	return img, f, err
 }
 
-// Encode takes an image and the preferred format of the output
+// Encode takes an image and the preferred format (extension) of the output
 // Current supported format are "png", "jpg" and "jpeg"
-func (bp *BildProcessor) Encode(img image.Image, format string) ([]byte, error) {
-	if format == pngType && isOpaque(img) {
-		format = jpgType
-	}
-	buff := &bytes.Buffer{}
-	var err error
-	if format == pngType {
-		enc := png.Encoder{CompressionLevel: png.BestCompression}
-		err = enc.Encode(buff, img)
-	} else {
-		err = jpeg.Encode(buff, img, nil)
-	}
-	return buff.Bytes(), err
+func (bp *BildProcessor) Encode(img image.Image, fmt string) ([]byte, error) {
+	enc := bp.encoders.GetEncoder(img, fmt)
+	data, err := enc.Encode(img)
+	return data, err
 }
 
-// NewBildProcessor creates a new BildProcessor
+// NewBildProcessor creates a new BildProcessor with default compression
 func NewBildProcessor() *BildProcessor {
-	return &BildProcessor{}
+	return &BildProcessor{
+		encoders: NewEncoders(DefaultEncoderOptions),
+	}
+}
+
+// NewBildProcessorWithCompression takes an input of encoding options
+// 	and creates a newBildProcessor with custom compression options
+func NewBildProcessorWithCompression(opts *EncoderOptions) *BildProcessor {
+	return &BildProcessor{
+		encoders: NewEncoders(opts),
+	}
 }
