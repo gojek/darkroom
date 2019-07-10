@@ -22,7 +22,7 @@ const (
 type BildProcessor struct {
 }
 
-// Crop takes an input byte array, width, height and a CropPoint and returns the cropped image bytes or error
+// Crop takes an input image, width, height and a CropPoint and returns the cropped image
 func (bp *BildProcessor) Crop(img image.Image, width, height int, point processor.CropPoint) image.Image {
 	w, h := getResizeWidthAndHeightForCrop(width, height, img.Bounds().Dx(), img.Bounds().Dy())
 
@@ -34,7 +34,7 @@ func (bp *BildProcessor) Crop(img image.Image, width, height int, point processo
 	return img
 }
 
-// Resize takes an input byte array, width and height and returns the re-sized image bytes or error
+// Resize takes an input image, width and height and returns the re-sized image
 func (bp *BildProcessor) Resize(img image.Image, width, height int) image.Image {
 
 	initW := img.Bounds().Dx()
@@ -80,7 +80,7 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 	return bp.Encode(baseImg, f)
 }
 
-// GrayScale takes an input byte array and returns the grayscaled byte array or error
+// GrayScale takes an input image and returns the grayscaled image
 func (bp *BildProcessor) GrayScale(img image.Image) image.Image {
 	src := clone.AsRGBA(img)
 	bounds := src.Bounds()
@@ -100,11 +100,14 @@ func (bp *BildProcessor) GrayScale(img image.Image) image.Image {
 	return src
 }
 
+// Decode takes a byte array and returns the decoded image, format, or the error
 func (bp *BildProcessor) Decode(data []byte) (image.Image, string, error) {
 	img, f, err := image.Decode(bytes.NewReader(data))
 	return img, f, err
 }
 
+// Encode takes an image and the preferred format of the output
+// Current supported format are "png", "jpg" and "jpeg"
 func (bp *BildProcessor) Encode(img image.Image, format string) ([]byte, error) {
 	if format == pngType && isOpaque(img) {
 		format = jpgType
