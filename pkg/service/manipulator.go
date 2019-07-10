@@ -47,7 +47,6 @@ type ProcessSpec struct {
 // This manipulator uses bild to do the actual image manipulations
 func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	params := spec.Params
-	//data := spec.ImageData
 	var err error
 	data, f, err := m.processor.Decode(spec.ImageData)
 	if params[fit] == crop {
