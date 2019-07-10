@@ -52,22 +52,16 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	if params[fit] == crop {
 		t := time.Now()
 		data = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
-		if err == nil {
-			trackDuration(cropDurationKey, t, spec)
-		}
+		trackDuration(cropDurationKey, t, spec)
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		t := time.Now()
 		data = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
-		if err == nil {
-			trackDuration(resizeDurationKey, t, spec)
-		}
+		trackDuration(resizeDurationKey, t, spec)
 	}
 	if params[mono] == blackHexCode {
 		t := time.Now()
 		data = m.processor.GrayScale(data)
-		if err == nil {
-			trackDuration(grayScaleDurationKey, t, spec)
-		}
+		trackDuration(grayScaleDurationKey, t, spec)
 	}
 	src, err := m.processor.Encode(data, f)
 	return src, err
