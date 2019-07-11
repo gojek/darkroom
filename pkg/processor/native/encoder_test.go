@@ -35,7 +35,7 @@ func TestNewEncoders(t *testing.T) {
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder() {
-	encoders := NewEncoders(DefaultEncoderOptions)
+	encoders := NewEncoders(DefaultCompressionOptions)
 	_, ok := (encoders.GetEncoder(image.Opaque, "jpg")).(*JpegEncoder)
 	assert.True(s.T(), ok)
 	_, ok = (encoders.GetEncoder(image.Opaque, "jpeg")).(*JpegEncoder)

@@ -97,13 +97,13 @@ func (bp *BildProcessor) Encode(img image.Image, fmt string) ([]byte, error) {
 // NewBildProcessor creates a new BildProcessor with default compression
 func NewBildProcessor() *BildProcessor {
 	return &BildProcessor{
-		encoders: NewEncoders(DefaultEncoderOptions),
+		encoders: NewEncoders(DefaultCompressionOptions),
 	}
 }
 
 // NewBildProcessorWithCompression takes an input of encoding options
 // 	and creates a newBildProcessor with custom compression options
-func NewBildProcessorWithCompression(opts *EncoderOptions) *BildProcessor {
+func NewBildProcessorWithCompression(opts *CompressionOptions) *BildProcessor {
 	return &BildProcessor{
 		encoders: NewEncoders(opts),
 	}
