@@ -3,7 +3,7 @@ package native
 import (
 	"bytes"
 	"github.com/anthonynsimon/bild/clone"
-	"github.com/anthonynsimon/bild/parallel"
+	"github.com/anthonynsimon/bild/effect"
 	"github.com/anthonynsimon/bild/transform"
 	"github.com/gojek/darkroom/pkg/processor"
 	"image"
@@ -82,22 +82,8 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 
 // GrayScale takes an input image and returns the grayscaled image
 func (bp *BildProcessor) GrayScale(img image.Image) image.Image {
-	src := clone.AsRGBA(img)
-	bounds := src.Bounds()
-	if bounds.Empty() {
-		src = &image.RGBA{}
-	} else {
-		parallel.Line(bounds.Dy(), func(start, end int) {
-			for y := start; y < end; y++ {
-				for x := 0; x < bounds.Dx(); x++ {
-					srcPix := src.At(x, y).(color.RGBA)
-					g := color.GrayModel.Convert(srcPix).(color.Gray).Y
-					src.Set(x, y, color.RGBA{R: g, G: g, B: g, A: srcPix.A})
-				}
-			}
-		})
-	}
-	return src
+	// Rec. 601 Luma formula (https://en.wikipedia.org/wiki/Luma_%28video%29#Rec._601_luma_versus_Rec._709_luma_coefficients)
+	return effect.GrayscaleWithWeights(img, 0.299, 0.587, 0.114)
 }
 
 // Decode takes a byte array and returns the decoded image, format, or the error
