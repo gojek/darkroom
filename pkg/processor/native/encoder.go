@@ -76,16 +76,6 @@ func (e *Encoders) GetEncoder(img image.Image, ext string) Encoder {
 	return e.noOpEncoder
 }
 
-// Getter for JpegEncoder
-func (e *Encoders) JpegEncoder() Encoder {
-	return e.jpegEncoder
-}
-
-// Getter for PngEncoder
-func (e *Encoders) PngEncoder() Encoder {
-	return e.pngEncoder
-}
-
 // Getter for Options
 func (e *Encoders) Options() *CompressionOptions {
 	return e.options
