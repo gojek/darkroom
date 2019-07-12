@@ -25,7 +25,6 @@ func (s *BildProcessorSuite) SetupSuite() {
 	s.srcImage, _, _ = s.processor.Decode(s.srcData)
 	s.watermarkData, _ = ioutil.ReadFile("_testdata/overlay.png")
 	s.badData = []byte("badImage.ext")
-
 }
 
 func TestNewBildProcessor(t *testing.T) {
@@ -56,7 +55,6 @@ func (s *BildProcessorSuite) TestBildProcessor_Grayscale() {
 	actual, err = s.processor.Encode(out, "png")
 	assert.NotNil(s.T(), actual)
 	assert.Nil(s.T(), err)
-
 	expected, err = ioutil.ReadFile("_testdata/test_grayscaled.png")
 	assert.NotNil(s.T(), expected)
 	assert.Nil(s.T(), err)
