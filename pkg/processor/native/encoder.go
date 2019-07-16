@@ -68,7 +68,7 @@ func (e *Encoders) GetEncoder(img image.Image, ext string) Encoder {
 		return e.jpegEncoder
 	}
 	if ext == "png" {
-		if isOpaque(img) {
+		if e.options.JpegQuality != 100 && isOpaque(img) {
 			return e.jpegEncoder
 		}
 		return e.pngEncoder
