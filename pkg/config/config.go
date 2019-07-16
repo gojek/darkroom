@@ -7,12 +7,13 @@ import (
 )
 
 type config struct {
-	logLevel  string
-	app       app
-	debugMode bool
-	port      int
-	cacheTime int
-	source    source
+	logLevel                        string
+	app                             app
+	debugMode                       bool
+	port                            int
+	cacheTime                       int
+	source                          source
+	enableConcurrentImageProcessing bool
 }
 
 var instance *config
@@ -54,10 +55,11 @@ func newConfig() *config {
 			version:     v.GetString("app.version"),
 			description: v.GetString("app.description"),
 		},
-		debugMode: v.GetBool("debug"),
-		port:      port,
-		cacheTime: v.GetInt("cache.time"),
-		source:    s,
+		debugMode:                       v.GetBool("debug"),
+		port:                            port,
+		cacheTime:                       v.GetInt("cache.time"),
+		source:                          s,
+		enableConcurrentImageProcessing: v.GetBool("enableConcurrentImageProcessing"),
 	}
 }
 
@@ -104,4 +106,9 @@ func CacheTime() int {
 // Source returns the source struct after it is initialised from the environment values
 func Source() *source {
 	return &getConfig().source
+}
+
+// ConcurrentImageProcessingEnabled returns true if we want to process image using multiple cores (checking isOpaque)
+func ConcurrentImageProcessingEnabled() bool {
+	return getConfig().enableConcurrentImageProcessing
 }
