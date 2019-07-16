@@ -40,7 +40,11 @@ func (s *EncoderSuite) TestEncoders_GetEncoder() {
 	assert.True(s.T(), ok)
 	_, ok = (encoders.GetEncoder(image.Opaque, "jpeg")).(*JpegEncoder)
 	assert.True(s.T(), ok)
+	encoders.options.JpegQuality = 99
 	_, ok = (encoders.GetEncoder(image.Opaque, "png")).(*JpegEncoder)
+	assert.True(s.T(), ok)
+	encoders.options.JpegQuality = 100
+	_, ok = (encoders.GetEncoder(image.Opaque, "png")).(*PngEncoder)
 	assert.True(s.T(), ok)
 	_, ok = (encoders.GetEncoder(image.Transparent, "png")).(*PngEncoder)
 	assert.True(s.T(), ok)
