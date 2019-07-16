@@ -100,26 +100,16 @@ func TestGetStartingPointForCrop(t *testing.T) {
 	assert.Equal(t, 0, y)
 }
 
-func Test_isOpaqueWithoutOpaqueMethod(t *testing.T) {
-	im := &mockImage{opaque: false}
-	val := isOpaque(im)
-	assert.False(t, val)
-
-	im = &mockImage{opaque: true}
-	val = isOpaque(im)
-	assert.True(t, val)
-}
-
-func Test_isOpaqueShouldReturnTrue(t *testing.T) {
-	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
+func Test_isOpaqueWithoutOpaqueMethodShouldReturnTrue(t *testing.T) {
+	img := NewMockImage(image.Rect(0, 0, 640, 480))
 	draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
 	val := isOpaque(img)
 	assert.True(t, val)
 }
 
-func Test_isOpaqueShouldReturnFalse(t *testing.T) {
+func Test_isOpaqueWithoutOpaqueMethodShouldReturnFalse(t *testing.T) {
 	w, h := 640, 480
-	img := image.NewRGBA(image.Rect(0, 0, w, h))
+	img := NewMockImage(image.Rect(0, 0, w, h))
 	draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
 
 	cases := []struct {
@@ -140,31 +130,34 @@ func Test_isOpaqueShouldReturnFalse(t *testing.T) {
 }
 
 type mockImage struct {
-	opaque bool
+	rect   image.Rectangle
+	points [][]color.Color
+}
+
+func NewMockImage(rect image.Rectangle) *mockImage {
+	mockImg := &mockImage{
+		rect: rect,
+	}
+	points := make([][]color.Color, rect.Dy())
+	for i := range points {
+		points[i] = make([]color.Color, rect.Dx())
+	}
+	mockImg.points = points
+	return mockImg
 }
 
 func (im *mockImage) ColorModel() color.Model {
-	panic("implement me")
+	return color.RGBAModel
 }
 
 func (im *mockImage) Bounds() image.Rectangle {
-	return image.Rectangle{
-		Min: image.Point{X: 5, Y: 5},
-		Max: image.Point{X: 10, Y: 10},
-	}
+	return im.rect
 }
 
 func (im *mockImage) At(x, y int) color.Color {
-	return &mockColor{opaque: im.opaque}
+	return im.points[y][x]
 }
 
-type mockColor struct {
-	opaque bool
-}
-
-func (m *mockColor) RGBA() (r, g, b, a uint32) {
-	if m.opaque {
-		return 0x0fff, 0xf0ff, 0xff0f, 0xffff
-	}
-	return 0x0fff, 0xf0ff, 0xff0f, 0xfff0
+func (im *mockImage) Set(x, y int, c color.Color) {
+	im.points[y][x] = c
 }

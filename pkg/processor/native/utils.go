@@ -7,6 +7,13 @@ import (
 )
 
 func isOpaque(im image.Image) bool {
+	// Check if image has Opaque() method:
+	if oim, ok := im.(interface {
+		Opaque() bool
+	}); ok {
+		return oim.Opaque() // It does, call it and return its result!
+	}
+	// No Opaque() method, we need to loop through all pixels and check manually:
 	rect := im.Bounds()
 	isOpaque := true
 	parallel.Line(rect.Dy(), func(start, end int) {
