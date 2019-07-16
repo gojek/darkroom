@@ -26,7 +26,7 @@ func isOpaque(im image.Image) bool {
 			}
 		}
 	}
-	if config.ConcurrentImageProcessingEnabled() {
+	if config.ConcurrentOpacityCheckingEnabled() {
 		parallel.Line(rect.Dy(), f)
 	} else {
 		f(rect.Min.Y, rect.Max.Y)

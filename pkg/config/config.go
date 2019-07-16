@@ -13,7 +13,7 @@ type config struct {
 	port                            int
 	cacheTime                       int
 	source                          source
-	enableConcurrentImageProcessing bool
+	enableConcurrentOpacityChecking bool
 }
 
 var instance *config
@@ -59,7 +59,7 @@ func newConfig() *config {
 		port:                            port,
 		cacheTime:                       v.GetInt("cache.time"),
 		source:                          s,
-		enableConcurrentImageProcessing: v.GetBool("enableConcurrentImageProcessing"),
+		enableConcurrentOpacityChecking: v.GetBool("enableConcurrentOpacityChecking"),
 	}
 }
 
@@ -108,7 +108,7 @@ func Source() *source {
 	return &getConfig().source
 }
 
-// ConcurrentImageProcessingEnabled returns true if we want to process image using multiple cores (checking isOpaque)
-func ConcurrentImageProcessingEnabled() bool {
-	return getConfig().enableConcurrentImageProcessing
+// ConcurrentOpacityCheckingEnabled returns true if we want to process image using multiple cores (checking isOpaque)
+func ConcurrentOpacityCheckingEnabled() bool {
+	return getConfig().enableConcurrentOpacityChecking
 }
