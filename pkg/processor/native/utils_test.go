@@ -101,7 +101,15 @@ func TestGetStartingPointForCrop(t *testing.T) {
 	assert.Equal(t, 0, y)
 }
 
-func Test_isOpaqueWithoutOpaqueMethodShouldReturnTrue(t *testing.T) {
+func Test_isOpaqueWithFastOpaqueMethod(t *testing.T) {
+	r := image.Rect(0, 0, 640, 480)
+	gray, gray16, cmyk := image.NewGray(r), image.NewGray16(r), image.NewCMYK(r)
+	assert.True(t, isOpaque(gray))
+	assert.True(t, isOpaque(gray16))
+	assert.True(t, isOpaque(cmyk))
+}
+
+func Test_isOpaqueWithoutFastOpaqueMethodShouldReturnTrue(t *testing.T) {
 	isOpaqueShouldReturnTrue := func() {
 		img := NewMockImage(image.Rect(0, 0, 640, 480))
 		draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
@@ -116,7 +124,7 @@ func Test_isOpaqueWithoutOpaqueMethodShouldReturnTrue(t *testing.T) {
 	isOpaqueShouldReturnTrue()
 }
 
-func Test_isOpaqueWithoutOpaqueMethodShouldReturnFalse(t *testing.T) {
+func Test_isOpaqueWithoutFastOpaqueMethodShouldReturnFalse(t *testing.T) {
 	isOpaqueShouldReturnFalse := func() {
 		w, h := 640, 480
 		img := NewMockImage(image.Rect(0, 0, w, h))
