@@ -7,14 +7,28 @@ import (
 	"image"
 )
 
-func isOpaque(im image.Image) bool {
-	// Check if image has Opaque() method:
-	if oim, ok := im.(interface {
-		Opaque() bool
-	}); ok {
-		return oim.Opaque() // It does, call it and return its result!
+func hasFastIsOpaque(im image.Image) bool {
+	if _, ok := im.(*image.Gray); ok {
+		return true
 	}
-	// No Opaque() method, we need to loop through all pixels and check manually:
+	if _, ok := im.(*image.Gray16); ok {
+		return true
+	}
+	if _, ok := im.(*image.CMYK); ok {
+		return true
+	}
+	return false
+}
+
+func isOpaque(im image.Image) bool {
+	// Check if image has fast Opaque checking method
+	if hasFastIsOpaque(im) {
+		oim, _ := im.(interface {
+			Opaque() bool
+		})
+		return oim.Opaque()
+	}
+	// No fast Opaque() method, we need to loop through all pixels and check manually:
 	rect := im.Bounds()
 	isOpaque := true
 	f := func(start, end int) {
@@ -26,12 +40,12 @@ func isOpaque(im image.Image) bool {
 			}
 		}
 	}
-	if config.ConcurrentImageProcessingEnabled() {
+	if config.ConcurrentOpacityCheckingEnabled() {
 		parallel.Line(rect.Dy(), f)
 	} else {
 		f(rect.Min.Y, rect.Max.Y)
 	}
-	return isOpaque // All pixels are opaque, so is the image
+	return isOpaque
 }
 
 // rw: required width, rh: required height, aw: actual width, ah: actual height

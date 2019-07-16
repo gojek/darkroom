@@ -1,6 +1,7 @@
 package native
 
 import (
+	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/stretchr/testify/assert"
 	"image"
@@ -100,33 +101,57 @@ func TestGetStartingPointForCrop(t *testing.T) {
 	assert.Equal(t, 0, y)
 }
 
-func Test_isOpaqueWithoutOpaqueMethodShouldReturnTrue(t *testing.T) {
-	img := NewMockImage(image.Rect(0, 0, 640, 480))
-	draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
-	val := isOpaque(img)
-	assert.True(t, val)
+func Test_isOpaqueWithFastOpaqueMethod(t *testing.T) {
+	r := image.Rect(0, 0, 640, 480)
+	gray, gray16, cmyk := image.NewGray(r), image.NewGray16(r), image.NewCMYK(r)
+	assert.True(t, isOpaque(gray))
+	assert.True(t, isOpaque(gray16))
+	assert.True(t, isOpaque(cmyk))
 }
 
-func Test_isOpaqueWithoutOpaqueMethodShouldReturnFalse(t *testing.T) {
-	w, h := 640, 480
-	img := NewMockImage(image.Rect(0, 0, w, h))
-	draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
-
-	cases := []struct {
-		x, y int
-	}{
-		{x: 0, y: 0},
-		{x: w / 2, y: h / 2},
-		{x: w - 1, y: h - 1},
-	}
-	for _, c := range cases {
-		// Flip only 1 bit to be transparent for each test case
-		x, y := c.x, c.y
-		img.Set(x, y, image.Transparent.C)
+func Test_isOpaqueWithoutFastOpaqueMethodShouldReturnTrue(t *testing.T) {
+	isOpaqueShouldReturnTrue := func() {
+		img := NewMockImage(image.Rect(0, 0, 640, 480))
+		draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
 		val := isOpaque(img)
-		assert.False(t, val)
-		img.Set(x, y, image.Opaque.C)
+		assert.True(t, val)
 	}
+	v := config.Viper()
+	v.Set("enableConcurrentOpacityChecking", true)
+	config.Update()
+	isOpaqueShouldReturnTrue()
+	v.Set("enableConcurrentOpacityChecking", false)
+	isOpaqueShouldReturnTrue()
+}
+
+func Test_isOpaqueWithoutFastOpaqueMethodShouldReturnFalse(t *testing.T) {
+	isOpaqueShouldReturnFalse := func() {
+		w, h := 640, 480
+		img := NewMockImage(image.Rect(0, 0, w, h))
+		draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
+
+		cases := []struct {
+			x, y int
+		}{
+			{x: 0, y: 0},
+			{x: w / 2, y: h / 2},
+			{x: w - 1, y: h - 1},
+		}
+		for _, c := range cases {
+			// Flip only 1 bit to be transparent for each test case
+			x, y := c.x, c.y
+			img.Set(x, y, image.Transparent.C)
+			val := isOpaque(img)
+			assert.False(t, val)
+			img.Set(x, y, image.Opaque.C)
+		}
+	}
+	v := config.Viper()
+	v.Set("enableConcurrentOpacityChecking", true)
+	config.Update()
+	isOpaqueShouldReturnFalse()
+	v.Set("enableConcurrentOpacityChecking", false)
+	isOpaqueShouldReturnFalse()
 }
 
 type mockImage struct {
