@@ -2,6 +2,7 @@ package native
 
 import (
 	"github.com/anthonynsimon/bild/parallel"
+	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/processor"
 	"image"
 )
@@ -16,7 +17,7 @@ func isOpaque(im image.Image) bool {
 	// No Opaque() method, we need to loop through all pixels and check manually:
 	rect := im.Bounds()
 	isOpaque := true
-	parallel.Line(rect.Dy(), func(start, end int) {
+	f := func(start, end int) {
 		for y := rect.Min.Y + start; isOpaque && y < rect.Min.Y+end; y++ {
 			for x := rect.Min.X; isOpaque && x < rect.Max.X; x++ {
 				if _, _, _, a := im.At(x, y).RGBA(); a != 0xffff {
@@ -24,7 +25,12 @@ func isOpaque(im image.Image) bool {
 				}
 			}
 		}
-	})
+	}
+	if config.ConcurrentImageProcessingEnabled() {
+		parallel.Line(rect.Dy(), f)
+	} else {
+		f(rect.Min.Y, rect.Max.Y)
+	}
 	return isOpaque // All pixels are opaque, so is the image
 }
 
