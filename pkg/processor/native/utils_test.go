@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"image"
 	"image/color"
+	"image/draw"
 	"testing"
 )
 
@@ -107,6 +108,35 @@ func Test_isOpaqueWithoutOpaqueMethod(t *testing.T) {
 	im = &mockImage{opaque: true}
 	val = isOpaque(im)
 	assert.True(t, val)
+}
+
+func Test_isOpaqueShouldReturnTrue(t *testing.T) {
+	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
+	draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
+	val := isOpaque(img)
+	assert.True(t, val)
+}
+
+func Test_isOpaqueShouldReturnFalse(t *testing.T) {
+	w, h := 640, 480
+	img := image.NewRGBA(image.Rect(0, 0, w, h))
+	draw.Draw(img, img.Bounds(), image.Opaque, image.ZP, draw.Src)
+
+	cases := []struct {
+		x, y int
+	}{
+		{x: 0, y: 0},
+		{x: w / 2, y: h / 2},
+		{x: w - 1, y: h - 1},
+	}
+	for _, c := range cases {
+		// Flip only 1 bit to be transparent for each test case
+		x, y := c.x, c.y
+		img.Set(x, y, image.Transparent.C)
+		val := isOpaque(img)
+		assert.False(t, val)
+		img.Set(x, y, image.Opaque.C)
+	}
 }
 
 type mockImage struct {

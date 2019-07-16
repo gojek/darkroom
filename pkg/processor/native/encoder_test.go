@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"image"
+	"image/draw"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
@@ -14,8 +15,10 @@ import (
 
 type EncoderSuite struct {
 	suite.Suite
-	srcImage  image.Image
-	processor processor.Processor
+	srcImage         image.Image
+	processor        processor.Processor
+	opaqueImage      image.Image
+	transparentImage image.Image
 }
 
 func (s *EncoderSuite) SetupSuite() {
@@ -28,6 +31,13 @@ func (s *EncoderSuite) SetupSuite() {
 	if err != nil {
 		panic(err)
 	}
+	opaque := image.NewRGBA(image.Rect(0, 0, 640, 480))
+	draw.Draw(opaque, opaque.Bounds(), image.Opaque, image.ZP, draw.Src)
+	s.opaqueImage = opaque
+
+	transparent := image.NewRGBA(image.Rect(0, 0, 640, 480))
+	draw.Draw(transparent, transparent.Bounds(), image.Transparent, image.ZP, draw.Src)
+	s.transparentImage = transparent
 }
 
 func TestNewEncoders(t *testing.T) {
@@ -36,13 +46,13 @@ func TestNewEncoders(t *testing.T) {
 
 func (s *EncoderSuite) TestEncoders_GetEncoder() {
 	encoders := NewEncoders(DefaultCompressionOptions)
-	_, ok := (encoders.GetEncoder(image.Opaque, "jpg")).(*JpegEncoder)
+	_, ok := (encoders.GetEncoder(s.opaqueImage, "jpg")).(*JpegEncoder)
 	assert.True(s.T(), ok)
-	_, ok = (encoders.GetEncoder(image.Opaque, "jpeg")).(*JpegEncoder)
+	_, ok = (encoders.GetEncoder(s.opaqueImage, "jpeg")).(*JpegEncoder)
 	assert.True(s.T(), ok)
-	_, ok = (encoders.GetEncoder(image.Opaque, "png")).(*JpegEncoder)
+	_, ok = (encoders.GetEncoder(s.opaqueImage, "png")).(*JpegEncoder)
 	assert.True(s.T(), ok)
-	_, ok = (encoders.GetEncoder(image.Transparent, "png")).(*PngEncoder)
+	_, ok = (encoders.GetEncoder(s.transparentImage, "png")).(*PngEncoder)
 	assert.True(s.T(), ok)
 	_, ok = (encoders.GetEncoder(image.Black, "unknown")).(*NopEncoder)
 	assert.True(s.T(), ok)
