@@ -1,12 +1,13 @@
 package native
 
 import (
-	"github.com/gojek/darkroom/pkg/processor"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"image"
 	"io/ioutil"
 	"testing"
+
+	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type BildProcessorSuite struct {
@@ -59,6 +60,68 @@ func (s *BildProcessorSuite) TestBildProcessor_Grayscale() {
 	assert.NotNil(s.T(), expected)
 	assert.Nil(s.T(), err)
 
+	assert.EqualValues(s.T(), actual, expected)
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_Flip() {
+	var actual, expected []byte
+	var err error
+	out := s.processor.Flip(s.srcImage, "v")
+	actual, err = s.processor.Encode(out, "jpeg")
+	assert.NotNil(s.T(), actual)
+	assert.Nil(s.T(), err)
+	expected, err = ioutil.ReadFile("_testdata/test_flipedV.jpg")
+	assert.NotNil(s.T(), expected)
+	assert.Nil(s.T(), err)
+	assert.EqualValues(s.T(), actual, expected)
+
+	out = s.processor.Flip(s.srcImage, "h")
+	actual, err = s.processor.Encode(out, "jpeg")
+	assert.NotNil(s.T(), actual)
+	assert.Nil(s.T(), err)
+	expected, err = ioutil.ReadFile("_testdata/test_flipedH.jpg")
+	assert.NotNil(s.T(), expected)
+	assert.Nil(s.T(), err)
+	assert.EqualValues(s.T(), actual, expected)
+
+	out = s.processor.Flip(s.srcImage, "vh")
+	actual, err = s.processor.Encode(out, "jpeg")
+	assert.NotNil(s.T(), actual)
+	assert.Nil(s.T(), err)
+	expected, err = ioutil.ReadFile("_testdata/test_flipedVH.jpg")
+	assert.NotNil(s.T(), expected)
+	assert.Nil(s.T(), err)
+	assert.EqualValues(s.T(), actual, expected)
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_Rotate() {
+	var actual, expected []byte
+	var err error
+	out := s.processor.Rotate(s.srcImage, 90)
+	actual, err = s.processor.Encode(out, "jpeg")
+	assert.NotNil(s.T(), actual)
+	assert.Nil(s.T(), err)
+	expected, err = ioutil.ReadFile("_testdata/test_rotated90.jpg")
+	assert.NotNil(s.T(), expected)
+	assert.Nil(s.T(), err)
+	assert.EqualValues(s.T(), actual, expected)
+
+	out = s.processor.Rotate(s.srcImage, 175)
+	actual, err = s.processor.Encode(out, "jpeg")
+	assert.NotNil(s.T(), actual)
+	assert.Nil(s.T(), err)
+	expected, err = ioutil.ReadFile("_testdata/test_rotated175.jpg")
+	assert.NotNil(s.T(), expected)
+	assert.Nil(s.T(), err)
+	assert.EqualValues(s.T(), actual, expected)
+
+	out = s.processor.Rotate(s.srcImage, 450)
+	actual, err = s.processor.Encode(out, "jpeg")
+	assert.NotNil(s.T(), actual)
+	assert.Nil(s.T(), err)
+	expected, err = ioutil.ReadFile("_testdata/test_rotated90.jpg")
+	assert.NotNil(s.T(), expected)
+	assert.Nil(s.T(), err)
 	assert.EqualValues(s.T(), actual, expected)
 }
 

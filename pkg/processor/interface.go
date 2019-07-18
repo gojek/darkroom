@@ -13,6 +13,13 @@ type Processor interface {
 	// Watermark takes an input byte array, overlay byte array and opacity value
 	// and returns the watermarked image bytes or error
 	Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error)
+	// Flip takes an input image and returns the image flipped. The direction of flip
+	// is determined by the specified mode - 'v' for a vertical flip, 'h' for a horizontal flip and
+	// 'vh'(or 'hv') for both.
+	Flip(image image.Image, mode string) image.Image
+	// Rotate takes an input image and returns a image rotated by the specified degrees.
+	// The rotation is applied clockwise, and fractional angles are supported.
+	Rotate(image image.Image, angel float64) image.Image
 	// Decode takes a byte array and returns the image, extension, and error
 	Decode(data []byte) (image.Image, string, error)
 	// Encode takes an image and extension and return the encoded byte array or error
