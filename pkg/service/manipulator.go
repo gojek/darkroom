@@ -20,7 +20,7 @@ const (
 	mono         = "mono"
 	blackHexCode = "000000"
 	flip         = "flip"
-	rotate       = "rotate"
+	rotate       = "rot"
 
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"
