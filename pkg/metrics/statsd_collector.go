@@ -73,13 +73,10 @@ func Update(updateOption UpdateOption) {
 	switch updateOption.Type {
 	case Duration:
 		err = instance.client.TimingDuration(formatter(updateOption), updateOption.Duration, instance.sampleRate)
-		break
 	case Gauge:
 		err = instance.client.Gauge(formatter(updateOption), int64(updateOption.NumValue), instance.sampleRate)
-		break
 	case Count:
 		err = instance.client.Inc(formatter(updateOption), 1, instance.sampleRate)
-		break
 	}
 	if err != nil {
 		logger.Errorf("metrics.Update got an error: %s", err)
