@@ -7,10 +7,12 @@ You may implement the `Processor` interface to gain custom functionality while s
 #### Interface
 ```go
 type Processor interface {
-	Crop(input []byte, width, height int, point CropPoint) ([]byte, error)
-	Resize(input []byte, width, height int) ([]byte, error)
+	Crop(img image.Image, width, height int, point CropPoint) (image.Image, error)
+	GrayScale(img image.Image) (image.Image, error)
+	Resize(img image.Image, width, height int) (image.Image, error)
 	Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error)
-	GrayScale(input []byte) ([]byte, error)
+	Decode(data []byte) (image.Image, string, error)
+	Encode(img image.Image, format string) ([]byte, error)
 }
 ```
 Any `struct` implementing the above interface can be used with Darkroom.
@@ -19,7 +21,9 @@ Any `struct` implementing the above interface can be used with Darkroom.
 
 ```go
 bp := NewBildProcessor()
-img, _ := ioutil.ReadFile("test.png")
-output, err := bp.Resize(img, 500, 500)
-_, _ := ioutil.WriteFile("output.png", output, 0644)
+srcImgData, _ := ioutil.ReadFile("test.png")
+srcImg, _, _ := bp.Decode(srcImgData)  
+outputImg, err := bp.Resize(srcImg, 500, 500)
+outputImgData, _ := bp.Encode(outputImg, "png")
+_ = ioutil.WriteFile("output.png", outputImgData, 0644)
 ```
