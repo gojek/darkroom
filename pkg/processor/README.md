@@ -7,14 +7,14 @@ You may implement the `Processor` interface to gain custom functionality while s
 #### Interface
 ```go
 type Processor interface {
-	Crop(img image.Image, width, height int, point CropPoint) (image.Image, error)
-	GrayScale(img image.Image) (image.Image, error)
-	Resize(img image.Image, width, height int) (image.Image, error)
-	Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error)
+	Crop(img image.Image, width, height int, point CropPoint) image.Image
 	Decode(data []byte) (image.Image, string, error)
 	Encode(img image.Image, format string) ([]byte, error)
-	Flip(image image.Image, mode string) (image.Image, error)
-	Rotate(image image.Image, angle float64) (image.Image, error)
+	GrayScale(img image.Image) image.Image
+	Resize(img image.Image, width, height int) image.Image
+	Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error)
+	Flip(image image.Image, mode string) image.Image
+	Rotate(image image.Image, angle float64) image.Image
 }
 ```
 Any `struct` implementing the above interface can be used with Darkroom.
