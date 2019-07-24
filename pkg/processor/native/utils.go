@@ -84,34 +84,24 @@ func getStartingPointForCrop(w, h, rw, rh int, cropPoint processor.CropPoint) (i
 	switch cropPoint {
 	case processor.CropTop:
 		y = 0
-		break
 	case processor.CropTopLeft:
 		x = 0
 		y = 0
-		break
 	case processor.CropTopRight:
 		x = w - rw
 		y = 0
-		break
 	case processor.CropLeft:
 		x = 0
-		break
 	case processor.CropRight:
 		x = w - rw
-		break
 	case processor.CropBottom:
 		y = h - rh
-		break
 	case processor.CropBottomLeft:
 		x = 0
 		y = h - rh
-		break
 	case processor.CropBottomRight:
 		x = w - rw
 		y = h - rh
-		break
-	default:
-		break
 	}
 	return x, y
 }
