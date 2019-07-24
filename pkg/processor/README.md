@@ -15,6 +15,7 @@ type Processor interface {
 	Encode(img image.Image, format string) ([]byte, error)
 	Flip(image image.Image, mode string) (image.Image, error)
 	Rotate(image image.Image, angle float64) (image.Image, error)
+	FixOrientation(img image.Image, orientation int) image.Image
 }
 ```
 Any `struct` implementing the above interface can be used with Darkroom.
