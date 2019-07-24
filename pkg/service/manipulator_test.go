@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"image"
 	"io/ioutil"
@@ -26,65 +27,63 @@ func TestManipulator_Process(t *testing.T) {
 	input := []byte("inputData")
 	decoded := &image.RGBA{Pix: []uint8{1, 2, 3, 4}}
 
+	// Test flow for Decode error from Processor
+	mp.On("Decode", mock.Anything).Return(nil, "", errors.New("decoding error"))
+	_, _ = m.Process(ProcessSpec{
+		ImageData: input,
+		Params:    params,
+	})
+	mp.AssertExpectations(t)
+
+	// Create new struct for asserting expectations
+	mp = &mockProcessor{}
+	m = NewManipulator(mp)
 	mp.On("Decode", input).Return(decoded, "png", nil)
 	mp.On("Encode", decoded, "png").Return(input, nil)
 	mp.On("Crop", decoded, 100, 100, processor.CropCenter).Return(decoded, nil)
-
 	params[fit] = crop
 	params[width] = "100"
 	params[height] = "100"
-	data, err := m.Process(ProcessSpec{
+	_, _ = m.Process(ProcessSpec{
 		ImageData: input,
 		Params:    params,
 	})
-	assert.Nil(t, err)
-	assert.Equal(t, input, data)
 
 	mp.On("Resize", decoded, 100, 100).Return(decoded, nil)
-
 	params = make(map[string]string)
 	params[width] = "100"
 	params[height] = "100"
-	data, err = m.Process(ProcessSpec{
+	_, _ = m.Process(ProcessSpec{
 		ImageData: input,
 		Params:    params,
 	})
-	assert.Nil(t, err)
-	assert.Equal(t, input, data)
 
 	mp.On("GrayScale", decoded).Return(decoded, nil)
-
 	params = make(map[string]string)
 	params[mono] = blackHexCode
-	data, err = m.Process(ProcessSpec{
+	_, _ = m.Process(ProcessSpec{
 		ImageData: input,
 		Params:    params,
 	})
-	assert.Nil(t, err)
-	assert.Equal(t, input, data)
 
 	mp.On("Flip", decoded, "v").Return(decoded, nil)
-
 	params = make(map[string]string)
 	params[flip] = "v"
-	data, err = m.Process(ProcessSpec{
+	_, _ = m.Process(ProcessSpec{
 		ImageData: input,
 		Params:    params,
 	})
-	assert.Nil(t, err)
-	assert.Equal(t, input, data)
 
 	mp.On("Rotate", decoded, 90.5).Return(decoded, nil)
-
 	params = make(map[string]string)
 	params[rotate] = "90.5"
-	data, err = m.Process(ProcessSpec{
+	_, _ = m.Process(ProcessSpec{
 		ImageData: input,
 		Params:    params,
 	})
-	assert.Nil(t, err)
-	assert.Equal(t, input, data)
 
+	// Assert all expectations once here
+	mp.AssertExpectations(t)
 }
 
 func TestGetCropPoint(t *testing.T) {
@@ -163,12 +162,12 @@ func (m *mockProcessor) Rotate(img image.Image, angle float64) image.Image {
 
 func (m *mockProcessor) Decode(data []byte) (image.Image, string, error) {
 	args := m.Called(data)
-	img := args.Get(0).(image.Image)
-	ext := args.Get(1).(string)
-	if args.Get(2) == nil {
-		return img, ext, nil
+	img := args.Get(0)
+	ext := args.Get(1)
+	if img != nil && ext != nil {
+		return img.(image.Image), ext.(string), args.Error(2)
 	}
-	return img, ext, args.Get(2).(error)
+	return nil, "", args.Error(2)
 }
 
 func (m *mockProcessor) Encode(img image.Image, format string) ([]byte, error) {
