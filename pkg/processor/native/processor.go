@@ -98,7 +98,7 @@ func (bp *BildProcessor) Flip(img image.Image, mode string) image.Image {
 	return img
 }
 
-// Rotate takes an input image and returns a image rotated by `angle` degrees.
+// Rotate takes an input image and returns a image rotated by the specified degrees.
 // The rotation is applied clockwise, and fractional angles are also supported.
 func (bp *BildProcessor) Rotate(img image.Image, angle float64) image.Image {
 	return transform.Rotate(img, angle, nil)

@@ -19,7 +19,7 @@ type Processor interface {
 	Flip(image image.Image, mode string) image.Image
 	// Rotate takes an input image and returns a image rotated by the specified degrees.
 	// The rotation is applied clockwise, and fractional angles are supported.
-	Rotate(image image.Image, angel float64) image.Image
+	Rotate(image image.Image, angle float64) image.Image
 	// Decode takes a byte array and returns the image, extension, and error
 	Decode(data []byte) (image.Image, string, error)
 	// Encode takes an image and extension and return the encoded byte array or error
