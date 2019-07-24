@@ -2,6 +2,7 @@ package native
 
 import (
 	"image"
+	"image/png"
 	"io/ioutil"
 	"testing"
 
@@ -30,6 +31,14 @@ func (s *BildProcessorSuite) SetupSuite() {
 
 func TestNewBildProcessor(t *testing.T) {
 	suite.Run(t, new(BildProcessorSuite))
+}
+
+func (s *BildProcessorSuite) TestNewBildProcessorWithCompression() {
+	p := NewBildProcessorWithCompression(&CompressionOptions{JpegQuality: 70, PngCompressionLevel: png.BestSpeed})
+
+	assert.NotNil(s.T(), p)
+	assert.Equal(s.T(), 70, p.encoders.Options().JpegQuality)
+	assert.Equal(s.T(), png.BestSpeed, p.encoders.Options().PngCompressionLevel)
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Resize() {
