@@ -7,7 +7,6 @@ import (
 	"image/draw"
 	"strings"
 
-	"github.com/adalberht/imageorient"
 	"github.com/anthonynsimon/bild/clone"
 	"github.com/anthonynsimon/bild/effect"
 	"github.com/anthonynsimon/bild/transform"
@@ -18,37 +17,8 @@ var resizeBoundOption = &transform.RotationOptions{
 	ResizeBounds: true,
 }
 
-var fixOperationFunctions = map[int]imageorient.FixOrientationFunction {
-	2: func(img image.Image) (image.Image, error) {
-		return transform.FlipH(img), nil
-	},
-	3: func(img image.Image) (image.Image, error) {
-		return transform.Rotate(img, 180, nil), nil
-	},
-	4: func(img image.Image) (image.Image, error) {
-		img = transform.FlipH(img)
-		return transform.Rotate(img, 180, nil), nil
-	},
-	5: func(img image.Image) (image.Image, error) {
-		img = transform.FlipV(img)
-		img = transform.Rotate(img, 90, resizeBoundOption)
-		return img, nil
-	},
-	6: func(img image.Image) (image.Image, error) {
-		return transform.Rotate(img, 90, resizeBoundOption), nil
-	},
-	7: func(img image.Image) (image.Image, error) {
-		img = transform.FlipV(img)
-		return transform.Rotate(img, 270, resizeBoundOption), nil
-	},
-	8: func(img image.Image) (image.Image, error) {
-		return transform.Rotate(img, 270, resizeBoundOption), nil
-	},
-}
-
 // BildProcessor uses bild library to process images using native Golang image.Image interface
 type BildProcessor struct {
-	decoder imageorient.Decoder
 	encoders *Encoders
 }
 
@@ -140,7 +110,7 @@ func (bp *BildProcessor) Rotate(img image.Image, angle float64) image.Image {
 
 // Decode takes a byte array and returns the decoded image, format, or the error
 func (bp *BildProcessor) Decode(data []byte) (image.Image, string, error) {
-	img, f, err := bp.decoder.Decode(bytes.NewReader(data))
+	img, f, err := image.Decode(bytes.NewReader(data))
 	return img, f, err
 }
 
@@ -152,10 +122,36 @@ func (bp *BildProcessor) Encode(img image.Image, fmt string) ([]byte, error) {
 	return data, err
 }
 
+// FixOrientation takes an image and it's EXIF orientation
+// To get the orientation of the image see getOrientation (exif.go)
+func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.Image {
+	switch orientation {
+	case 2:
+		return transform.FlipH(img)
+	case 3:
+		return transform.Rotate(img, 180, nil)
+	case 4:
+		img = transform.FlipH(img)
+		return transform.Rotate(img, 180, nil)
+	case 5:
+		img = transform.FlipV(img)
+		return transform.Rotate(img, 90, resizeBoundOption)
+	case 6:
+		return transform.Rotate(img, 90, resizeBoundOption)
+	case 7:
+		img = transform.FlipV(img)
+		return transform.Rotate(img, 270, resizeBoundOption)
+	case
+		8:
+		return transform.Rotate(img, 270, resizeBoundOption)
+	default:
+		return img
+	}
+}
+
 // NewBildProcessor creates a new BildProcessor with default compression
 func NewBildProcessor() *BildProcessor {
 	return &BildProcessor{
-		decoder: imageorient.NewDecoder(fixOperationFunctions),
 		encoders: NewEncoders(DefaultCompressionOptions),
 	}
 }
@@ -164,7 +160,6 @@ func NewBildProcessor() *BildProcessor {
 // 	and creates a newBildProcessor with custom compression options
 func NewBildProcessorWithCompression(opts *CompressionOptions) *BildProcessor {
 	return &BildProcessor{
-		decoder: imageorient.NewDecoder(fixOperationFunctions),
 		encoders: NewEncoders(opts),
 	}
 }

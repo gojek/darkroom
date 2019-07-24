@@ -1,6 +1,7 @@
 package native
 
 import (
+	"bytes"
 	"image"
 	"io/ioutil"
 	"testing"
@@ -138,8 +139,8 @@ func (s *BildProcessorSuite) TestBildProcessor_Watermark() {
 	assert.NotEqual(s.T(), s.srcData, output)
 }
 
-func (s* BildProcessorSuite) TestBildProcessor_DecodeShouldFixOrientationAutomatically() {
-	var testFiles = []string {
+func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
+	var testFiles = []string{
 		"./_testdata/exif_orientation/f2t.jpg",
 		"./_testdata/exif_orientation/f3t.jpg",
 		"./_testdata/exif_orientation/f4t.jpg",
@@ -157,11 +158,10 @@ func (s* BildProcessorSuite) TestBildProcessor_DecodeShouldFixOrientationAutomat
 		if err != nil {
 			panic(err)
 		}
+		orientation, _ := getOrientation(bytes.NewReader(file))
 		img, _, err := s.processor.Decode(file)
+		img = s.processor.FixOrientation(img, orientation)
 		actual, err := s.processor.Encode(img, "jpg")
-		if err != nil {
-			panic(err)
-		}
 		if err != nil {
 			panic(err)
 		}

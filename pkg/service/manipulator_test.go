@@ -179,3 +179,8 @@ func (m *mockProcessor) Encode(img image.Image, format string) ([]byte, error) {
 	}
 	return b, args.Get(1).(error)
 }
+
+func (m *mockProcessor) FixOrientation(img image.Image, orientation int) image.Image {
+	args := m.Called(img, orientation)
+	return args.Get(0).(image.Image)
+}

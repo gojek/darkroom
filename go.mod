@@ -5,7 +5,6 @@ go 1.12
 require (
 	cloud.google.com/go v0.41.0 // indirect
 	github.com/OneOfOne/xxhash v1.2.5 // indirect
-	github.com/adalberht/imageorient v0.0.0-20190724091956-017edf5f23ba
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/anthonynsimon/bild v0.10.1-0.20190710205720-eee9188e4370
 	github.com/aws/aws-sdk-go v1.20.19
