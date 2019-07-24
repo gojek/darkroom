@@ -22,9 +22,9 @@ import (
 
 const maxBufLen = 1 << 20
 
-// getOrientation returns the EXIF orientation tag from the given image
+// GetOrientation returns the EXIF orientation tag from the given image
 // and a new io.Reader with the same state as the original reader r.
-func getOrientation(r io.Reader) (int, io.Reader) {
+func GetOrientation(r io.Reader) (int, io.Reader) {
 	buf := new(bytes.Buffer)
 	tr := io.TeeReader(io.LimitReader(r, maxBufLen), buf)
 	orientation := readOrientation(tr)

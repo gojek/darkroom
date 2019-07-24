@@ -1,7 +1,9 @@
 package service
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/gojek/darkroom/pkg/processor/native"
 	"math"
 	"net/http"
 	"strconv"
@@ -21,6 +23,9 @@ const (
 	blackHexCode = "000000"
 	flip         = "flip"
 	rotate       = "rot"
+	auto         = "auto"
+
+	compress = "compress"
 
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"
@@ -29,6 +34,7 @@ const (
 	resizeDurationKey    = "resizeDuration"
 	flipDurationKey      = "flipDuration"
 	rotateDurationKey    = "rotateDuration"
+	fixOrientationKey = "fixOrientation"
 )
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
@@ -58,6 +64,7 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	var err error
 	t := time.Now()
 	data, f, err := m.processor.Decode(spec.ImageData)
+	orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
 	if err != nil {
 		return nil, err
 	}
@@ -76,6 +83,13 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		data = m.processor.GrayScale(data)
 		trackDuration(grayScaleDurationKey, t, spec)
 	}
+
+	if params[auto] == compress {
+		t = time.Now()
+		data = m.processor.FixOrientation(data, orientation)
+		trackDuration(fixOrientationKey, t, spec)
+	}
+
 	if len(params[flip]) != 0 {
 		t = time.Now()
 		data = m.processor.Flip(data, params[flip])

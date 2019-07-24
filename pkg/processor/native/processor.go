@@ -123,7 +123,7 @@ func (bp *BildProcessor) Encode(img image.Image, fmt string) ([]byte, error) {
 }
 
 // FixOrientation takes an image and it's EXIF orientation
-// To get the orientation of the image see getOrientation (exif.go)
+// To get the orientation of the image see GetOrientation (exif.go)
 func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.Image {
 	switch orientation {
 	case 2:

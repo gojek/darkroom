@@ -84,7 +84,18 @@ func TestManipulator_Process(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.Equal(t, input, data)
+	assert.True(t, mp.AssertNotCalled(t, "FixOrientation", decoded, 0))
 
+	// Should call FixOrientation
+	mp.On("FixOrientation", decoded, mock.Anything).Return(decoded)
+	params = make(map[string]string)
+	params[auto] = compress
+	data, err = m.Process(ProcessSpec{
+		ImageData: input,
+		Params:    params,
+	})
+	assert.Nil(t, err)
+	assert.True(t, mp.AssertCalled(t, "FixOrientation", decoded, 0))
 }
 
 func TestGetCropPoint(t *testing.T) {

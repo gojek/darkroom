@@ -158,7 +158,7 @@ func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
 		if err != nil {
 			panic(err)
 		}
-		orientation, _ := getOrientation(bytes.NewReader(file))
+		orientation, _ := GetOrientation(bytes.NewReader(file))
 		img, _, err := s.processor.Decode(file)
 		img = s.processor.FixOrientation(img, orientation)
 		actual, err := s.processor.Encode(img, "jpg")
