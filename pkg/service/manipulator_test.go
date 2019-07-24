@@ -2,14 +2,15 @@ package service
 
 import (
 	"fmt"
-	"github.com/gojek/darkroom/pkg/processor"
-	"github.com/gojek/darkroom/pkg/processor/native"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"image"
 	"io/ioutil"
 	"testing"
 	"time"
+
+	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/gojek/darkroom/pkg/processor/native"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestNewManipulator(t *testing.T) {
@@ -61,6 +62,29 @@ func TestManipulator_Process(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.Equal(t, input, data)
+
+	mp.On("Flip", decoded, "v").Return(decoded, nil)
+
+	params = make(map[string]string)
+	params[flip] = "v"
+	data, err = m.Process(ProcessSpec{
+		ImageData: input,
+		Params:    params,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, input, data)
+
+	mp.On("Rotate", decoded, 90.5).Return(decoded, nil)
+
+	params = make(map[string]string)
+	params[rotate] = "90.5"
+	data, err = m.Process(ProcessSpec{
+		ImageData: input,
+		Params:    params,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, input, data)
+
 }
 
 func TestGetCropPoint(t *testing.T) {
@@ -124,6 +148,16 @@ func (m *mockProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([
 
 func (m *mockProcessor) GrayScale(img image.Image) image.Image {
 	args := m.Called(img)
+	return args.Get(0).(image.Image)
+}
+
+func (m *mockProcessor) Flip(img image.Image, mode string) image.Image {
+	args := m.Called(img, mode)
+	return args.Get(0).(image.Image)
+}
+
+func (m *mockProcessor) Rotate(img image.Image, angle float64) image.Image {
+	args := m.Called(img, angle)
 	return args.Get(0).(image.Image)
 }
 

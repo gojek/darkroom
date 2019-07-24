@@ -2,12 +2,14 @@ package service
 
 import (
 	"fmt"
-	"github.com/gojek/darkroom/pkg/metrics"
-	"github.com/gojek/darkroom/pkg/processor"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gojek/darkroom/pkg/metrics"
+	"github.com/gojek/darkroom/pkg/processor"
 )
 
 const (
@@ -17,12 +19,16 @@ const (
 	crop         = "crop"
 	mono         = "mono"
 	blackHexCode = "000000"
+	flip         = "flip"
+	rotate       = "rot"
 
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"
 	encodeDurationKey    = "encodeDuration"
 	grayScaleDurationKey = "grayScaleDuration"
 	resizeDurationKey    = "resizeDuration"
+	flipDurationKey      = "flipDuration"
+	rotateDurationKey    = "rotateDuration"
 )
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
@@ -70,6 +76,16 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		data = m.processor.GrayScale(data)
 		trackDuration(grayScaleDurationKey, t, spec)
 	}
+	if len(params[flip]) != 0 {
+		t = time.Now()
+		data = m.processor.Flip(data, params[flip])
+		trackDuration(flipDurationKey, t, spec)
+	}
+	if CleanAngle(params[rotate]) > 0 {
+		t = time.Now()
+		data = m.processor.Rotate(data, CleanAngle(params[rotate]))
+		trackDuration(rotateDurationKey, t, spec)
+	}
 	t = time.Now()
 	src, err := m.processor.Encode(data, f)
 	if err == nil {
@@ -85,6 +101,15 @@ func CleanInt(input string) int {
 		return 0
 	}
 	return val % 10000 // Never return value greater than 9999
+}
+
+// CleanAngle takes a string and return a float64 not greater than 360
+func CleanAngle(input string) float64 {
+	val, _ := strconv.ParseFloat(input, 64)
+	if val <= 0 {
+		return 0
+	}
+	return math.Mod(val, 360) // Never return value greater than 360
 }
 
 // GetCropPoint takes a string and returns the type CropPoint

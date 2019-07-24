@@ -13,6 +13,8 @@ type Processor interface {
 	Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error)
 	Decode(data []byte) (image.Image, string, error)
 	Encode(img image.Image, format string) ([]byte, error)
+	Flip(image image.Image, mode string) (image.Image, error)
+	Rotate(image image.Image, angle float64) (image.Image, error)
 }
 ```
 Any `struct` implementing the above interface can be used with Darkroom.
@@ -22,7 +24,7 @@ Any `struct` implementing the above interface can be used with Darkroom.
 ```go
 bp := NewBildProcessor()
 srcImgData, _ := ioutil.ReadFile("test.png")
-srcImg, _, _ := bp.Decode(srcImgData)  
+srcImg, _, _ := bp.Decode(srcImgData)
 outputImg, err := bp.Resize(srcImg, 500, 500)
 outputImgData, _ := bp.Encode(outputImg, "png")
 _ = ioutil.WriteFile("output.png", outputImgData, 0644)

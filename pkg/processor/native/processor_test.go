@@ -1,12 +1,13 @@
 package native
 
 import (
-	"github.com/gojek/darkroom/pkg/processor"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"image"
 	"io/ioutil"
 	"testing"
+
+	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type BildProcessorSuite struct {
@@ -60,6 +61,72 @@ func (s *BildProcessorSuite) TestBildProcessor_Grayscale() {
 	assert.Nil(s.T(), err)
 
 	assert.EqualValues(s.T(), actual, expected)
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_Flip() {
+	var actual, expected []byte
+	var err error
+	cases := []struct {
+		flipMode string
+		testFile string
+	}{
+		{
+			flipMode: "v",
+			testFile: "_testdata/test_flipedV.jpg",
+		},
+		{
+			flipMode: "h",
+			testFile: "_testdata/test_flipedH.jpg",
+		},
+		{
+			flipMode: "vh",
+			testFile: "_testdata/test_flipedVH.jpg",
+		},
+	}
+
+	for _, c := range cases {
+		out := s.processor.Flip(s.srcImage, c.flipMode)
+		actual, err = s.processor.Encode(out, "jpeg")
+		assert.NotNil(s.T(), actual)
+		assert.Nil(s.T(), err)
+		expected, err = ioutil.ReadFile(c.testFile)
+		assert.NotNil(s.T(), expected)
+		assert.Nil(s.T(), err)
+		assert.EqualValues(s.T(), actual, expected)
+	}
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_Rotate() {
+	var actual, expected []byte
+	var err error
+	cases := []struct {
+		angle    float64
+		testFile string
+	}{
+		{
+			angle:    90.0,
+			testFile: "_testdata/test_rotated90.jpg",
+		},
+		{
+			angle:    175,
+			testFile: "_testdata/test_rotated175.jpg",
+		},
+		{
+			angle:    450.0,
+			testFile: "_testdata/test_rotated90.jpg",
+		},
+	}
+
+	for _, c := range cases {
+		out := s.processor.Rotate(s.srcImage, c.angle)
+		actual, err = s.processor.Encode(out, "jpeg")
+		assert.NotNil(s.T(), actual)
+		assert.Nil(s.T(), err)
+		expected, err = ioutil.ReadFile(c.testFile)
+		assert.NotNil(s.T(), expected)
+		assert.Nil(s.T(), err)
+		assert.EqualValues(s.T(), actual, expected)
+	}
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Watermark() {

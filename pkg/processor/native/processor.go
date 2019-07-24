@@ -2,13 +2,15 @@ package native
 
 import (
 	"bytes"
+	"image"
+	"image/color"
+	"image/draw"
+	"strings"
+
 	"github.com/anthonynsimon/bild/clone"
 	"github.com/anthonynsimon/bild/effect"
 	"github.com/anthonynsimon/bild/transform"
 	"github.com/gojek/darkroom/pkg/processor"
-	"image"
-	"image/color"
-	"image/draw"
 )
 
 // BildProcessor uses bild library to process images using native Golang image.Image interface
@@ -78,6 +80,28 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 func (bp *BildProcessor) GrayScale(img image.Image) image.Image {
 	// Rec. 601 Luma formula (https://en.wikipedia.org/wiki/Luma_%28video%29#Rec._601_luma_versus_Rec._709_luma_coefficients)
 	return effect.GrayscaleWithWeights(img, 0.299, 0.587, 0.114)
+}
+
+// Flip takes an input image and returns the image flipped. The direction of flip
+// is determined by the specified mode - 'v' for a vertical flip, 'h' for a
+// horizontal flip and 'vh'(or 'hv') for both.
+func (bp *BildProcessor) Flip(img image.Image, mode string) image.Image {
+	mode = strings.ToLower(mode)
+	for _, op := range mode {
+		switch op {
+		case 'v':
+			img = transform.FlipV(img)
+		case 'h':
+			img = transform.FlipH(img)
+		}
+	}
+	return img
+}
+
+// Rotate takes an input image and returns a image rotated by the specified degrees.
+// The rotation is applied clockwise, and fractional angles are also supported.
+func (bp *BildProcessor) Rotate(img image.Image, angle float64) image.Image {
+	return transform.Rotate(img, angle, nil)
 }
 
 // Decode takes a byte array and returns the decoded image, format, or the error
