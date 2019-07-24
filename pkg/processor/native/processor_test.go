@@ -138,6 +138,37 @@ func (s *BildProcessorSuite) TestBildProcessor_Watermark() {
 	assert.NotEqual(s.T(), s.srcData, output)
 }
 
+func (s* BildProcessorSuite) TestBildProcessor_DecodeShouldFixOrientationAutomatically() {
+	var testFiles = []string {
+		"./_testdata/exif_orientation/f2t.jpg",
+		"./_testdata/exif_orientation/f3t.jpg",
+		"./_testdata/exif_orientation/f4t.jpg",
+		"./_testdata/exif_orientation/f5t.jpg",
+		"./_testdata/exif_orientation/f6t.jpg",
+		"./_testdata/exif_orientation/f7t.jpg",
+		"./_testdata/exif_orientation/f8t.jpg",
+	}
+	expected, err := ioutil.ReadFile("./_testdata/exif_orientation/expected.jpg")
+	if err != nil {
+		panic(err)
+	}
+	for _, testFile := range testFiles {
+		file, err := ioutil.ReadFile(testFile)
+		if err != nil {
+			panic(err)
+		}
+		img, _, err := s.processor.Decode(file)
+		actual, err := s.processor.Encode(img, "jpg")
+		if err != nil {
+			panic(err)
+		}
+		if err != nil {
+			panic(err)
+		}
+		assert.EqualValues(s.T(), expected, actual)
+	}
+}
+
 func (s *BildProcessorSuite) TestBildProcessorWithBadInput() {
 	output, err := s.processor.Watermark(s.badData, s.watermarkData, 255)
 	assert.NotNil(s.T(), err)
