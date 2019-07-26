@@ -44,6 +44,14 @@ func TestNewEncoders(t *testing.T) {
 	suite.Run(t, new(EncoderSuite))
 }
 
+func (s *EncoderSuite) TestNopEncoder() {
+	nopEncoder := NopEncoder{}
+
+	data, err := nopEncoder.Encode(s.srcImage)
+	assert.Nil(s.T(), data)
+	assert.Error(s.T(), err)
+}
+
 func (s *EncoderSuite) TestEncoders_GetEncoder() {
 	encoders := NewEncoders(DefaultCompressionOptions)
 
