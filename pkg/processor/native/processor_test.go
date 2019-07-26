@@ -2,6 +2,7 @@ package native
 
 import (
 	"image"
+	"image/png"
 	"io/ioutil"
 	"testing"
 
@@ -32,12 +33,30 @@ func TestNewBildProcessor(t *testing.T) {
 	suite.Run(t, new(BildProcessorSuite))
 }
 
+func (s *BildProcessorSuite) TestNewBildProcessorWithCompression() {
+	p := NewBildProcessorWithCompression(&CompressionOptions{JpegQuality: 70, PngCompressionLevel: png.BestSpeed})
+
+	assert.NotNil(s.T(), p)
+	assert.Equal(s.T(), 70, p.encoders.Options().JpegQuality)
+	assert.Equal(s.T(), png.BestSpeed, p.encoders.Options().PngCompressionLevel)
+}
+
 func (s *BildProcessorSuite) TestBildProcessor_Resize() {
-	out := s.processor.Resize(s.srcImage, 500, 500)
+	out := s.processor.Resize(s.srcImage, 600, 500)
+
+	assert.NotNil(s.T(), out)
+	assert.Equal(s.T(), 600, out.Bounds().Dx())
+	assert.Equal(s.T(), 450, out.Bounds().Dy())
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_ResizeWithSameWidthAndHeight() {
+	out := s.processor.Resize(s.srcImage, 500, 375)
 
 	assert.NotNil(s.T(), out)
 	assert.Equal(s.T(), 500, out.Bounds().Dx())
 	assert.Equal(s.T(), 375, out.Bounds().Dy())
+	// Checks if the image is the same image which was passed by doing a pointer comparision
+	assert.Equal(s.T(), &s.srcImage, &out)
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Crop() {
