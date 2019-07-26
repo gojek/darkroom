@@ -84,9 +84,7 @@ func TestManipulator_Process(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.Equal(t, input, data)
-	assert.True(t, mp.AssertNotCalled(t, "FixOrientation", decoded, 0))
 
-	// Should call FixOrientation
 	mp.On("FixOrientation", decoded, mock.Anything).Return(decoded)
 	params = make(map[string]string)
 	params[auto] = compress

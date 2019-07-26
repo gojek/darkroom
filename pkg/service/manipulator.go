@@ -34,7 +34,7 @@ const (
 	resizeDurationKey    = "resizeDuration"
 	flipDurationKey      = "flipDuration"
 	rotateDurationKey    = "rotateDuration"
-	fixOrientationKey = "fixOrientation"
+	fixOrientationKey    = "fixOrientation"
 )
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
@@ -64,7 +64,6 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	var err error
 	t := time.Now()
 	data, f, err := m.processor.Decode(spec.ImageData)
-	orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
 	if err != nil {
 		return nil, err
 	}
@@ -85,6 +84,7 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 	}
 
 	if params[auto] == compress {
+		orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
 		t = time.Now()
 		data = m.processor.FixOrientation(data, orientation)
 		trackDuration(fixOrientationKey, t, spec)

@@ -162,9 +162,7 @@ func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
 		img, _, err := s.processor.Decode(file)
 		img = s.processor.FixOrientation(img, orientation)
 		actual, err := s.processor.Encode(img, "jpg")
-		if err != nil {
-			panic(err)
-		}
+		assert.Nil(s.T(), err)
 		assert.EqualValues(s.T(), expected, actual)
 	}
 }

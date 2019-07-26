@@ -141,8 +141,7 @@ func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.
 	case 7:
 		img = transform.FlipV(img)
 		return transform.Rotate(img, 270, resizeBoundOption)
-	case
-		8:
+	case 8:
 		return transform.Rotate(img, 270, resizeBoundOption)
 	default:
 		return img
