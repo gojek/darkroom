@@ -13,6 +13,10 @@ import (
 	"github.com/gojek/darkroom/pkg/processor"
 )
 
+var resizeBoundOption = &transform.RotationOptions{
+	ResizeBounds: true,
+}
+
 // BildProcessor uses bild library to process images using native Golang image.Image interface
 type BildProcessor struct {
 	encoders *Encoders
@@ -116,6 +120,32 @@ func (bp *BildProcessor) Encode(img image.Image, fmt string) ([]byte, error) {
 	enc := bp.encoders.GetEncoder(img, fmt)
 	data, err := enc.Encode(img)
 	return data, err
+}
+
+// FixOrientation takes an image and it's EXIF orientation
+// To get the orientation of the image see GetOrientation (exif.go)
+func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.Image {
+	switch orientation {
+	case 2:
+		return transform.FlipH(img)
+	case 3:
+		return transform.Rotate(img, 180, nil)
+	case 4:
+		img = transform.FlipH(img)
+		return transform.Rotate(img, 180, nil)
+	case 5:
+		img = transform.FlipV(img)
+		return transform.Rotate(img, 90, resizeBoundOption)
+	case 6:
+		return transform.Rotate(img, 90, resizeBoundOption)
+	case 7:
+		img = transform.FlipV(img)
+		return transform.Rotate(img, 270, resizeBoundOption)
+	case 8:
+		return transform.Rotate(img, 270, resizeBoundOption)
+	default:
+		return img
+	}
 }
 
 // NewBildProcessor creates a new BildProcessor with default compression

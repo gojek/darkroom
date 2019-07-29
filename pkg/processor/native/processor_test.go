@@ -1,6 +1,7 @@
 package native
 
 import (
+	"bytes"
 	"image"
 	"image/png"
 	"io/ioutil"
@@ -155,6 +156,34 @@ func (s *BildProcessorSuite) TestBildProcessor_Watermark() {
 	assert.Nil(s.T(), err)
 
 	assert.NotEqual(s.T(), s.srcData, output)
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
+	var testFiles = []string{
+		"./_testdata/exif_orientation/f2t.jpg",
+		"./_testdata/exif_orientation/f3t.jpg",
+		"./_testdata/exif_orientation/f4t.jpg",
+		"./_testdata/exif_orientation/f5t.jpg",
+		"./_testdata/exif_orientation/f6t.jpg",
+		"./_testdata/exif_orientation/f7t.jpg",
+		"./_testdata/exif_orientation/f8t.jpg",
+	}
+	expected, err := ioutil.ReadFile("./_testdata/exif_orientation/expected.jpg")
+	if err != nil {
+		panic(err)
+	}
+	for _, testFile := range testFiles {
+		file, err := ioutil.ReadFile(testFile)
+		if err != nil {
+			panic(err)
+		}
+		orientation, _ := GetOrientation(bytes.NewReader(file))
+		img, _, err := s.processor.Decode(file)
+		img = s.processor.FixOrientation(img, orientation)
+		actual, err := s.processor.Encode(img, "jpg")
+		assert.Nil(s.T(), err)
+		assert.EqualValues(s.T(), expected, actual)
+	}
 }
 
 func (s *BildProcessorSuite) TestBildProcessorWithBadInput() {

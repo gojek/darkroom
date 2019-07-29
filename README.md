@@ -77,6 +77,7 @@ type Processor interface {
 	Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error)
 	Flip(image image.Image, mode string) image.Image
 	Rotate(image image.Image, angle float64) image.Image
+	FixOrientation(image image.Image, orientation int) image.Image
 }
 ```
 ```go

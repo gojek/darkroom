@@ -82,6 +82,14 @@ func TestManipulator_Process(t *testing.T) {
 		Params:    params,
 	})
 
+	mp.On("FixOrientation", decoded, 0).Return(decoded)
+	params = make(map[string]string)
+	params[auto] = compress
+	_, _ = m.Process(ProcessSpec{
+		ImageData: input,
+		Params:    params,
+	})
+
 	// Assert all expectations once here
 	mp.AssertExpectations(t)
 }
@@ -177,4 +185,9 @@ func (m *mockProcessor) Encode(img image.Image, format string) ([]byte, error) {
 		return b, nil
 	}
 	return b, args.Get(1).(error)
+}
+
+func (m *mockProcessor) FixOrientation(img image.Image, orientation int) image.Image {
+	args := m.Called(img, orientation)
+	return args.Get(0).(image.Image)
 }
