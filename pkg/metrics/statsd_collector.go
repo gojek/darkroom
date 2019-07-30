@@ -2,10 +2,13 @@ package metrics
 
 import (
 	"fmt"
-	"github.com/cactus/go-statsd-client/statsd"
-	"github.com/gojek/darkroom/pkg/logger"
 	"strings"
 	"time"
+
+	"github.com/afex/hystrix-go/hystrix/metric_collector"
+	"github.com/afex/hystrix-go/plugins"
+	"github.com/cactus/go-statsd-client/statsd"
+	"github.com/gojek/darkroom/pkg/logger"
 )
 
 // https://github.com/etsy/statsd/blob/master/docs/metric_types.md#multi-metric-packets
@@ -53,6 +56,15 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) error {
 		c = &statsd.NoopClient{}
 	}
 	instance = &statsdClient{client: c, sampleRate: sampleRate}
+	return nil
+}
+
+func RegisterHystrixMetrics(config *StatsdCollectorConfig, prefix string) error {
+	c, _ := plugins.InitializeStatsdCollector(&plugins.StatsdCollectorConfig{
+		StatsdAddr: config.StatsdAddr,
+		Prefix:     prefix,
+	})
+	metricCollector.Registry.Register(c.NewStatsdCollector)
 	return nil
 }
 

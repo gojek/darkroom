@@ -3,11 +3,12 @@ package metrics
 import (
 	"errors"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/cactus/go-statsd-client/statsd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
-	"time"
 )
 
 func TestInitializeStatsdCollector(t *testing.T) {
@@ -25,6 +26,11 @@ func TestInitializeStatsdCollector(t *testing.T) {
 	err = InitializeStatsdCollector(&StatsdCollectorConfig{})
 	assert.Nil(t, err)
 	assert.Equal(t, float32(1), instance.sampleRate)
+}
+
+func TestRegisterHystrixMetrics(t *testing.T) {
+	err := RegisterHystrixMetrics(&StatsdCollectorConfig{}, "prefix")
+	assert.Nil(t, err)
 }
 
 func TestUpdate(t *testing.T) {
