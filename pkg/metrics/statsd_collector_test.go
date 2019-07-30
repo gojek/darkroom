@@ -31,6 +31,11 @@ func TestInitializeStatsdCollector(t *testing.T) {
 func TestRegisterHystrixMetrics(t *testing.T) {
 	err := RegisterHystrixMetrics(&StatsdCollectorConfig{}, "prefix")
 	assert.Nil(t, err)
+
+	err = RegisterHystrixMetrics(&StatsdCollectorConfig{
+		StatsdAddr: "foo:bar:foo",
+	}, "prefix")
+	assert.NotNil(t, err)
 }
 
 func TestUpdate(t *testing.T) {

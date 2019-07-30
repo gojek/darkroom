@@ -60,10 +60,14 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) error {
 }
 
 func RegisterHystrixMetrics(config *StatsdCollectorConfig, prefix string) error {
-	c, _ := plugins.InitializeStatsdCollector(&plugins.StatsdCollectorConfig{
+	c, err := plugins.InitializeStatsdCollector(&plugins.StatsdCollectorConfig{
 		StatsdAddr: config.StatsdAddr,
 		Prefix:     prefix,
 	})
+	if err != nil {
+		logger.Errorf("failed to initialize statsd collector for hystrix metrics with error: %s", err.Error())
+		return err
+	}
 	metricCollector.Registry.Register(c.NewStatsdCollector)
 	return nil
 }
