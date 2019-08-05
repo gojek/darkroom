@@ -3,7 +3,7 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "A website for testing",
+    "tagline": "Yet Another Image Proxy",
     "docs": {
       "doc1": {
         "title": "Latin-ish",
@@ -13,7 +13,7 @@
         "title": "document number 2"
       },
       "doc3": {
-        "title": "This is document number 3"
+        "title": "This is Doc 3"
       },
       "doc4": {
         "title": "Other Document"

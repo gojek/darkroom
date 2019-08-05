@@ -1,5 +1,6 @@
 # IDE stuff
 .idea/
+.DS_Store
 
 # binaries
 out/
