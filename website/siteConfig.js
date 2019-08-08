@@ -49,8 +49,8 @@ const siteConfig = {
 
   /* path to images for header/footer */
   headerIcon: 'img/darkroom-logo.png',
-  footerIcon: 'img/favicon.ico',
-  favicon: 'img/favicon.ico',
+  footerIcon: 'img/darkroom-logo.png',
+  favicon: 'img/darkroom-logo.png',
 
   /* Colors for website */
   colors: {

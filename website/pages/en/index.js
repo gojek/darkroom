@@ -91,15 +91,6 @@ class Index extends React.Component {
       </Container>
     );
 
-    const FeatureCallout = () => (
-      <div
-        className="productShowcaseSection paddingBottom"
-        style={{textAlign: 'center',color: 'black'}}>
-        <h2 style={{color: 'black'}}>Customizable</h2>
-        <MarkdownBlock>Implement your own `Storage` and `Processor` interfaces to gain custom functionality while still keeping other Darkroom Server functionality</MarkdownBlock>
-      </div>
-    );
-
     const TryOut = () => (
       <Block id="try">
         {[
@@ -116,51 +107,35 @@ class Index extends React.Component {
       </Block>
     );
 
-    const Description = () => (
-      <Block background="dark">
-        {[
-          {
-            content:
-              'This is another description of how this project is useful',
-            image: `${baseUrl}img/undraw_note_list.svg`,
-            imageAlign: 'right',
-            title: 'Description',
-          },
-        ]}
-      </Block>
-    );
-
-    const LearnHow = () => (
-      <Block background="light">
-        {[
-          {
-            content:
-              'Each new Docusaurus project has **randomly-generated** theme colors.',
-            image: `${baseUrl}img/undraw_youtube_tutorial.svg`,
-            imageAlign: 'right',
-            title: 'Randomly Generated Theme Colors',
-          },
-        ]}
-      </Block>
-    );
-
     const Features = () => (
-      <Block layout="fourColumn">
+      <div>
+      <Block layout="twoColumn">
         {[
           {
             content: 'Works without a Database',
-            image: `${baseUrl}img/undraw_react.svg`,
+            image: `${baseUrl}img/undraw_stateless.svg`,
             imageAlign: 'top',
             title: 'Stateless',
           },
           {
-            content: 'Can use multiple backend servers',
-            image: `${baseUrl}img/undraw_operating_system.svg`,
+            content: 'Can use multiple storage backends',
+            image: `${baseUrl}img/undraw_storage.svg`,
             imageAlign: 'top',
             title: 'Storage',
           },
         ]}
       </Block>
+      <Block>
+      {[
+        {
+          title: "Customizable",
+          content: "Implement your own `Storage` and `Processor` interfaces to gain custom functionality while still keeping other Darkroom Server functionality",
+          image: `${baseUrl}img/undraw_customizable.svg`,
+          imageAlign: 'top'
+        },
+      ]}
+      </Block>
+      </div>
     );
 
     const Showcase = () => {
@@ -196,10 +171,7 @@ class Index extends React.Component {
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
           <Features />
-          <FeatureCallout />
-          <LearnHow />
           <TryOut />
-          <Description />
           <Showcase />
         </div>
       </div>
