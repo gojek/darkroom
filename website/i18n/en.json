@@ -5,33 +5,27 @@
     "previous": "Previous",
     "tagline": "Yet Another Image Proxy",
     "docs": {
-      "doc1": {
-        "title": "Latin-ish",
-        "sidebar_label": "Example Page"
+      "contribute": {
+        "title": "Contribution"
       },
-      "doc2": {
-        "title": "document number 2"
+      "customization": {
+        "title": "Customization"
       },
-      "doc3": {
-        "title": "This is Doc 3"
+      "getting-started": {
+        "title": "Getting Started"
       },
-      "doc4": {
-        "title": "Other Document"
-      },
-      "doc5": {
-        "title": "Fifth Document"
+      "usage/size": {
+        "title": "Size"
       }
     },
     "links": {
       "Docs": "Docs",
-      "API": "API",
       "Help": "Help",
       "Blog": "Blog"
     },
     "categories": {
-      "Docusaurus": "Docusaurus",
-      "First Category": "First Category",
-      "Second Category": "Second Category"
+      "Contents": "Contents",
+      "First Category": "First Category"
     }
   },
   "pages-strings": {

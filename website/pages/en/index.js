@@ -94,9 +94,9 @@ class Index extends React.Component {
     const FeatureCallout = () => (
       <div
         className="productShowcaseSection paddingBottom"
-        style={{textAlign: 'center'}}>
-        <h2>Feature Callout</h2>
-        <MarkdownBlock>These are features of this project</MarkdownBlock>
+        style={{textAlign: 'center',color: 'black'}}>
+        <h2 style={{color: 'black'}}>Customizable</h2>
+        <MarkdownBlock>Implement your own `Storage` and `Processor` interfaces to gain custom functionality while still keeping other Darkroom Server functionality</MarkdownBlock>
       </div>
     );
 
@@ -148,16 +148,16 @@ class Index extends React.Component {
       <Block layout="fourColumn">
         {[
           {
-            content: 'This is the content of my feature',
+            content: 'Works without a Database',
             image: `${baseUrl}img/undraw_react.svg`,
             imageAlign: 'top',
-            title: 'Feature One',
+            title: 'Stateless',
           },
           {
-            content: 'The content of my second feature',
+            content: 'Can use multiple backend servers',
             image: `${baseUrl}img/undraw_operating_system.svg`,
             imageAlign: 'top',
-            title: 'Feature Two',
+            title: 'Storage',
           },
         ]}
       </Block>
