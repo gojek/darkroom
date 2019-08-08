@@ -17,4 +17,9 @@ The `top`, `bottom`, `left`, and `right` values allow you to specify the startin
 - `top`: Crop from the top of the image, down.
 - `bottom`: Crop from the bottom of the image, up.
 - `left`: Crop from the left of the image, right.
-- `right`: Crop from the right of the image, left.
+- `right`: Crop from the right of the image, left.  
+
+
+| `?w=500&h=250&fit=crop` | `?w=500&h=250` |
+|:---:|:---:|
+| ![image](https://kdarkroom.herokuapp.com/sample-image.jpg?w=500&h=250&fit=crop) | ![image](https://kdarkroom.herokuapp.com/sample-image.jpg?w=500&h=250) |
