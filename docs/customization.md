@@ -34,3 +34,60 @@ type IResponse interface {
 Any `struct` implementing the above interfaces can be used with Darkroom.  
 > Note: The struct implementing the `Storage` interface must return a struct implementing the `IResponse` interface.
 
+## Custom Storage Example
+
+This example shows how you can implement a custom `Storage` which reads file from the local storage of the machine on which darkroom server is running.
+
+- Create file `pkg/storage/local/storage.go`
+```go
+package local
+
+// Storage holds the fields used by local storage implementation
+type Storage struct {
+	volume string
+}
+
+// Option represents the local storage options
+type Option func(s *Storage)
+
+// WithVolume sets the volume
+func WithVolume(volume string) Option {
+	return func(s *Storage) {
+		s.volume = volume
+	}
+}
+
+// Get takes in the Context and path as an argument and returns an IResponse interface implementation.
+// This method figures out how to get the data from the local storage backend.
+func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
+	data, err := ioutil.ReadFile(fmt.Sprintf("%s%s", s.volume, path))
+	if err != nil {
+		return storage.NewResponse([]byte(err.Error()), http.StatusUnprocessableEntity, err)
+	}
+	return storage.NewResponse([]byte(data), http.StatusOK, nil)
+}
+
+// NewStorage returns a new local.Storage instance
+func NewStorage(opts ...Option) *Storage {
+	s := Storage{}
+	for _, opt := range opts {
+		opt(&s)
+	}
+	return &s
+}
+```
+
+
+- Inject this `local.Storage` in the handler dependencies `pkg/service/dependencies.go`
+```go
+func NewDependencies() *Dependencies {
+	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor())}
+	deps.Storage = local.NewStorage(
+		local.WithVolume("/absolute/path/to/folder/containing/images"),
+	)
+	return deps
+}
+```
+
+
+When you make a call to `http://localhost:3000/sample-image.jpg?w=500`, Darkroom will try to get the image from the location `/absolute/path/to/folder/containing/images/sample-image.jpg` on the local disk and serve a 500 pixel width image.
