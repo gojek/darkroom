@@ -94,6 +94,25 @@ func (s *StorageTestSuite) TestStorage_GetSuccessResponse() {
 	assert.Equal(s.T(), []byte("response body"), res.Data())
 }
 
+func (s *StorageTestSuite) TestStorage_getURL() {
+	cases := []struct {
+		secureProtocol bool
+		cloudfrontHost string
+		path           string
+		expected       string
+	}{
+		{secureProtocol: true, cloudfrontHost: "www.darkroom.com", path: "images/v1", expected: "https://www.darkroom.com/images/v1"},
+		{secureProtocol: true, cloudfrontHost: "www.darkroom.com", path: "/images/v1", expected: "https://www.darkroom.com/images/v1"},
+		{secureProtocol: true, cloudfrontHost: "www.darkroom.com/", path: "images/v1", expected: "https://www.darkroom.com/images/v1"},
+		{secureProtocol: true, cloudfrontHost: "www.darkroom.com/", path: "/images/v1", expected: "https://www.darkroom.com/images/v1"},
+	}
+	for _, c := range cases {
+		s.storage.cloudfrontHost = c.cloudfrontHost
+		s.storage.secureProtocol = c.secureProtocol
+		assert.Equal(s.T(), c.expected, s.storage.getURL(c.path))
+	}
+}
+
 // Mocks
 type mockClient struct {
 	mock.Mock
