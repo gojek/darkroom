@@ -23,15 +23,15 @@ const users = [
 const siteConfig = {
   title: 'Darkroom', // Title for your website.
   tagline: 'Yet Another Image Proxy',
-  githubUrl: 'https://github.com/gojek/darkroom', // Your website URL
-  baseUrl: '/', // Base URL for your project */
+  githubUrl: 'https://github.com/kavishgambhir/darkroom', // Your website URL
+  baseUrl: '/darkroom/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
-  //   url: 'https://facebook.github.io',
+  url: 'https://kavishgambhir.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
   projectName: 'darkroom',
-  organizationName: 'gojek',
+  organizationName: 'kavishgambhir',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'

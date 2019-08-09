@@ -1,12 +1,13 @@
 # IDE stuff
 .idea/
-.DS_Store
+*.DS_Store
 
 # binaries
 out/
 
 # releases
 dist/
+build/
 
 # config files
 config.yaml
