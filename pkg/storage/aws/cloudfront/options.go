@@ -7,7 +7,7 @@ import (
 // Option represents the Cloudfront storage options
 type Option func(s *Storage)
 
-// WithCloudfrontHost sets the cloudfront URL
+// WithCloudfrontHost sets the cloudfront host, can ends up with trailing slash or not
 func WithCloudfrontHost(host string) Option {
 	return func(s *Storage) {
 		s.cloudfrontHost = host

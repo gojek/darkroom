@@ -12,7 +12,7 @@ import (
 
 // Storage holds the fields used by cloudfront storage implementation
 type Storage struct {
-	cloudfrontHost string
+	cloudfrontHost string // can ends with trailing slash or not (example: "localhost:8000", "localhost:8000/")
 	client         heimdall.Client
 	secureProtocol bool
 }
@@ -20,7 +20,7 @@ type Storage struct {
 // Get takes in the Context and path as an argument and returns an IResponse interface implementation.
 // This method figures out how to get the data from the cloudfront storage backend.
 func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
-	res, err := s.client.Get(fmt.Sprintf("%s://%s%s", s.getProtocol(), s.cloudfrontHost, path), nil)
+	res, err := s.client.Get(s.getURL(path), nil)
 	if err != nil {
 		if res != nil {
 			return storage.NewResponse([]byte(nil), res.StatusCode, err)
@@ -32,6 +32,17 @@ func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	}
 	body, _ := ioutil.ReadAll(res.Body)
 	return storage.NewResponse([]byte(body), res.StatusCode, nil)
+}
+
+func (s *Storage) getURL(path string) string {
+	host := s.cloudfrontHost
+	if host[len(host)-1] == '/' {
+		host = host[:len(host)-1]
+	}
+	if path[0] != '/' {
+		path = "/" + path
+	}
+	return fmt.Sprintf("%s://%s%s", s.getProtocol(), host, path)
 }
 
 func (s *Storage) getProtocol() string {
