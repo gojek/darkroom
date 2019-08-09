@@ -12,7 +12,7 @@ import (
 
 // Storage holds the fields used by cloudfront storage implementation
 type Storage struct {
-	cloudfrontHost string // can ends with trailing slash or not (example: "localhost:8000", "localhost:8000/")
+	cloudfrontHost string // can end with trailing slash or not (example: "localhost:8000", "localhost:8000/")
 	client         heimdall.Client
 	secureProtocol bool
 }
