@@ -14,7 +14,7 @@ const users = [
     caption: 'Gojek',
     // You will need to prepend the image path with your baseUrl
     // if it is not '/', like: '/test-site/img/image.jpg'.
-    image: '/img/gojek-logo.svg',
+    image: './img/gojek-logo.svg',
     infoLink: 'https://www.gojek.io',
     pinned: true,
   },
@@ -23,7 +23,7 @@ const users = [
 const siteConfig = {
   title: 'Darkroom', // Title for your website.
   tagline: 'Yet Another Image Proxy',
-  githubUrl: 'https://github.com/kavishgambhir/darkroom', // Your website URL
+  githubUrl: 'https://github.com/gojek/darkroom', // Your website URL
   baseUrl: '/darkroom/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   url: 'https://kavishgambhir.github.io',
@@ -39,9 +39,7 @@ const siteConfig = {
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
     {doc: 'getting-started', label: 'Docs'},
-    // {doc: 'doc4', label: 'API'},
-    {page: 'help', label: 'Help'},
-    {blog: true, label: 'Blog'},
+    {blog: true, label: 'Blog'}
   ],
 
   // If you have users set above, you add it here:
