@@ -6,7 +6,8 @@
         "type": "subcategory",
         "label": "API Reference",
         "ids": [
-          "usage/size"
+          "usage/size",
+          "usage/rotate"
         ]
       },
       "customization",
