@@ -7,7 +7,7 @@ title: Rotate
 ## Rotate
 
 The `rot` parameter can be used to rotate the image clockwise for a certain degree.
-Image can be rotated upto any degree till 360.
+Image can be rotated upto any degree till 360 and `rot` can have any float value.
 
 | `?w=500&h=250` | `?w=500&h=250&rot=90` |`?w=500&h=250&rot=180` |
 |:---:|:---:|:---:|

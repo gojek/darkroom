@@ -7,7 +7,8 @@
         "label": "API Reference",
         "ids": [
           "usage/size",
-          "usage/rotate"
+          "usage/rotate",
+          "usage/filter"
         ]
       },
       "customization",
