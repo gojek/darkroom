@@ -34,7 +34,7 @@ func (s *Server) AddLifeCycleHook(hook *LifeCycleHook) {
 
 // Start is used to start a http.Server and wait for a kill signal to gracefully shutdown the server
 func (s *Server) Start() {
-	logger.Infof("Starting %s server", config.AppName())
+	logger.Info("Starting darkroom server")
 
 	if s.hook != nil {
 		s.hook.initFunc()
@@ -51,7 +51,7 @@ func (s *Server) Start() {
 func listenServer(s *http.Server) {
 	err := s.ListenAndServe()
 	if err != http.ErrServerClosed && err != nil {
-		logger.Errorf("error while starting %s server: %s", config.AppName(), err)
+		logger.Errorf("error while starting darkroom server: %s", err)
 	}
 }
 
@@ -61,12 +61,12 @@ func waitForShutdown(s *http.Server) {
 		syscall.SIGINT,
 		syscall.SIGTERM)
 	_ = <-sig
-	logger.Infof("%s server shutting down", config.AppName())
+	logger.Info("darkroom server shutting down")
 
 	err := s.Shutdown(context.Background())
 	if err != nil {
 		logger.Error(err.Error())
 	}
 	close(sig)
-	logger.Infof("%s server shutdown complete", config.AppName())
+	logger.Info("darkroom server shutdown complete")
 }

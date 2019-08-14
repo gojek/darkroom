@@ -5,12 +5,6 @@ import (
 	"github.com/gojek/darkroom/pkg/storage"
 )
 
-type app struct {
-	name        string
-	version     string
-	description string
-}
-
 // S3Bucket contains the configuration values for S3 source
 type S3Bucket struct {
 	// Name of the bucket
