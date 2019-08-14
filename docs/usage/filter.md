@@ -4,9 +4,9 @@ title: Filter
 ---
 
 
-## Grey Scale
+## Grayscale
 
-The `mono` parameter can be used to filter the image to Grey-scale by giving it the value `000000`.
+The `mono` parameter can be used to filter the image to Grayscale by giving it the value `000000`.
 
 | `?w=500&h=250` | `?w=500&h=250&mono=000000`|
 |:---:|:---:|
