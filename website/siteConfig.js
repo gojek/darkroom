@@ -26,7 +26,7 @@ const siteConfig = {
   githubUrl: 'https://github.com/gojek/darkroom', // Your website URL
   baseUrl: '/darkroom/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
-  url: 'https://kavishgambhir.github.io',
+  url: 'https://gojek.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
