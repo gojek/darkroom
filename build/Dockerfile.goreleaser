@@ -4,4 +4,4 @@ COPY darkroom ./darkroom
 RUN chmod +x ./darkroom
 ENV PORT 3000
 EXPOSE 3000
-ENTRYPOINT ["./darkroom"]
+CMD ["./darkroom", "server"]
