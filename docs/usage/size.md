@@ -11,7 +11,7 @@ Fit mode can be used to enforce crop on an image. If this is not set, the defaul
 
 | `?w=500&h=250&fit=crop` | `?w=500&h=250` |
 |:---:|:---:|
-| ![image](https://kdarkroom.herokuapp.com/sample-image.jpg?w=500&h=250&fit=crop) | ![image](https://kdarkroom.herokuapp.com/sample-image.jpg?w=500&h=250) |
+| {@injectImage: sample-image.jpg?w=500&h=250&fit=crop} | {@injectImage: sample-image.jpg?w=500&h=250} |
 
 ## Crop
 Crop mode controls the focus point of image when `fit=crop` is set. The `w` and `h` parameters should also be set, so that the crop is defined within specific image dimensions.
@@ -28,4 +28,4 @@ The `top`, `bottom`, `left`, and `right` values allow you to specify the startin
 
 | `?w=250&h=250&fit=crop&crop=left` | `?w=250&h=250&fit=crop&crop=right` |
 |:---:|:---:|
-| ![image](https://kdarkroom.herokuapp.com/sample-image.jpg?w=250&h=250&fit=crop&crop=left) | ![image](https://kdarkroom.herokuapp.com/sample-image.jpg?w=250&h=250&fit=crop&crop=right) |
+| {@injectImage: sample-image.jpg?w=500&h=250&fit=crop&crop=left}| {@injectImage: sample-image.jpg?w=500&h=250&fit=crop&crop=right} |

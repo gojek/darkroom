@@ -8,6 +8,35 @@
 // See https://docusaurus.io/docs/site-config for all the possible
 // site configuration options.
 
+
+const {Plugin: Embed} = require('remarkable-embed');
+
+// Our custom remarkable plugin factory.
+const createVariableInjectionPlugin = () => {
+  // `let` binding used to initialize the `Embed` plugin only once for efficiency.
+  // See `if` statement below.
+  let initializedPlugin;
+
+  const embed = new Embed();
+  embed.register({
+    // Call the render method to process the corresponding variable with
+    // the passed Remarkable instance.
+    // -> the Markdown markup in the variable will be converted to HTML.
+    injectImage: path => `<img src="https://kdarkroom.herokuapp.com/${path}" alt="image"/>`,
+  });
+
+  return (md, options) => {
+    if (!initializedPlugin) {
+      initializedPlugin = {
+        render: md.render.bind(md),
+        hook: embed.hook(md, options)
+      };
+    }
+
+    return initializedPlugin.hook;
+  };
+};
+
 // List of projects/orgs using your project for the users page.
 const users = [
   {
@@ -28,7 +57,7 @@ const siteConfig = {
   // For github.io type URLs, you would set the url and baseUrl like:
   url: 'https://gojek.io',
   //   baseUrl: '/test-site/',
-
+ 
   // Used for publishing and more
   projectName: 'darkroom',
   organizationName: 'kavishgambhir',
@@ -37,6 +66,9 @@ const siteConfig = {
   //   organizationName: 'JoelMarcey'
 
   // For no header links in the top nav bar -> headerLinks: [],
+  markdownPlugins: [
+    createVariableInjectionPlugin()
+  ],
   headerLinks: [
     {doc: 'getting-started', label: 'Docs'},
     {blog: true, label: 'Updates'}
