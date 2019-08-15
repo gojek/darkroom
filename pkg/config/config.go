@@ -8,7 +8,6 @@ import (
 
 type config struct {
 	logLevel                        string
-	app                             app
 	debugMode                       bool
 	port                            int
 	cacheTime                       int
@@ -49,12 +48,7 @@ func newConfig() *config {
 	s.readValue()
 
 	return &config{
-		logLevel: v.GetString("log.level"),
-		app: app{
-			name:        v.GetString("app.Name"),
-			version:     v.GetString("app.version"),
-			description: v.GetString("app.description"),
-		},
+		logLevel:                        v.GetString("log.level"),
 		debugMode:                       v.GetBool("debug"),
 		port:                            port,
 		cacheTime:                       v.GetInt("cache.time"),
@@ -71,21 +65,6 @@ func Update() {
 // LogLevel returns the log level for logger from the environment
 func LogLevel() string {
 	return getConfig().logLevel
-}
-
-// AppName returns the application name from the environment
-func AppName() string {
-	return getConfig().app.name
-}
-
-// AppVersion returns the application version from the environment
-func AppVersion() string {
-	return getConfig().app.version
-}
-
-// AppDescription returns the application description from the environment
-func AppDescription() string {
-	return getConfig().app.description
 }
 
 // DebugModeEnabled returns the debug mode bool from the environment

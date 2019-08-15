@@ -12,18 +12,6 @@ func TestConfigCases(t *testing.T) {
 		callFunc func() string
 	}{
 		{
-			key:      "app.Name",
-			callFunc: AppName,
-		},
-		{
-			key:      "app.version",
-			callFunc: AppVersion,
-		},
-		{
-			key:      "app.description",
-			callFunc: AppDescription,
-		},
-		{
 			key:      "log.level",
 			callFunc: LogLevel,
 		},

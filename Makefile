@@ -9,7 +9,7 @@ setup:
 
 compile:
 	mkdir -p out
-	go build -o $(APP_EXECUTABLE) ./cmd/darkroom/main.go
+	go build -o $(APP_EXECUTABLE) main.go
 
 lint:
 	golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
