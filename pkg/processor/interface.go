@@ -10,8 +10,9 @@ type Processor interface {
 	Resize(image image.Image, width, height int) image.Image
 	// GrayScale takes an input byte array and returns the grayscaled byte array or error
 	GrayScale(image image.Image) image.Image
-	// Blur takes an input byte array and returns the blurred byte array or error
-	Blur(image image.Image) image.Image
+	// Blur takes an input byte array and returns the blurred byte array by the specified radius or error
+	// radius must be larger than 0
+	Blur(image image.Image, radius float64) image.Image
 	// Watermark takes an input byte array, overlay byte array and opacity value
 	// and returns the watermarked image bytes or error
 	Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error)

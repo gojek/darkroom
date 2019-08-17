@@ -89,7 +89,7 @@ func (bp *BildProcessor) GrayScale(img image.Image) image.Image {
 
 // Blur takes an input image and blur radius and returns the Gausian blurred image
 func (bp *BildProcessor) Blur(img image.Image, radius float64) image.Image {
-	return blur.Gaussian(img,radius)
+	return blur.Gaussian(img, radius)
 }
 
 // Flip takes an input image and returns the image flipped. The direction of flip

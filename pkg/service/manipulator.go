@@ -24,13 +24,14 @@ const (
 	flip         = "flip"
 	rotate       = "rot"
 	auto         = "auto"
-
-	compress = "compress"
+	blur         = "blur"
+	compress     = "compress"
 
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"
 	encodeDurationKey    = "encodeDuration"
 	grayScaleDurationKey = "grayScaleDuration"
+	blurDurationKey		 = "blurDuration"
 	resizeDurationKey    = "resizeDuration"
 	flipDurationKey      = "flipDuration"
 	rotateDurationKey    = "rotateDuration"
@@ -82,6 +83,11 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		data = m.processor.GrayScale(data)
 		trackDuration(grayScaleDurationKey, t, spec)
 	}
+	if CleanFloat(params[blur], 1000) > 0 {
+		t = time.Now()
+		data = m.processor.Blur(data, CleanFloat(params[blur], 1000))
+		trackDuration(blurDurationKey, t, spec)
+	}
 
 	if params[auto] == compress {
 		orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
@@ -95,9 +101,9 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		data = m.processor.Flip(data, params[flip])
 		trackDuration(flipDurationKey, t, spec)
 	}
-	if CleanAngle(params[rotate]) > 0 {
+	if CleanFloat(params[rotate], 360) > 0 {
 		t = time.Now()
-		data = m.processor.Rotate(data, CleanAngle(params[rotate]))
+		data = m.processor.Rotate(data, CleanFloat(params[rotate], 360))
 		trackDuration(rotateDurationKey, t, spec)
 	}
 	t = time.Now()
@@ -117,13 +123,13 @@ func CleanInt(input string) int {
 	return val % 10000 // Never return value greater than 9999
 }
 
-// CleanAngle takes a string and return a float64 not greater than 360
-func CleanAngle(input string) float64 {
+// CleanAngle takes a string and return a float64 not greater than bound
+func CleanFloat(input string, bound float64) float64 {
 	val, _ := strconv.ParseFloat(input, 64)
 	if val <= 0 {
 		return 0
 	}
-	return math.Mod(val, 360) // Never return value greater than 360
+	return math.Mod(val, bound) // Never return value greater than bound
 }
 
 // GetCropPoint takes a string and returns the type CropPoint
