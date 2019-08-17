@@ -83,6 +83,39 @@ func (s *BildProcessorSuite) TestBildProcessor_Grayscale() {
 	assert.EqualValues(s.T(), actual, expected)
 }
 
+func (s *BildProcessorSuite) TestBildProcessor_Blur() {
+	var actual, expected []byte
+	var err error
+	cases := []struct {
+		radius float64
+		expectedFile string
+	}{
+		{
+			radius: 0.0,
+			expectedFile: "_testdata/test.jpg",
+		},
+		{
+			radius: 1.0,
+			expectedFile: "_testdata/test_blurred_1.jpg",
+		},
+		{
+			radius: 60.0,
+			expectedFile: "_testdata/test_blurred_60.jpg",
+		},
+	}
+	for _, c := range cases {
+		out := s.processor.Blur(s.srcImage, c.radius)
+		actual, err = s.processor.Encode(out, "jpeg")
+		assert.NotNil(s.T(), actual)
+		assert.Nil(s.T(), err)
+		expected, err = ioutil.ReadFile(c.expectedFile)
+		assert.NotNil(s.T(), expected)
+		assert.Nil(s.T(), err)
+		assert.EqualValues(s.T(), actual, expected)
+	}
+}
+
+
 func (s *BildProcessorSuite) TestBildProcessor_Flip() {
 	var actual, expected []byte
 	var err error
