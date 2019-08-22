@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"testing"
 
-	_ "github.com/chai2010/webp"
 	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
