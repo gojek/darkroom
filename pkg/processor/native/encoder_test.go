@@ -24,17 +24,19 @@ type EncoderSuite struct {
 }
 
 func (s *EncoderSuite) SetupSuite() {
-	s.encoders = NewEncoders(DefaultCompressionOptions)
+	s.encoders = NewEncoders()
 
 	s.processor = NewBildProcessor()
 	data, err := ioutil.ReadFile("_testdata/test.png")
 	if err != nil {
 		panic(err)
 	}
+
 	s.srcImage, _, err = image.Decode(bytes.NewReader(data))
 	if err != nil {
 		panic(err)
 	}
+
 	opaque := image.NewRGBA(image.Rect(0, 0, 640, 480))
 	draw.Draw(opaque, opaque.Bounds(), image.Opaque, image.ZP, draw.Src)
 	s.opaqueImage = opaque
@@ -48,12 +50,18 @@ func TestEncoder(t *testing.T) {
 	suite.Run(t, new(EncoderSuite))
 }
 
-func (s *EncoderSuite) TestNopEncoder() {
-	nopEncoder := NopEncoder{}
-
-	data, err := nopEncoder.Encode(s.srcImage)
-	assert.Nil(s.T(), data)
-	assert.Error(s.T(), err)
+func TestNewEncoders(t *testing.T) {
+	jpegEncoder := &JpegEncoder{}
+	pngEncoder := &PngEncoder{}
+	webPEncoder := &WebPEncoder{}
+	e := NewEncoders(
+		WithJpegEncoder(jpegEncoder),
+		WithPngEncoder(pngEncoder),
+		WithWebPEncoder(webPEncoder),
+	)
+	assert.Equal(t, jpegEncoder, e.jpegEncoder)
+	assert.Equal(t, pngEncoder, e.pngEncoder)
+	assert.Equal(t, webPEncoder, e.webPEncoder)
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpgExtensionShouldReturnJpegEncoder() {
@@ -65,12 +73,12 @@ func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpegExtensionShouldReturnJpe
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnPngEncoder() {
-	s.encoders.options.JpegQuality = 99
+	s.encoders.jpegEncoder.Option.Quality = 99
 	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "png"))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnJpegEncoder() {
-	s.encoders.options.JpegQuality = 100
+	s.encoders.jpegEncoder.Option.Quality = 100
 	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "png"))
 }
 
@@ -105,6 +113,14 @@ func (s *EncoderSuite) TestJpgEncoder_Encode_QualityShouldAffectFileSize() {
 	assert.Nil(s.T(), err)
 
 	assert.True(s.T(), len(lowQualityData) < len(highQualityData))
+}
+
+func (s *EncoderSuite) TestNopEncoder() {
+	nopEncoder := NopEncoder{}
+
+	data, err := nopEncoder.Encode(s.srcImage)
+	assert.Nil(s.T(), data)
+	assert.Error(s.T(), err)
 }
 
 func (s *EncoderSuite) TestPngEncoder_Encode_ShouldEncodeToPng() {

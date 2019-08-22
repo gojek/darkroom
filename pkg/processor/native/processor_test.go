@@ -3,7 +3,6 @@ package native
 import (
 	"bytes"
 	"image"
-	"image/png"
 	"io/ioutil"
 	"testing"
 
@@ -32,14 +31,6 @@ func (s *BildProcessorSuite) SetupSuite() {
 
 func TestBildProcessor(t *testing.T) {
 	suite.Run(t, new(BildProcessorSuite))
-}
-
-func (s *BildProcessorSuite) TestNewBildProcessorWithCompression() {
-	p := NewBildProcessorWithCompression(&CompressionOptions{JpegQuality: 70, PngCompressionLevel: png.BestSpeed})
-
-	assert.NotNil(s.T(), p)
-	assert.Equal(s.T(), 70, p.encoders.Options().JpegQuality)
-	assert.Equal(s.T(), png.BestSpeed, p.encoders.Options().PngCompressionLevel)
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Resize() {
@@ -186,7 +177,7 @@ func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
 	}
 }
 
-func (s *BildProcessorSuite) TestBildProcessorWithBadInput() {
+func (s *BildProcessorSuite) TestBildProcessor_Watermark_WithBadInput() {
 	output, err := s.processor.Watermark(s.badData, s.watermarkData, 255)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), output)
@@ -194,4 +185,10 @@ func (s *BildProcessorSuite) TestBildProcessorWithBadInput() {
 	output, err = s.processor.Watermark(s.srcData, s.badData, 255)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), output)
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_WithEncoders() {
+	e := NewEncoders()
+	bp := NewBildProcessor(WithEncoders(e))
+	assert.Equal(s.T(), e, bp.encoders)
 }
