@@ -192,3 +192,10 @@ func (s *BildProcessorSuite) TestBildProcessor_WithEncoders() {
 	bp := NewBildProcessor(WithEncoders(e))
 	assert.Equal(s.T(), e, bp.encoders)
 }
+
+func (s *BildProcessorSuite) TestBildProcessor_Decode_GivenWebPImageShouldBeAbleToDecodeProperly() {
+	data, _ := ioutil.ReadFile("_testdata/test.webp")
+	_, ext, err := s.processor.Decode(data)
+	assert.Nil(s.T(), err)
+	assert.Equal(s.T(), "webp", ext)
+}
