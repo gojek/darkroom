@@ -30,7 +30,7 @@ func (s *BildProcessorSuite) SetupSuite() {
 	s.badData = []byte("badImage.ext")
 }
 
-func TestNewBildProcessor(t *testing.T) {
+func TestBildProcessor(t *testing.T) {
 	suite.Run(t, new(BildProcessorSuite))
 }
 

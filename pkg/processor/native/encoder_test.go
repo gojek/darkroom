@@ -16,6 +16,7 @@ import (
 
 type EncoderSuite struct {
 	suite.Suite
+	encoders         *Encoders
 	srcImage         image.Image
 	processor        processor.Processor
 	opaqueImage      image.Image
@@ -23,6 +24,8 @@ type EncoderSuite struct {
 }
 
 func (s *EncoderSuite) SetupSuite() {
+	s.encoders = NewEncoders(DefaultCompressionOptions)
+
 	s.processor = NewBildProcessor()
 	data, err := ioutil.ReadFile("_testdata/test.png")
 	if err != nil {
@@ -41,7 +44,7 @@ func (s *EncoderSuite) SetupSuite() {
 	s.transparentImage = transparent
 }
 
-func TestNewEncoders(t *testing.T) {
+func TestEncoder(t *testing.T) {
 	suite.Run(t, new(EncoderSuite))
 }
 
@@ -53,33 +56,34 @@ func (s *EncoderSuite) TestNopEncoder() {
 	assert.Error(s.T(), err)
 }
 
-func (s *EncoderSuite) TestEncoders_GetEncoder() {
-	// TODO (adalberht): refactor this test case to be more modular
-	encoders := NewEncoders(DefaultCompressionOptions)
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpgExtensionShouldReturnJpegEncoder() {
+	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "jpg"))
+}
 
-	// TODO (adalberht): refactor to use assert.IsType() instead of assert.True()
-	_, ok := (encoders.GetEncoder(s.opaqueImage, "jpg")).(*JpegEncoder)
-	assert.True(s.T(), ok)
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpegExtensionShouldReturnJpegEncoder() {
+	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "jpeg"))
+}
 
-	_, ok = (encoders.GetEncoder(s.opaqueImage, "jpeg")).(*JpegEncoder)
-	assert.True(s.T(), ok)
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnPngEncoder() {
+	s.encoders.options.JpegQuality = 99
+	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "png"))
+}
 
-	encoders.options.JpegQuality = 99
-	_, ok = (encoders.GetEncoder(s.opaqueImage, "png")).(*JpegEncoder)
-	assert.True(s.T(), ok)
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnJpegEncoder() {
+	s.encoders.options.JpegQuality = 100
+	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "png"))
+}
 
-	encoders.options.JpegQuality = 100
-	_, ok = (encoders.GetEncoder(s.opaqueImage, "png")).(*PngEncoder)
-	assert.True(s.T(), ok)
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenTransparentImageAndPngExtensionShouldReturnPngEncoder() {
+	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.transparentImage, "png"))
+}
 
-	_, ok = (encoders.GetEncoder(s.transparentImage, "png")).(*PngEncoder)
-	assert.True(s.T(), ok)
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenUnknownExtensionShouldReturnNopEncoder() {
+	assert.IsType(s.T(), &NopEncoder{}, s.encoders.GetEncoder(image.Black, "unknown"))
+}
 
-	_, ok = (encoders.GetEncoder(image.Black, "unknown")).(*NopEncoder)
-	assert.True(s.T(), ok)
-
-	_, ok = (encoders.GetEncoder(s.transparentImage, "webp")).(*WebPEncoder)
-	assert.True(s.T(), ok)
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenWebPExtensionShouldReturnWebPEncoder() {
+	assert.IsType(s.T(), &WebPEncoder{}, s.encoders.GetEncoder(s.transparentImage, "webp"))
 }
 
 func (s *EncoderSuite) TestJpgEncoder_Encode_ShouldEncodeToJpeg() {
