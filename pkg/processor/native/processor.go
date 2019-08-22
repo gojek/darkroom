@@ -22,10 +22,12 @@ type BildProcessor struct {
 	encoders *Encoders
 }
 
+// ProcessorOption represents builder function for BildProcessor
+type ProcessorOption func(*BildProcessor)
+
 // Crop takes an input image, width, height and a CropPoint and returns the cropped image
 func (bp *BildProcessor) Crop(img image.Image, width, height int, point processor.CropPoint) image.Image {
 	w, h := getResizeWidthAndHeightForCrop(width, height, img.Bounds().Dx(), img.Bounds().Dy())
-
 	img = transform.Resize(img, w, h, transform.Linear)
 	x0, y0 := getStartingPointForCrop(w, h, width, height, point)
 	rect := image.Rect(x0, y0, width+x0, height+y0)
@@ -148,17 +150,18 @@ func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.
 	}
 }
 
-// NewBildProcessor creates a new BildProcessor with default compression
-func NewBildProcessor() *BildProcessor {
-	return &BildProcessor{
-		encoders: NewEncoders(DefaultCompressionOptions),
+// WithEncoders is a builder function to set custom Encoders for BildProcessor
+func WithEncoders(encoders *Encoders) ProcessorOption {
+	return func(bp *BildProcessor) {
+		bp.encoders = encoders
 	}
 }
 
-// NewBildProcessorWithCompression takes an input of encoding options
-// 	and creates a newBildProcessor with custom compression options
-func NewBildProcessorWithCompression(opts *CompressionOptions) *BildProcessor {
-	return &BildProcessor{
-		encoders: NewEncoders(opts),
+// NewBildProcessor creates a new BildProcessor, if called without parameters encoders will be default
+func NewBildProcessor(opts ...ProcessorOption) *BildProcessor {
+	bp := &BildProcessor{encoders: NewEncoders()}
+	for _, opt := range opts {
+		opt(bp)
 	}
+	return bp
 }

@@ -6,19 +6,9 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
+
+	"github.com/chai2010/webp"
 )
-
-// DefaultCompressionOptions is the default compression options used for encoding images
-var DefaultCompressionOptions = &CompressionOptions{
-	JpegQuality:         jpeg.DefaultQuality,
-	PngCompressionLevel: png.BestCompression,
-}
-
-// CompressionOptions is an object to configure jpeg quality and png compression level when encoding the image
-type CompressionOptions struct {
-	JpegQuality         int
-	PngCompressionLevel png.CompressionLevel
-}
 
 // Encoder is an interface to Encode image and return the encoded byte array or error
 type Encoder interface {
@@ -33,6 +23,11 @@ type JpegEncoder struct {
 // PngEncoder is an object to encode image to byte array with png format
 type PngEncoder struct {
 	Encoder *png.Encoder
+}
+
+// WebPEncoder is an object to encode image to byte array with webp format
+type WebPEncoder struct {
+	Option *webp.Options
 }
 
 // NopEncoder is a no-op encoder object for unsupported format and will return error
@@ -50,44 +45,77 @@ func (e *JpegEncoder) Encode(img image.Image) ([]byte, error) {
 	return buff.Bytes(), err
 }
 
+func (e *WebPEncoder) Encode(img image.Image) ([]byte, error) {
+	buff := &bytes.Buffer{}
+	err := webp.Encode(buff, img, e.Option)
+	return buff.Bytes(), err
+}
+
 func (e *NopEncoder) Encode(img image.Image) ([]byte, error) {
 	return nil, errors.New("unknown format: failed to encode image")
 }
 
 // Encoders is a struct to store all supported encoders so that we don't have to create new encoder every time
 type Encoders struct {
-	options     *CompressionOptions
-	jpegEncoder Encoder
-	pngEncoder  Encoder
-	noOpEncoder Encoder
+	jpegEncoder *JpegEncoder
+	pngEncoder  *PngEncoder
+	noOpEncoder *NopEncoder
+	webPEncoder *WebPEncoder
 }
+
+// EncodersOption represents builder function for Encoders
+type EncodersOption func(*Encoders)
 
 // GetEncoder takes an input of image and extension and return the appropriate Encoder for encoding the image
 func (e *Encoders) GetEncoder(img image.Image, ext string) Encoder {
-	if ext == "jpg" || ext == "jpeg" {
+	switch ext {
+	case "jpg", "jpeg":
 		return e.jpegEncoder
-	}
-	if ext == "png" {
-		if e.options.JpegQuality != 100 && isOpaque(img) {
+	case "png":
+		if e.jpegEncoder.Option.Quality != 100 && isOpaque(img) {
 			return e.jpegEncoder
 		}
 		return e.pngEncoder
+	case "webp":
+		return e.webPEncoder
+	default:
+		return e.noOpEncoder
 	}
-	return e.noOpEncoder
 }
 
-// Getter for Options
-func (e *Encoders) Options() *CompressionOptions {
-	return e.options
+// WithJpegEncoder is a builder function for setting custom JpegEncoder
+func WithJpegEncoder(jpegEncoder *JpegEncoder) EncodersOption {
+	return func(e *Encoders) {
+		e.jpegEncoder = jpegEncoder
+	}
 }
 
-func NewEncoders(opts *CompressionOptions) *Encoders {
-	return &Encoders{
-		options:     opts,
-		jpegEncoder: &JpegEncoder{Option: &jpeg.Options{Quality: opts.JpegQuality}},
+// WithPngEncoder is a builder function for setting custom PngEncoder
+func WithPngEncoder(pngEncoder *PngEncoder) EncodersOption {
+	return func(e *Encoders) {
+		e.pngEncoder = pngEncoder
+	}
+}
+
+// WithWebPEncoder is a builder function for setting custom WebPEncoder
+func WithWebPEncoder(webPEncoder *WebPEncoder) EncodersOption {
+	return func(e *Encoders) {
+		e.webPEncoder = webPEncoder
+	}
+}
+
+// NewEncoders creates a new Encoders, if called without parameter (builder), all encoders option will be default
+func NewEncoders(opts ...EncodersOption) *Encoders {
+	e := &Encoders{
+		jpegEncoder: &JpegEncoder{Option: &jpeg.Options{Quality: jpeg.DefaultQuality}},
 		pngEncoder: &PngEncoder{
-			Encoder: &png.Encoder{CompressionLevel: opts.PngCompressionLevel},
+			Encoder: &png.Encoder{CompressionLevel: png.BestCompression},
 		},
 		noOpEncoder: &NopEncoder{},
+		webPEncoder: &WebPEncoder{},
 	}
+	for _, opt := range opts {
+		opt(e)
+	}
+	return e
 }
