@@ -6,6 +6,8 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
+
+	"github.com/chai2010/webp"
 )
 
 // DefaultCompressionOptions is the default compression options used for encoding images
@@ -35,6 +37,10 @@ type PngEncoder struct {
 	Encoder *png.Encoder
 }
 
+type WebPEncoder struct {
+	Option *webp.Options
+}
+
 // NopEncoder is a no-op encoder object for unsupported format and will return error
 type NopEncoder struct{}
 
@@ -50,30 +56,41 @@ func (e *JpegEncoder) Encode(img image.Image) ([]byte, error) {
 	return buff.Bytes(), err
 }
 
+func (e *WebPEncoder) Encode(img image.Image) ([]byte, error) {
+	buff := &bytes.Buffer{}
+	err := webp.Encode(buff, img, e.Option)
+	return buff.Bytes(), err
+}
+
 func (e *NopEncoder) Encode(img image.Image) ([]byte, error) {
 	return nil, errors.New("unknown format: failed to encode image")
 }
 
 // Encoders is a struct to store all supported encoders so that we don't have to create new encoder every time
 type Encoders struct {
-	options     *CompressionOptions
+	options *CompressionOptions
+
 	jpegEncoder Encoder
 	pngEncoder  Encoder
 	noOpEncoder Encoder
+	webPEncoder Encoder
 }
 
 // GetEncoder takes an input of image and extension and return the appropriate Encoder for encoding the image
 func (e *Encoders) GetEncoder(img image.Image, ext string) Encoder {
-	if ext == "jpg" || ext == "jpeg" {
+	switch ext {
+	case "jpg", "jpeg":
 		return e.jpegEncoder
-	}
-	if ext == "png" {
+	case "png":
 		if e.options.JpegQuality != 100 && isOpaque(img) {
 			return e.jpegEncoder
 		}
 		return e.pngEncoder
+	case "webp":
+		return e.webPEncoder
+	default:
+		return e.noOpEncoder
 	}
-	return e.noOpEncoder
 }
 
 // Getter for Options
@@ -89,5 +106,6 @@ func NewEncoders(opts *CompressionOptions) *Encoders {
 			Encoder: &png.Encoder{CompressionLevel: opts.PngCompressionLevel},
 		},
 		noOpEncoder: &NopEncoder{},
+		webPEncoder: &WebPEncoder{},
 	}
 }

@@ -8,6 +8,7 @@ require (
 	github.com/anthonynsimon/bild v0.10.1-0.20190710205720-eee9188e4370
 	github.com/aws/aws-sdk-go v1.20.19
 	github.com/cactus/go-statsd-client/statsd v0.0.0-20190501063751-9a7692639588
+	github.com/chai2010/webp v1.1.0 // indirect
 	github.com/gojektech/heimdall v5.0.2+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20190430165422-3e4dfb77656c // indirect
 	github.com/gorilla/mux v1.7.3

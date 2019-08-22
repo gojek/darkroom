@@ -2,15 +2,17 @@ package native
 
 import (
 	"bytes"
-	"github.com/gojek/darkroom/pkg/processor"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"image"
 	"image/draw"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
 	"testing"
+
+	_ "github.com/chai2010/webp"
+	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type EncoderSuite struct {
@@ -53,8 +55,10 @@ func (s *EncoderSuite) TestNopEncoder() {
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder() {
+	// TODO (adalberht): refactor this test case to be more modular
 	encoders := NewEncoders(DefaultCompressionOptions)
 
+	// TODO (adalberht): refactor to use assert.IsType() instead of assert.True()
 	_, ok := (encoders.GetEncoder(s.opaqueImage, "jpg")).(*JpegEncoder)
 	assert.True(s.T(), ok)
 
@@ -73,6 +77,9 @@ func (s *EncoderSuite) TestEncoders_GetEncoder() {
 	assert.True(s.T(), ok)
 
 	_, ok = (encoders.GetEncoder(image.Black, "unknown")).(*NopEncoder)
+	assert.True(s.T(), ok)
+
+	_, ok = (encoders.GetEncoder(s.transparentImage, "webp")).(*WebPEncoder)
 	assert.True(s.T(), ok)
 }
 
@@ -104,4 +111,13 @@ func (s *EncoderSuite) TestPngEncoder_Encode_ShouldEncodeToPng() {
 	_, f, err := s.processor.Decode(data)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), "png", f)
+}
+
+func (s *EncoderSuite) TestWebPEncoder_Encode_ShouldEncodeToWebP() {
+	encoder := WebPEncoder{}
+	data, err := encoder.Encode(s.srcImage)
+	assert.Nil(s.T(), err)
+	_, f, err := s.processor.Decode(data)
+	assert.Nil(s.T(), err)
+	assert.Equal(s.T(), "webp", f)
 }
