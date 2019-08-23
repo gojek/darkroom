@@ -26,8 +26,8 @@ type Processor interface {
 	// Decode takes a byte array and returns the image, extension, and error
 	Decode(data []byte) (img image.Image, format string, err error)
 	// Encode takes an image and extension and return the encoded byte array or error
-	Encode(img image.Image, format string) ([]byte, error)
+	Encode(image image.Image, format string) ([]byte, error)
 	// FixOrientation takes an image and it's EXIF orientation (if exist)
 	// and returns the image with its EXIF orientation fixed
-	FixOrientation(img image.Image, orientation int) image.Image
+	FixOrientation(image image.Image, orientation int) image.Image
 }
