@@ -65,25 +65,25 @@ func TestNewEncoders(t *testing.T) {
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpgExtensionShouldReturnJpegEncoder() {
-	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "jpg"))
+	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpegExtensionShouldReturnJpegEncoder() {
-	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "jpeg"))
+	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPEG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnPngEncoder() {
 	s.encoders.jpegEncoder.Option.Quality = 99
-	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "png"))
+	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnJpegEncoder() {
 	s.encoders.jpegEncoder.Option.Quality = 100
-	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.opaqueImage, "png"))
+	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenTransparentImageAndPngExtensionShouldReturnPngEncoder() {
-	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.transparentImage, "png"))
+	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.transparentImage, processor.FormatPNG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenUnknownExtensionShouldReturnNopEncoder() {
@@ -91,7 +91,7 @@ func (s *EncoderSuite) TestEncoders_GetEncoder_GivenUnknownExtensionShouldReturn
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenWebPExtensionShouldReturnWebPEncoder() {
-	assert.IsType(s.T(), &WebPEncoder{}, s.encoders.GetEncoder(s.transparentImage, "webp"))
+	assert.IsType(s.T(), &WebPEncoder{}, s.encoders.GetEncoder(s.transparentImage, processor.FormatWebP))
 }
 
 func (s *EncoderSuite) TestJpgEncoder_Encode_ShouldEncodeToJpeg() {
@@ -129,7 +129,7 @@ func (s *EncoderSuite) TestPngEncoder_Encode_ShouldEncodeToPng() {
 	assert.Nil(s.T(), err)
 	_, f, err := s.processor.Decode(data)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), "png", f)
+	assert.Equal(s.T(), processor.FormatPNG, f)
 }
 
 func (s *EncoderSuite) TestWebPEncoder_Encode_ShouldEncodeToWebP() {
@@ -138,5 +138,5 @@ func (s *EncoderSuite) TestWebPEncoder_Encode_ShouldEncodeToWebP() {
 	assert.Nil(s.T(), err)
 	_, f, err := s.processor.Decode(data)
 	assert.Nil(s.T(), err)
-	assert.Equal(s.T(), "webp", f)
+	assert.Equal(s.T(), processor.FormatWebP, f)
 }
