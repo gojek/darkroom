@@ -55,7 +55,7 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	params := spec.Params
 	var err error
 	t := time.Now()
-	data, f, err := m.processor.Decode(spec.ImageData)
+	data, format, err := m.processor.Decode(spec.ImageData)
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +109,12 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		trackDuration(rotateDurationKey, t, spec)
 	}
 
+	if m.processor.Support(params[fm]) {
+		format = params[fm]
+	}
+
 	t = time.Now()
-	src, err := m.processor.Encode(data, f)
+	src, err := m.processor.Encode(data, format)
 	if err == nil {
 		trackDuration(encodeDurationKey, t, spec)
 	}

@@ -1,3 +1,4 @@
+// TODO: Change test case to use suite
 package service
 
 import (
@@ -57,6 +58,7 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 }
 
 func TestManipulator_Process(t *testing.T) {
+	// TODO: Refactor this test case to be more modular
 	mp := &processor.MockProcessor{}
 	m := NewManipulator(mp)
 	params := make(map[string]string)
@@ -72,6 +74,7 @@ func TestManipulator_Process(t *testing.T) {
 	// Create new struct for asserting expectations
 	mp = &processor.MockProcessor{}
 	m = NewManipulator(mp)
+	mp.On("Support", mock.Anything).Return(false)
 	mp.On("Decode", input).Return(decoded, "png", nil)
 	mp.On("Encode", decoded, "png").Return(input, nil)
 	mp.On("Crop", decoded, 100, 100, processor.CropCenter).Return(decoded, nil)
@@ -114,6 +117,45 @@ func TestManipulator_Process(t *testing.T) {
 	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
 	// Assert all expectations once here
+	mp.AssertExpectations(t)
+}
+
+func TestManipulator_Process_GivenValidFmQueryParameterShouldEncodeToCustomFormat(t *testing.T) {
+	originalFmt, customFmt := "png", "jpeg"
+	assert.NotEqual(t, originalFmt, customFmt)
+
+	input, expected := []byte("input"), []byte("output")
+	img := &image.RGBA{}
+	mp := &processor.MockProcessor{}
+	mp.On("Decode", input).Return(img, originalFmt, nil)
+	mp.On("Support", customFmt).Return(true)
+	mp.On("Encode", img, customFmt).Return(expected, nil)
+
+	m := NewManipulator(mp)
+	params := map[string]string{fm: customFmt}
+	actual, err := m.Process(ProcessSpec{ImageData: input, Params: params})
+
+	assert.Equal(t, expected, actual)
+	assert.Nil(t, err)
+	mp.AssertExpectations(t)
+}
+
+func TestManipulator_Process_GivenInvalidFmQueryParameterShouldEncodeToOriginalFormat(t *testing.T) {
+	originalFmt, customFmt := "png", "unknown"
+
+	input, expected := []byte("input"), []byte("output")
+	img := &image.RGBA{}
+	mp := &processor.MockProcessor{}
+	mp.On("Decode", input).Return(img, originalFmt, nil)
+	mp.On("Support", customFmt).Return(false)
+	mp.On("Encode", img, originalFmt).Return(expected, nil)
+
+	m := NewManipulator(mp)
+	params := map[string]string{fm: customFmt}
+	actual, err := m.Process(ProcessSpec{ImageData: input, Params: params})
+
+	assert.Equal(t, expected, actual)
+	assert.Nil(t, err)
 	mp.AssertExpectations(t)
 }
 
