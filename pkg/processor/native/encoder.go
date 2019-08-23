@@ -68,8 +68,8 @@ type Encoders struct {
 type EncodersOption func(*Encoders)
 
 // GetEncoder takes an input of image and extension and return the appropriate Encoder for encoding the image
-func (e *Encoders) GetEncoder(img image.Image, fmt string) Encoder {
-	switch fmt {
+func (e *Encoders) GetEncoder(img image.Image, format string) Encoder {
+	switch format {
 	case processor.FormatJPG, processor.FormatJPEG:
 		return e.JPEGEncoder
 	case processor.FormatPNG:
@@ -81,6 +81,16 @@ func (e *Encoders) GetEncoder(img image.Image, fmt string) Encoder {
 		return e.WebPEncoder
 	default:
 		return e.NoOpEncoder
+	}
+}
+
+// Support takes an input of image format and return whether encoders support encoding for that image format
+func (e *Encoders) Support(format string) bool {
+	switch format {
+	case processor.FormatJPG, processor.FormatJPEG, processor.FormatPNG, processor.FormatWebP:
+		return true
+	default:
+		return false
 	}
 }
 

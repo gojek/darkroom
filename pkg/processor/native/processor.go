@@ -123,7 +123,6 @@ func (bp *BildProcessor) Decode(data []byte) (image.Image, string, error) {
 }
 
 // Encode takes an image and the preferred format (extension) of the output
-// Current supported format are "png", "jpg" and "jpeg"
 func (bp *BildProcessor) Encode(img image.Image, fmt string) ([]byte, error) {
 	enc := bp.encoders.GetEncoder(img, fmt)
 	data, err := enc.Encode(img)
@@ -156,10 +155,16 @@ func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.
 	}
 }
 
+// Support takes an input of image format
+// and return whether the processor supports encoding/decoding the format or not
+func (bp *BildProcessor) Support(format string) bool {
+	return bp.encoders.Support(format)
+}
+
 // WithEncoders is a builder function to set custom Encoders for BildProcessor
-func WithEncoders(encoders *Encoders) ProcessorOption {
+func WithEncoders(e *Encoders) ProcessorOption {
 	return func(bp *BildProcessor) {
-		bp.encoders = encoders
+		bp.encoders = e
 	}
 }
 

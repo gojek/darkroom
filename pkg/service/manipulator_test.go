@@ -215,3 +215,8 @@ func (m *mockProcessor) FixOrientation(img image.Image, orientation int) image.I
 	args := m.Called(img, orientation)
 	return args.Get(0).(image.Image)
 }
+
+func (m *mockProcessor) Support(format string) bool {
+	args := m.Called(format)
+	return args.Get(0).(bool)
+}

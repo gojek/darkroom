@@ -232,3 +232,14 @@ func (s *BildProcessorSuite) TestBildProcessor_Decode_GivenWebPImageShouldBeAble
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), "webp", ext)
 }
+
+func (s *BildProcessorSuite) TestBildProcessor_Support_GivenSupportedFormatShouldReturnTrue() {
+	assert.True(s.T(), s.processor.Support(processor.FormatJPG))
+	assert.True(s.T(), s.processor.Support(processor.FormatJPEG))
+	assert.True(s.T(), s.processor.Support(processor.FormatPNG))
+	assert.True(s.T(), s.processor.Support(processor.FormatWebP))
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_Support_GivenUnsupportedFormatShouldReturnFalse() {
+	assert.False(s.T(), s.processor.Support("unknown"))
+}
