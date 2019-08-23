@@ -51,43 +51,43 @@ func TestEncoder(t *testing.T) {
 }
 
 func TestNewEncoders(t *testing.T) {
-	jpegEncoder := &JpegEncoder{}
-	pngEncoder := &PngEncoder{}
+	jpegEncoder := &JPEGEncoder{}
+	pngEncoder := &PNGEncoder{}
 	webPEncoder := &WebPEncoder{}
 	e := NewEncoders(
-		WithJpegEncoder(jpegEncoder),
-		WithPngEncoder(pngEncoder),
+		WithJPEGEncoder(jpegEncoder),
+		WithPNGEncoder(pngEncoder),
 		WithWebPEncoder(webPEncoder),
 	)
-	assert.Equal(t, jpegEncoder, e.jpegEncoder)
-	assert.Equal(t, pngEncoder, e.pngEncoder)
-	assert.Equal(t, webPEncoder, e.webPEncoder)
+	assert.Equal(t, jpegEncoder, e.JPEGEncoder)
+	assert.Equal(t, pngEncoder, e.PNGEncoder)
+	assert.Equal(t, webPEncoder, e.WebPEncoder)
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpgExtensionShouldReturnJpegEncoder() {
-	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPG))
+	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpegExtensionShouldReturnJpegEncoder() {
-	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPEG))
+	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPEG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnPngEncoder() {
-	s.encoders.jpegEncoder.Option.Quality = 99
-	assert.IsType(s.T(), &JpegEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG))
+	s.encoders.JPEGEncoder.Options.Quality = 99
+	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnJpegEncoder() {
-	s.encoders.jpegEncoder.Option.Quality = 100
-	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG))
+	s.encoders.JPEGEncoder.Options.Quality = 100
+	assert.IsType(s.T(), &PNGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenTransparentImageAndPngExtensionShouldReturnPngEncoder() {
-	assert.IsType(s.T(), &PngEncoder{}, s.encoders.GetEncoder(s.transparentImage, processor.FormatPNG))
+	assert.IsType(s.T(), &PNGEncoder{}, s.encoders.GetEncoder(s.transparentImage, processor.FormatPNG))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenUnknownExtensionShouldReturnNopEncoder() {
-	assert.IsType(s.T(), &NopEncoder{}, s.encoders.GetEncoder(image.Black, "unknown"))
+	assert.IsType(s.T(), &NoOpEncoder{}, s.encoders.GetEncoder(image.Black, "unknown"))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenWebPExtensionShouldReturnWebPEncoder() {
@@ -95,7 +95,7 @@ func (s *EncoderSuite) TestEncoders_GetEncoder_GivenWebPExtensionShouldReturnWeb
 }
 
 func (s *EncoderSuite) TestJpgEncoder_Encode_ShouldEncodeToJpeg() {
-	encoder := JpegEncoder{Option: nil}
+	encoder := JPEGEncoder{Options: nil}
 	data, err := encoder.Encode(s.srcImage)
 	assert.Nil(s.T(), err)
 	_, f, err := NewBildProcessor().Decode(data)
@@ -104,8 +104,8 @@ func (s *EncoderSuite) TestJpgEncoder_Encode_ShouldEncodeToJpeg() {
 }
 
 func (s *EncoderSuite) TestJpgEncoder_Encode_QualityShouldAffectFileSize() {
-	lowQualityEncoder := JpegEncoder{Option: &jpeg.Options{Quality: 25}}
-	highQualityEncoder := JpegEncoder{Option: &jpeg.Options{Quality: 90}}
+	lowQualityEncoder := JPEGEncoder{Options: &jpeg.Options{Quality: 25}}
+	highQualityEncoder := JPEGEncoder{Options: &jpeg.Options{Quality: 90}}
 	lowQualityData, err := lowQualityEncoder.Encode(s.srcImage)
 	assert.Nil(s.T(), err)
 
@@ -116,7 +116,7 @@ func (s *EncoderSuite) TestJpgEncoder_Encode_QualityShouldAffectFileSize() {
 }
 
 func (s *EncoderSuite) TestNopEncoder() {
-	nopEncoder := NopEncoder{}
+	nopEncoder := NoOpEncoder{}
 
 	data, err := nopEncoder.Encode(s.srcImage)
 	assert.Nil(s.T(), data)
@@ -124,7 +124,7 @@ func (s *EncoderSuite) TestNopEncoder() {
 }
 
 func (s *EncoderSuite) TestPngEncoder_Encode_ShouldEncodeToPng() {
-	encoder := PngEncoder{Encoder: &png.Encoder{CompressionLevel: png.NoCompression}}
+	encoder := PNGEncoder{Encoder: &png.Encoder{CompressionLevel: png.NoCompression}}
 	data, err := encoder.Encode(s.srcImage)
 	assert.Nil(s.T(), err)
 	_, f, err := s.processor.Decode(data)

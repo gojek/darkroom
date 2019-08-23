@@ -16,52 +16,52 @@ type Encoder interface {
 	Encode(img image.Image) ([]byte, error)
 }
 
-// JpegEncoder is an object to encode image to byte array with jpeg format
-type JpegEncoder struct {
-	Option *jpeg.Options
+// JPEGEncoder is an object to encode image to byte array with jpeg format
+type JPEGEncoder struct {
+	Options *jpeg.Options
 }
 
-// PngEncoder is an object to encode image to byte array with png format
-type PngEncoder struct {
+// PNGEncoder is an object to encode image to byte array with png format
+type PNGEncoder struct {
 	Encoder *png.Encoder
 }
 
 // WebPEncoder is an object to encode image to byte array with webp format
 type WebPEncoder struct {
-	Option *webp.Options
+	Options *webp.Options
 }
 
-// NopEncoder is a no-op encoder object for unsupported format and will return error
-type NopEncoder struct{}
+// NoOpEncoder is a no-op encoder object for unsupported format and will return error
+type NoOpEncoder struct{}
 
-func (e *PngEncoder) Encode(img image.Image) ([]byte, error) {
+func (e *PNGEncoder) Encode(img image.Image) ([]byte, error) {
 	buff := &bytes.Buffer{}
 	err := e.Encoder.Encode(buff, img)
 	return buff.Bytes(), err
 }
 
-func (e *JpegEncoder) Encode(img image.Image) ([]byte, error) {
+func (e *JPEGEncoder) Encode(img image.Image) ([]byte, error) {
 	buff := &bytes.Buffer{}
-	err := jpeg.Encode(buff, img, e.Option)
+	err := jpeg.Encode(buff, img, e.Options)
 	return buff.Bytes(), err
 }
 
 func (e *WebPEncoder) Encode(img image.Image) ([]byte, error) {
 	buff := &bytes.Buffer{}
-	err := webp.Encode(buff, img, e.Option)
+	err := webp.Encode(buff, img, e.Options)
 	return buff.Bytes(), err
 }
 
-func (e *NopEncoder) Encode(img image.Image) ([]byte, error) {
+func (e *NoOpEncoder) Encode(img image.Image) ([]byte, error) {
 	return nil, errors.New("unknown format: failed to encode image")
 }
 
 // Encoders is a struct to store all supported encoders so that we don't have to create new encoder every time
 type Encoders struct {
-	jpegEncoder *JpegEncoder
-	pngEncoder  *PngEncoder
-	noOpEncoder *NopEncoder
-	webPEncoder *WebPEncoder
+	JPEGEncoder *JPEGEncoder
+	PNGEncoder  *PNGEncoder
+	NoOpEncoder *NoOpEncoder
+	WebPEncoder *WebPEncoder
 }
 
 // EncodersOption represents builder function for Encoders
@@ -71,49 +71,49 @@ type EncodersOption func(*Encoders)
 func (e *Encoders) GetEncoder(img image.Image, fmt string) Encoder {
 	switch fmt {
 	case processor.FormatJPG, processor.FormatJPEG:
-		return e.jpegEncoder
+		return e.JPEGEncoder
 	case processor.FormatPNG:
-		if e.jpegEncoder.Option.Quality != 100 && isOpaque(img) {
-			return e.jpegEncoder
+		if e.JPEGEncoder.Options.Quality != 100 && isOpaque(img) {
+			return e.JPEGEncoder
 		}
-		return e.pngEncoder
+		return e.PNGEncoder
 	case processor.FormatWebP:
-		return e.webPEncoder
+		return e.WebPEncoder
 	default:
-		return e.noOpEncoder
+		return e.NoOpEncoder
 	}
 }
 
-// WithJpegEncoder is a builder function for setting custom JpegEncoder
-func WithJpegEncoder(jpegEncoder *JpegEncoder) EncodersOption {
+// WithJPEGEncoder is a builder function for setting custom JPEGEncoder
+func WithJPEGEncoder(j *JPEGEncoder) EncodersOption {
 	return func(e *Encoders) {
-		e.jpegEncoder = jpegEncoder
+		e.JPEGEncoder = j
 	}
 }
 
-// WithPngEncoder is a builder function for setting custom PngEncoder
-func WithPngEncoder(pngEncoder *PngEncoder) EncodersOption {
+// WithPNGEncoder is a builder function for setting custom PNGEncoder
+func WithPNGEncoder(p *PNGEncoder) EncodersOption {
 	return func(e *Encoders) {
-		e.pngEncoder = pngEncoder
+		e.PNGEncoder = p
 	}
 }
 
 // WithWebPEncoder is a builder function for setting custom WebPEncoder
-func WithWebPEncoder(webPEncoder *WebPEncoder) EncodersOption {
+func WithWebPEncoder(w *WebPEncoder) EncodersOption {
 	return func(e *Encoders) {
-		e.webPEncoder = webPEncoder
+		e.WebPEncoder = w
 	}
 }
 
 // NewEncoders creates a new Encoders, if called without parameter (builder), all encoders option will be default
 func NewEncoders(opts ...EncodersOption) *Encoders {
 	e := &Encoders{
-		jpegEncoder: &JpegEncoder{Option: &jpeg.Options{Quality: jpeg.DefaultQuality}},
-		pngEncoder: &PngEncoder{
+		JPEGEncoder: &JPEGEncoder{Options: &jpeg.Options{Quality: jpeg.DefaultQuality}},
+		PNGEncoder: &PNGEncoder{
 			Encoder: &png.Encoder{CompressionLevel: png.BestCompression},
 		},
-		noOpEncoder: &NopEncoder{},
-		webPEncoder: &WebPEncoder{},
+		NoOpEncoder: &NoOpEncoder{},
+		WebPEncoder: &WebPEncoder{},
 	}
 	for _, opt := range opts {
 		opt(e)
