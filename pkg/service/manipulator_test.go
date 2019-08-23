@@ -57,7 +57,7 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 }
 
 func TestManipulator_Process(t *testing.T) {
-	mp := &mockProcessor{}
+	mp := &processor.MockProcessor{}
 	m := NewManipulator(mp)
 	params := make(map[string]string)
 
@@ -70,7 +70,7 @@ func TestManipulator_Process(t *testing.T) {
 	mp.AssertExpectations(t)
 
 	// Create new struct for asserting expectations
-	mp = &mockProcessor{}
+	mp = &processor.MockProcessor{}
 	m = NewManipulator(mp)
 	mp.On("Decode", input).Return(decoded, "png", nil)
 	mp.On("Encode", decoded, "png").Return(input, nil)
