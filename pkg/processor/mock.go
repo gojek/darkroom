@@ -50,8 +50,8 @@ func (m *MockProcessor) Decode(data []byte) (image.Image, string, error) {
 	return nil, "", args.Error(2)
 }
 
-func (m *MockProcessor) Encode(img image.Image, format string) ([]byte, error) {
-	args := m.Called(img, format)
+func (m *MockProcessor) Encode(img image.Image, format string, enforceFmt bool) ([]byte, error) {
+	args := m.Called(img, format, enforceFmt)
 	b := args.Get(0).([]byte)
 	if args.Get(1) == nil {
 		return b, nil

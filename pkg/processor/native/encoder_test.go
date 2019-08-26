@@ -65,33 +65,38 @@ func TestNewEncoders(t *testing.T) {
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpgExtensionShouldReturnJpegEncoder() {
-	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPG))
+	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPG, false))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenJpegExtensionShouldReturnJpegEncoder() {
-	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPEG))
+	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatJPEG, false))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnPngEncoder() {
 	s.encoders.JPEGEncoder.Options.Quality = 99
-	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG))
+	assert.IsType(s.T(), &JPEGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG, false))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenOpaqueImageAndPngExtensionShouldReturnJpegEncoder() {
 	s.encoders.JPEGEncoder.Options.Quality = 100
-	assert.IsType(s.T(), &PNGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG))
+	assert.IsType(s.T(), &PNGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG, false))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenTransparentImageAndPngExtensionShouldReturnPngEncoder() {
-	assert.IsType(s.T(), &PNGEncoder{}, s.encoders.GetEncoder(s.transparentImage, processor.FormatPNG))
+	assert.IsType(s.T(), &PNGEncoder{}, s.encoders.GetEncoder(s.transparentImage, processor.FormatPNG, false))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenUnknownExtensionShouldReturnNopEncoder() {
-	assert.IsType(s.T(), &NoOpEncoder{}, s.encoders.GetEncoder(image.Black, "unknown"))
+	assert.IsType(s.T(), &NoOpEncoder{}, s.encoders.GetEncoder(image.Black, "unknown", false))
 }
 
 func (s *EncoderSuite) TestEncoders_GetEncoder_GivenWebPExtensionShouldReturnWebPEncoder() {
-	assert.IsType(s.T(), &WebPEncoder{}, s.encoders.GetEncoder(s.transparentImage, processor.FormatWebP))
+	assert.IsType(s.T(), &WebPEncoder{}, s.encoders.GetEncoder(s.transparentImage, processor.FormatWebP, false))
+}
+
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenEnforceFmtTrueShouldReturnCorrectEncoder() {
+	s.encoders.JPEGEncoder.Options.Quality = 100
+	assert.IsType(s.T(), &PNGEncoder{}, s.encoders.GetEncoder(s.opaqueImage, processor.FormatPNG, true))
 }
 
 func (s *EncoderSuite) TestJpgEncoder_Encode_ShouldEncodeToJpeg() {

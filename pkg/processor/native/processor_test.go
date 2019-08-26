@@ -64,7 +64,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Grayscale() {
 	var actual, expected []byte
 	var err error
 	out := s.processor.GrayScale(s.srcImage)
-	actual, err = s.processor.Encode(out, "png")
+	actual, err = s.processor.Encode(out, "png", false)
 	assert.NotNil(s.T(), actual)
 	assert.Nil(s.T(), err)
 	expected, err = ioutil.ReadFile("_testdata/test_grayscaled.png")
@@ -130,7 +130,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Flip() {
 
 	for _, c := range cases {
 		out := s.processor.Flip(s.srcImage, c.flipMode)
-		actual, err = s.processor.Encode(out, "jpeg")
+		actual, err = s.processor.Encode(out, "jpeg", false)
 		assert.NotNil(s.T(), actual)
 		assert.Nil(s.T(), err)
 		expected, err = ioutil.ReadFile(c.testFile)
@@ -163,7 +163,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Rotate() {
 
 	for _, c := range cases {
 		out := s.processor.Rotate(s.srcImage, c.angle)
-		actual, err = s.processor.Encode(out, "jpeg")
+		actual, err = s.processor.Encode(out, "jpeg", false)
 		assert.NotNil(s.T(), actual)
 		assert.Nil(s.T(), err)
 		expected, err = ioutil.ReadFile(c.testFile)
@@ -204,7 +204,7 @@ func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
 		orientation, _ := GetOrientation(bytes.NewReader(file))
 		img, _, err := s.processor.Decode(file)
 		img = s.processor.FixOrientation(img, orientation)
-		actual, err := s.processor.Encode(img, "jpg")
+		actual, err := s.processor.Encode(img, "jpg", false)
 		assert.Nil(s.T(), err)
 		assert.EqualValues(s.T(), expected, actual)
 	}

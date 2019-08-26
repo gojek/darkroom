@@ -76,7 +76,7 @@ func TestManipulator_Process(t *testing.T) {
 	m = NewManipulator(mp)
 	mp.On("Support", mock.Anything).Return(false)
 	mp.On("Decode", input).Return(decoded, "png", nil)
-	mp.On("Encode", decoded, "png").Return(input, nil)
+	mp.On("Encode", decoded, "png", false).Return(input, nil)
 	mp.On("Crop", decoded, 100, 100, processor.CropCenter).Return(decoded, nil)
 	params[fit] = crop
 	params[width] = "100"
@@ -129,7 +129,8 @@ func TestManipulator_Process_GivenValidFmQueryParameterShouldEncodeToCustomForma
 	mp := &processor.MockProcessor{}
 	mp.On("Decode", input).Return(img, originalFmt, nil)
 	mp.On("Support", customFmt).Return(true)
-	mp.On("Encode", img, customFmt).Return(expected, nil)
+	// enforceFmt should be true when fm query parameter is present and valid
+	mp.On("Encode", img, customFmt, true).Return(expected, nil)
 
 	m := NewManipulator(mp)
 	params := map[string]string{fm: customFmt}
@@ -148,7 +149,7 @@ func TestManipulator_Process_GivenInvalidFmQueryParameterShouldEncodeToOriginalF
 	mp := &processor.MockProcessor{}
 	mp.On("Decode", input).Return(img, originalFmt, nil)
 	mp.On("Support", customFmt).Return(false)
-	mp.On("Encode", img, originalFmt).Return(expected, nil)
+	mp.On("Encode", img, originalFmt, false).Return(expected, nil)
 
 	m := NewManipulator(mp)
 	params := map[string]string{fm: customFmt}

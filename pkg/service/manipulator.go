@@ -109,12 +109,14 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		trackDuration(rotateDurationKey, t, spec)
 	}
 
+	var customFmt bool
 	if m.processor.Support(params[fm]) {
 		format = params[fm]
+		customFmt = true
 	}
 
 	t = time.Now()
-	src, err := m.processor.Encode(data, format)
+	src, err := m.processor.Encode(data, format, customFmt)
 	if err == nil {
 		trackDuration(encodeDurationKey, t, spec)
 	}

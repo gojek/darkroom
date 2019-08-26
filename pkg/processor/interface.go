@@ -23,7 +23,7 @@ type Processor interface {
 	// Decode takes a byte array and returns the image, extension, and error
 	Decode(data []byte) (img image.Image, format string, err error)
 	// Encode takes an image and extension and return the encoded byte array or error
-	Encode(img image.Image, format string) ([]byte, error)
+	Encode(img image.Image, format string, enforceFmt bool) ([]byte, error)
 	// Support takes an input of image format
 	// and return whether the processor supports encoding/decoding the format or not
 	Support(format string) bool

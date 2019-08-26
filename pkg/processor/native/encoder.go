@@ -68,12 +68,12 @@ type Encoders struct {
 type EncodersOption func(*Encoders)
 
 // GetEncoder takes an input of image and extension and return the appropriate Encoder for encoding the image
-func (e *Encoders) GetEncoder(img image.Image, format string) Encoder {
+func (e *Encoders) GetEncoder(img image.Image, format string, enforceFmt bool) Encoder {
 	switch format {
 	case processor.FormatJPG, processor.FormatJPEG:
 		return e.JPEGEncoder
 	case processor.FormatPNG:
-		if e.JPEGEncoder.Options.Quality != 100 && isOpaque(img) {
+		if !enforceFmt && e.JPEGEncoder.Options.Quality != 100 && isOpaque(img) {
 			return e.JPEGEncoder
 		}
 		return e.PNGEncoder

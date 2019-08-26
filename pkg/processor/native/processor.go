@@ -80,7 +80,7 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 	// Performing overlay
 	draw.DrawMask(baseImg.(draw.Image), overlayImg.Bounds().Add(offset), overlayImg, image.ZP, mask, image.ZP, draw.Over)
 
-	return bp.Encode(baseImg, f)
+	return bp.Encode(baseImg, f, false)
 }
 
 // GrayScale takes an input image and returns the grayscaled image
@@ -123,8 +123,8 @@ func (bp *BildProcessor) Decode(data []byte) (image.Image, string, error) {
 }
 
 // Encode takes an image and the preferred format (extension) of the output
-func (bp *BildProcessor) Encode(img image.Image, fmt string) ([]byte, error) {
-	enc := bp.encoders.GetEncoder(img, fmt)
+func (bp *BildProcessor) Encode(img image.Image, fmt string, enforceFmt bool) ([]byte, error) {
+	enc := bp.encoders.GetEncoder(img, fmt, enforceFmt)
 	data, err := enc.Encode(img)
 	return data, err
 }
