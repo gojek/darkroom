@@ -21,7 +21,7 @@ type Processor interface {
 	// The rotation is applied clockwise, and fractional angles are supported.
 	Rotate(image image.Image, angle float64) image.Image
 	// Decode takes a byte array and returns the image, extension, and error
-	Decode(data []byte) (image.Image, string, error)
+	Decode(data []byte) (img image.Image, format string, err error)
 	// Encode takes an image and extension and return the encoded byte array or error
 	Encode(img image.Image, format string) ([]byte, error)
 	// FixOrientation takes an image and it's EXIF orientation (if exist)
