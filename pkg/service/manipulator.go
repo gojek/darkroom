@@ -83,9 +83,10 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		data = m.processor.GrayScale(data)
 		trackDuration(grayScaleDurationKey, t, spec)
 	}
-	if CleanFloat(params[blur], 1000) > 0 {
+
+	if radius := CleanFloat(params[blur], 1000); radius > 0 {
 		t = time.Now()
-		data = m.processor.Blur(data, CleanFloat(params[blur], 1000))
+		data = m.processor.Blur(data, radius)
 		trackDuration(blurDurationKey, t, spec)
 	}
 
@@ -101,11 +102,13 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		data = m.processor.Flip(data, params[flip])
 		trackDuration(flipDurationKey, t, spec)
 	}
-	if CleanFloat(params[rotate], 360) > 0 {
+
+	if angle := CleanFloat(params[rotate], 360); angle > 0 {
 		t = time.Now()
-		data = m.processor.Rotate(data, CleanFloat(params[rotate], 360))
+		data = m.processor.Rotate(data, angle)
 		trackDuration(rotateDurationKey, t, spec)
 	}
+
 	t = time.Now()
 	src, err := m.processor.Encode(data, f)
 	if err == nil {
