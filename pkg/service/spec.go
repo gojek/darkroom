@@ -13,6 +13,9 @@ type Spec struct {
 
 type SpecBuilder interface {
 	WithScope(scope string) SpecBuilder
+	WithImageData(img []byte) SpecBuilder
+	WithParams(params map[string]string) SpecBuilder
+	WithFormats(formats []string) SpecBuilder
 	Build() Spec
 }
 
@@ -28,9 +31,27 @@ func (sb *specBuilder) WithScope(scope string) SpecBuilder {
 	return sb
 }
 
+func (sb *specBuilder) WithImageData(img []byte) SpecBuilder {
+	sb.imageData = img
+	return sb
+}
+
+func (sb *specBuilder) WithParams(params map[string]string) SpecBuilder {
+	sb.params = params
+	return sb
+}
+
+func (sb *specBuilder) WithFormats(formats []string) SpecBuilder {
+	sb.formats = formats
+	return sb
+}
+
 func (sb *specBuilder) Build() Spec {
 	return Spec{
-		Scope: sb.scope,
+		Scope:     sb.scope,
+		ImageData: sb.imageData,
+		Params:    sb.params,
+		Formats:   sb.formats,
 	}
 }
 
