@@ -31,7 +31,7 @@ const (
 	decodeDurationKey    = "decodeDuration"
 	encodeDurationKey    = "encodeDuration"
 	grayScaleDurationKey = "grayScaleDuration"
-	blurDurationKey		 = "blurDuration"
+	blurDurationKey      = "blurDuration"
 	resizeDurationKey    = "resizeDuration"
 	flipDurationKey      = "flipDuration"
 	rotateDurationKey    = "rotateDuration"
