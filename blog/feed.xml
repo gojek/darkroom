@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Darkroom Blog</title>
+        <link>https://www.gojek.io/darkroom/blog</link>
+        <description>The best place to stay up-to-date with the latest Darkroom news and events.</description>
+        <lastBuildDate>Wed, 14 Aug 2019 06:00:00 GMT</lastBuildDate>
+        <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+        <generator>Feed for Node.js</generator>
+        <image>
+            <title>Darkroom Blog</title>
+            <url>https://www.gojek.io/darkroom/img/darkroom-logo.png</url>
+            <link>https://www.gojek.io/darkroom/blog</link>
+        </image>
+        <copyright>Copyright © 2019 Gojek </copyright>
+        <item>
+            <title><![CDATA[New Version 0.0.4]]></title>
+            <link>https://www.gojek.io/darkroom/blog/2019/08/14/new-version-1.0.0.html</link>
+            <guid>https://www.gojek.io/darkroom/blog/2019/08/14/new-version-1.0.0.html</guid>
+            <pubDate>Wed, 14 Aug 2019 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>Docs updated using Docusaurus.</p> ]]></description>
+        </item>
+    </channel>
+</rss>
