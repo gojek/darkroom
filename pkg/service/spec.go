@@ -1,6 +1,11 @@
 package service
 
-type Spec struct {
+type Spec interface {
+	// IsWebPSupported() will tell if WebP is supported based on the accepted formats
+	IsWebPSupported() bool
+}
+
+type spec struct {
 	// Scope defines a scope for the image manipulation job, it can be used for logging/mertrics collection purposes
 	Scope string
 	// ImageData holds the actual image contents to processed
@@ -8,7 +13,11 @@ type Spec struct {
 	// Params hold the key-value pairs for the processing job and tells the manipulator what to do with the image
 	Params map[string]string
 	// Formats have the information of accepted formats, whether darkroom can return the image using webp or not
-	Formats []string
+	formats []string
+}
+
+func (s *spec) IsWebPSupported() bool {
+	return true
 }
 
 type SpecBuilder interface {
@@ -16,7 +25,7 @@ type SpecBuilder interface {
 	WithImageData(img []byte) SpecBuilder
 	WithParams(params map[string]string) SpecBuilder
 	WithFormats(formats []string) SpecBuilder
-	Build() Spec
+	Build() spec
 }
 
 type specBuilder struct {
@@ -46,12 +55,12 @@ func (sb *specBuilder) WithFormats(formats []string) SpecBuilder {
 	return sb
 }
 
-func (sb *specBuilder) Build() Spec {
-	return Spec{
+func (sb *specBuilder) Build() spec {
+	return spec{
 		Scope:     sb.scope,
 		ImageData: sb.imageData,
 		Params:    sb.params,
-		Formats:   sb.formats,
+		formats:   sb.formats,
 	}
 }
 

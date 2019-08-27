@@ -23,5 +23,11 @@ func TestSpecBuilder_Build(t *testing.T) {
 	assert.Equal(t, spec.Scope, scope)
 	assert.Equal(t, spec.ImageData, img)
 	assert.Equal(t, spec.Params, params)
-	assert.Equal(t, spec.Formats, formats)
+	assert.Equal(t, spec.formats, formats)
+}
+
+func TestSpec_IsWebPSupported(t *testing.T) {
+	f := []string{"image/webp", "image/apng"}
+	spec := NewSpecBuilder().WithFormats(f).Build()
+	assert.True(t, spec.IsWebPSupported())
 }
