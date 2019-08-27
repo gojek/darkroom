@@ -2,8 +2,8 @@
 id: customization
 title: Customization
 ---
-## Customisation
-You may customise darkroom, for example, you may want to write a storage backend that talks to another service and gets the images.
+## Customization
+You may customize darkroom, for example, you may want to write a storage backend that talks to another service and gets the images.
 Or might want to create an image processor that uses GPU acceleration to speed up the performance.
 ## Available Interfaces
 ```go
