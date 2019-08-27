@@ -99,9 +99,12 @@ func (m *manipulator) Process(spec spec) ([]byte, error) {
 		data = m.processor.Rotate(data, angle)
 		trackDuration(rotateDurationKey, t, spec)
 	}
-
-	if !spec.IsWebPSupported() {
+	w := spec.IsWebPSupported()
+	if !w && f == "webp" {
 		f = "png"
+	}
+	if w {
+		f = "webp"
 	}
 
 	t = time.Now()

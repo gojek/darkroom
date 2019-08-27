@@ -34,6 +34,21 @@ func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *test
 	assert.Equal(t, expectedImg, img)
 }
 
+// Integration test to verify the flow of PNG image is requested with having support of WebP on client's side
+func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T) {
+	// Use real processor to ensure that right encoder is being used
+	p := native.NewBildProcessor()
+	m := NewManipulator(p)
+
+	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.png")
+	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_png_to_webp.webp")
+
+	s := NewSpecBuilder().WithImageData(img).WithFormats([]string{"image/webp"}).Build()
+	img, err := m.Process(s)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedImg, img)
+}
+
 func TestManipulator_Process(t *testing.T) {
 	mp := &mockProcessor{}
 	m := NewManipulator(mp)
