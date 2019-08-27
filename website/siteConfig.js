@@ -55,12 +55,11 @@ const siteConfig = {
   githubUrl: 'https://github.com/gojek/darkroom', // Your website URL
   baseUrl: '/darkroom/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
-  url: 'https://gojek.io',
-  //   baseUrl: '/test-site/',
+  url: 'https://www.gojek.io',
  
   // Used for publishing and more
   projectName: 'darkroom',
-  organizationName: 'Gojek',
+  organizationName: 'gojek',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
@@ -85,7 +84,7 @@ const siteConfig = {
   /* Colors for website */
   colors: {
     primaryColor: '#ed646a',
-    secondaryColor: '#ffffff',
+    secondaryColor: '#ed777d',
   },
 
   /* Custom fonts for website */
