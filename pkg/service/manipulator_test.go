@@ -94,10 +94,7 @@ func TestManipulator_Process(t *testing.T) {
 	mp.On("Blur", decoded, 60.0).Return(decoded, nil)
 	params = make(map[string]string)
 	params[blur] = "60"
-	_, _ = m.Process(ProcessSpec{
-		ImageData: input,
-		Params:    params,
-	})
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
 	mp.On("Flip", decoded, "v").Return(decoded, nil)
 	params = make(map[string]string)
