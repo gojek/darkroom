@@ -64,7 +64,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParameters() {
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.AnythingOfType("service.spec")).Return([]byte("processedData"), nil)
+	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return([]byte("processedData"), nil)
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
@@ -80,7 +80,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessing
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.AnythingOfType("service.spec")).Return([]byte(nil), errors.New("error"))
+	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return([]byte(nil), errors.New("error"))
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 

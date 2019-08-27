@@ -1,11 +1,11 @@
 package service
 
-type Spec interface {
+type ProcessSpec interface {
 	// IsWebPSupported() will tell if WebP is supported based on the accepted formats
 	IsWebPSupported() bool
 }
 
-type spec struct {
+type processSpec struct {
 	// Scope defines a scope for the image manipulation job, it can be used for logging/mertrics collection purposes
 	Scope string
 	// ImageData holds the actual image contents to processed
@@ -16,8 +16,8 @@ type spec struct {
 	formats []string
 }
 
-func (s *spec) IsWebPSupported() bool {
-	for _, f := range s.formats {
+func (ps *processSpec) IsWebPSupported() bool {
+	for _, f := range ps.formats {
 		if f == "image/webp" {
 			return true
 		}
@@ -30,7 +30,7 @@ type SpecBuilder interface {
 	WithImageData(img []byte) SpecBuilder
 	WithParams(params map[string]string) SpecBuilder
 	WithFormats(formats []string) SpecBuilder
-	Build() spec
+	Build() processSpec
 }
 
 type specBuilder struct {
@@ -60,8 +60,8 @@ func (sb *specBuilder) WithFormats(formats []string) SpecBuilder {
 	return sb
 }
 
-func (sb *specBuilder) Build() spec {
-	return spec{
+func (sb *specBuilder) Build() processSpec {
+	return processSpec{
 		Scope:     sb.scope,
 		ImageData: sb.imageData,
 		Params:    sb.params,

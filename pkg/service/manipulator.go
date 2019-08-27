@@ -41,7 +41,7 @@ const (
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
 type Manipulator interface {
 	// Process takes ProcessSpec as an argument and returns []byte, error
-	Process(spec spec) ([]byte, error)
+	Process(spec processSpec) ([]byte, error)
 }
 
 type manipulator struct {
@@ -50,7 +50,7 @@ type manipulator struct {
 
 // Process takes ProcessSpec as an argument and returns []byte, error
 // This manipulator uses bild to do the actual image manipulations
-func (m *manipulator) Process(spec spec) ([]byte, error) {
+func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	params := spec.Params
 	var err error
 	t := time.Now()
@@ -155,7 +155,7 @@ func GetCropPoint(input string) processor.CropPoint {
 	}
 }
 
-func trackDuration(name string, start time.Time, spec spec) *metrics.UpdateOption {
+func trackDuration(name string, start time.Time, spec processSpec) *metrics.UpdateOption {
 	ext := strings.Split(http.DetectContentType(spec.ImageData), "/")[1]
 	updateOption := metrics.UpdateOption{
 		Name:     fmt.Sprintf("%s.%s.%s", name, metrics.GetImageSizeCluster(spec.ImageData), ext),
