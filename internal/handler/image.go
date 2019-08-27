@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gojek/darkroom/pkg/metrics"
-
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"
+	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/service"
 )
 
@@ -55,7 +54,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		}
 
 		cl, _ := w.Write([]byte(data))
-		w.Header().Set(ContentLengthHeader, string(cl))
+		w.Header().Set(ContentLengthHeader, fmt.Sprintf("%d", cl))
 		w.Header().Set(CacheControlHeader, fmt.Sprintf("public,max-age=%d", config.CacheTime()))
 	}
 }

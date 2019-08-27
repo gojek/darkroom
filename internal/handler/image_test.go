@@ -3,13 +3,14 @@ package handler
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gojek/darkroom/pkg/storage"
-
+	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/service"
+	"github.com/gojek/darkroom/pkg/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -59,17 +60,21 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithStorageGetError() {
 func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParameters() {
 	r, _ := http.NewRequest(http.MethodGet, "/image-valid?w=100&h=100", nil)
 	rr := httptest.NewRecorder()
+	maxAge := config.CacheTime()
+	processedData := []byte("processedData")
 
 	params := make(map[string]string)
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return([]byte("processedData"), nil)
+	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return(processedData, nil)
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
 	assert.Equal(s.T(), "processedData", rr.Body.String())
 	assert.Equal(s.T(), http.StatusOK, rr.Code)
+	assert.Equal(s.T(), fmt.Sprintf("%d", len(processedData)), rr.Header().Get(ContentLengthHeader))
+	assert.Equal(s.T(), fmt.Sprintf("public,max-age=%d", maxAge), rr.Header().Get(CacheControlHeader))
 }
 
 func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessingError() {
