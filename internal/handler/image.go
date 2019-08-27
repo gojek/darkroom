@@ -15,6 +15,9 @@ const (
 	ContentLengthHeader = "Content-Length"
 	// CacheControlHeader is the response header key used to set cache control
 	CacheControlHeader = "Cache-Control"
+	// VaryHeader is the response header key used to indicate the CDN that the response should depend on client's accept header
+	// Ref: https://tools.ietf.org/html/rfc7231#section-7.1.4
+	VaryHeader = "Vary"
 	// StorageGetErrorKey is the key used while pushing metrics update to statsd
 	StorageGetErrorKey = "handler.storage.get.error"
 	// ProcessorErrorKey is the key used while pushing metrics update to statsd
@@ -56,5 +59,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		cl, _ := w.Write([]byte(data))
 		w.Header().Set(ContentLengthHeader, fmt.Sprintf("%d", cl))
 		w.Header().Set(CacheControlHeader, fmt.Sprintf("public,max-age=%d", config.CacheTime()))
+		// Ref to Google CDN we support: https://cloud.google.com/cdn/docs/caching#cacheability
+		w.Header().Set(VaryHeader, "Accept")
 	}
 }

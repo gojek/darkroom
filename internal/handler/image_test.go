@@ -75,6 +75,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParameters() {
 	assert.Equal(s.T(), http.StatusOK, rr.Code)
 	assert.Equal(s.T(), fmt.Sprintf("%d", len(processedData)), rr.Header().Get(ContentLengthHeader))
 	assert.Equal(s.T(), fmt.Sprintf("public,max-age=%d", maxAge), rr.Header().Get(CacheControlHeader))
+	assert.Equal(s.T(), "Accept", rr.Header().Get(VaryHeader))
 }
 
 func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessingError() {
