@@ -2,8 +2,9 @@ package handler
 
 import (
 	"fmt"
-	"github.com/gojek/darkroom/pkg/metrics"
 	"net/http"
+
+	"github.com/gojek/darkroom/pkg/metrics"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"
@@ -44,10 +45,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 					params[v] = values.Get(v)
 				}
 			}
-			data, err = deps.Manipulator.Process(service.ProcessSpec{
-				ImageData: data,
-				Params:    params,
-			})
+			data, err = deps.Manipulator.Process(service.NewSpecBuilder().WithImageData(data).WithParams(params).Build())
 			if err != nil {
 				l.Errorf("error from Manipulator.Process: %s", err)
 				metrics.Update(metrics.UpdateOption{Name: ProcessorErrorKey, Type: metrics.Count})

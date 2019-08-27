@@ -7,8 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gojek/darkroom/pkg/service"
 	"github.com/gojek/darkroom/pkg/storage"
+
+	"github.com/gojek/darkroom/pkg/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -18,7 +19,7 @@ type ImageHandlerTestSuite struct {
 	suite.Suite
 	deps        *service.Dependencies
 	storage     *mockStorage
-	manipulator *mockManipulator
+	manipulator *service.MockManipulator
 }
 
 func TestImageHandlerSuite(t *testing.T) {
@@ -27,7 +28,7 @@ func TestImageHandlerSuite(t *testing.T) {
 
 func (s *ImageHandlerTestSuite) SetupTest() {
 	s.storage = &mockStorage{}
-	s.manipulator = &mockManipulator{}
+	s.manipulator = &service.MockManipulator{}
 	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator}
 }
 
@@ -63,7 +64,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParameters() {
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.AnythingOfType("ProcessSpec")).Return([]byte("processedData"), nil)
+	s.manipulator.On("Process", mock.AnythingOfType("service.spec")).Return([]byte("processedData"), nil)
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
@@ -79,21 +80,12 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessing
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.AnythingOfType("ProcessSpec")).Return([]byte(nil), errors.New("error"))
+	s.manipulator.On("Process", mock.AnythingOfType("service.spec")).Return([]byte(nil), errors.New("error"))
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
 	assert.Equal(s.T(), "", rr.Body.String())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, rr.Code)
-}
-
-type mockManipulator struct {
-	mock.Mock
-}
-
-func (m *mockManipulator) Process(spec service.ProcessSpec) ([]byte, error) {
-	args := m.Called(spec)
-	return args.Get(0).([]byte), args.Error(1)
 }
 
 type mockStorage struct {
