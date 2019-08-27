@@ -17,7 +17,12 @@ type spec struct {
 }
 
 func (s *spec) IsWebPSupported() bool {
-	return true
+	for _, f := range s.formats {
+		if f == "image/webp" {
+			return true
+		}
+	}
+	return false
 }
 
 type SpecBuilder interface {

@@ -30,4 +30,8 @@ func TestSpec_IsWebPSupported(t *testing.T) {
 	f := []string{"image/webp", "image/apng"}
 	spec := NewSpecBuilder().WithFormats(f).Build()
 	assert.True(t, spec.IsWebPSupported())
+
+	f = []string{"image/apng"}
+	spec = NewSpecBuilder().WithFormats(f).Build()
+	assert.False(t, spec.IsWebPSupported())
 }
