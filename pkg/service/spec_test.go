@@ -9,8 +9,7 @@ import (
 func TestSpecBuilder_Build(t *testing.T) {
 	scope := "scope"
 	img := []byte("imageData")
-	params := make(map[string]string)
-	params["foo"] = "bar"
+	params := map[string]string{"foo": "bar"}
 	formats := []string{"image/webp", "image/apng"}
 
 	spec := NewSpecBuilder().

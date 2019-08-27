@@ -22,4 +22,9 @@ const (
 	CropBottom CropPoint = 8
 	// CropBottomRight crops an image with focus point at bottom-right
 	CropBottomRight CropPoint = 9
+
+	ExtensionWebP = "webp"
+	ExtensionPNG  = "png"
+	ExtensionJPG  = "jpg"
+	ExtensionJPEG = "jpeg"
 )

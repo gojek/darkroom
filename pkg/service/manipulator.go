@@ -9,10 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gojek/darkroom/pkg/processor/native"
-
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/gojek/darkroom/pkg/processor/native"
 )
 
 const (
@@ -100,11 +99,10 @@ func (m *manipulator) Process(spec spec) ([]byte, error) {
 		trackDuration(rotateDurationKey, t, spec)
 	}
 	w := spec.IsWebPSupported()
-	if !w && f == "webp" {
-		f = "png"
-	}
 	if w {
-		f = "webp"
+		f = processor.ExtensionWebP
+	} else if f == processor.ExtensionWebP {
+		f = processor.ExtensionPNG
 	}
 
 	t = time.Now()
