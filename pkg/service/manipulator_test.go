@@ -19,6 +19,21 @@ func TestNewManipulator(t *testing.T) {
 	assert.NotNil(t, m)
 }
 
+// Integration test to verify the flow of WebP image is requested without having support of WebP on client's side
+func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *testing.T) {
+	// Use real processor to ensure that right encoder is being used
+	p := native.NewBildProcessor()
+	m := NewManipulator(p)
+
+	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.webp")
+	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_webp_to_png.png")
+
+	s := NewSpecBuilder().WithImageData(img).Build()
+	img, err := m.Process(s)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedImg, img)
+}
+
 func TestManipulator_Process(t *testing.T) {
 	mp := &mockProcessor{}
 	m := NewManipulator(mp)

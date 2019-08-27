@@ -100,6 +100,10 @@ func (m *manipulator) Process(spec spec) ([]byte, error) {
 		trackDuration(rotateDurationKey, t, spec)
 	}
 
+	if !spec.IsWebPSupported() {
+		f = "png"
+	}
+
 	t = time.Now()
 	src, err := m.processor.Encode(data, f)
 	if err == nil {
