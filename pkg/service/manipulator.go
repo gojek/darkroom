@@ -3,12 +3,13 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"github.com/gojek/darkroom/pkg/processor/native"
 	"math"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gojek/darkroom/pkg/processor/native"
 
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor"
@@ -41,26 +42,16 @@ const (
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
 type Manipulator interface {
 	// Process takes ProcessSpec as an argument and returns []byte, error
-	Process(spec ProcessSpec) ([]byte, error)
+	Process(spec spec) ([]byte, error)
 }
 
 type manipulator struct {
 	processor processor.Processor
 }
 
-// ProcessSpec defines the specification for a image manipulation job
-type ProcessSpec struct {
-	// Scope defines a scope for the image manipulation job, it can be used for logging/mertrics collection purposes
-	Scope string
-	// ImageData holds the actual image contents to processed
-	ImageData []byte
-	// Params hold the key-value pairs for the processing job and tells the manipulator what to do with the image
-	Params map[string]string
-}
-
 // Process takes ProcessSpec as an argument and returns []byte, error
 // This manipulator uses bild to do the actual image manipulations
-func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
+func (m *manipulator) Process(spec spec) ([]byte, error) {
 	params := spec.Params
 	var err error
 	t := time.Now()
@@ -159,7 +150,7 @@ func GetCropPoint(input string) processor.CropPoint {
 	}
 }
 
-func trackDuration(name string, start time.Time, spec ProcessSpec) *metrics.UpdateOption {
+func trackDuration(name string, start time.Time, spec spec) *metrics.UpdateOption {
 	ext := strings.Split(http.DetectContentType(spec.ImageData), "/")[1]
 	updateOption := metrics.UpdateOption{
 		Name:     fmt.Sprintf("%s.%s.%s", name, metrics.GetImageSizeCluster(spec.ImageData), ext),

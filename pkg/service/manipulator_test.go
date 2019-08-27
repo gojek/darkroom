@@ -29,10 +29,7 @@ func TestManipulator_Process(t *testing.T) {
 
 	// Test flow for Decode error from Processor
 	mp.On("Decode", mock.Anything).Return(nil, "", errors.New("decoding error"))
-	_, _ = m.Process(ProcessSpec{
-		ImageData: input,
-		Params:    params,
-	})
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 	mp.AssertExpectations(t)
 
 	// Create new struct for asserting expectations
@@ -44,27 +41,18 @@ func TestManipulator_Process(t *testing.T) {
 	params[fit] = crop
 	params[width] = "100"
 	params[height] = "100"
-	_, _ = m.Process(ProcessSpec{
-		ImageData: input,
-		Params:    params,
-	})
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
 	mp.On("Resize", decoded, 100, 100).Return(decoded, nil)
 	params = make(map[string]string)
 	params[width] = "100"
 	params[height] = "100"
-	_, _ = m.Process(ProcessSpec{
-		ImageData: input,
-		Params:    params,
-	})
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
 	mp.On("GrayScale", decoded).Return(decoded, nil)
 	params = make(map[string]string)
 	params[mono] = blackHexCode
-	_, _ = m.Process(ProcessSpec{
-		ImageData: input,
-		Params:    params,
-	})
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
 	mp.On("Blur", decoded, 60.0).Return(decoded, nil)
 	params = make(map[string]string)
@@ -77,26 +65,17 @@ func TestManipulator_Process(t *testing.T) {
 	mp.On("Flip", decoded, "v").Return(decoded, nil)
 	params = make(map[string]string)
 	params[flip] = "v"
-	_, _ = m.Process(ProcessSpec{
-		ImageData: input,
-		Params:    params,
-	})
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
 	mp.On("Rotate", decoded, 90.5).Return(decoded, nil)
 	params = make(map[string]string)
 	params[rotate] = "90.5"
-	_, _ = m.Process(ProcessSpec{
-		ImageData: input,
-		Params:    params,
-	})
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
 	mp.On("FixOrientation", decoded, 0).Return(decoded)
 	params = make(map[string]string)
 	params[auto] = compress
-	_, _ = m.Process(ProcessSpec{
-		ImageData: input,
-		Params:    params,
-	})
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
 	// Assert all expectations once here
 	mp.AssertExpectations(t)
@@ -131,14 +110,10 @@ func Test_trackDuration(t *testing.T) {
 		panic(err)
 	}
 
-	updateOption := trackDuration(cropDurationKey, time.Now(), ProcessSpec{
-		ImageData: imageData,
-	})
+	updateOption := trackDuration(cropDurationKey, time.Now(), NewSpecBuilder().WithImageData(imageData).Build())
 	assert.Equal(t, fmt.Sprintf("%s.%s.%s", cropDurationKey, "<=128KB", "png"), updateOption.Name)
 
-	updateOption = trackDuration(cropDurationKey, time.Now(), ProcessSpec{
-		ImageData: make([]byte, 10, 10),
-	})
+	updateOption = trackDuration(cropDurationKey, time.Now(), NewSpecBuilder().WithImageData(make([]byte, 10, 10)).Build())
 	assert.Equal(t, fmt.Sprintf("%s.%s.%s", cropDurationKey, "<=128KB", "octet-stream"), updateOption.Name)
 }
 
