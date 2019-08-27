@@ -66,6 +66,14 @@ func TestManipulator_Process(t *testing.T) {
 		Params:    params,
 	})
 
+	mp.On("Blur", decoded, 60.0).Return(decoded, nil)
+	params = make(map[string]string)
+	params[blur] = "60"
+	_, _ = m.Process(ProcessSpec{
+		ImageData: input,
+		Params:    params,
+	})
+
 	mp.On("Flip", decoded, "v").Return(decoded, nil)
 	params = make(map[string]string)
 	params[flip] = "v"
@@ -155,6 +163,11 @@ func (m *mockProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([
 
 func (m *mockProcessor) GrayScale(img image.Image) image.Image {
 	args := m.Called(img)
+	return args.Get(0).(image.Image)
+}
+
+func (m *mockProcessor) Blur(img image.Image, radius float64) image.Image {
+	args := m.Called(img, radius)
 	return args.Get(0).(image.Image)
 }
 

@@ -7,6 +7,7 @@ import (
 	"image/draw"
 	"strings"
 
+	"github.com/anthonynsimon/bild/blur"
 	"github.com/anthonynsimon/bild/clone"
 	"github.com/anthonynsimon/bild/effect"
 	"github.com/anthonynsimon/bild/transform"
@@ -86,6 +87,11 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 func (bp *BildProcessor) GrayScale(img image.Image) image.Image {
 	// Rec. 601 Luma formula (https://en.wikipedia.org/wiki/Luma_%28video%29#Rec._601_luma_versus_Rec._709_luma_coefficients)
 	return effect.GrayscaleWithWeights(img, 0.299, 0.587, 0.114)
+}
+
+// Blur takes an input image and blur radius and returns the Gausian blurred image
+func (bp *BildProcessor) Blur(img image.Image, radius float64) image.Image {
+	return blur.Gaussian(img, radius)
 }
 
 // Flip takes an input image and returns the image flipped. The direction of flip
