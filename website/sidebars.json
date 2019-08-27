@@ -1,0 +1,18 @@
+{
+  "docs": {
+    "Contents": [
+      "getting-started", 
+      {
+        "type": "subcategory",
+        "label": "API Reference",
+        "ids": [
+          "usage/size",
+          "usage/rotate",
+          "usage/filter"
+        ]
+      },
+      "customization",
+      "contribute"
+    ]
+  }
+}

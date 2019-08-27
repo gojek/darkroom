@@ -1,14 +1,20 @@
 # IDE stuff
 .idea/
+*.DS_Store
 
 # binaries
 out/
 
 # releases
 dist/
+website/build/
 
 # config files
 config.yaml
+
+# docs
+node_modules/
+*.log
 
 coverage.json
 config.env

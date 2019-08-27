@@ -32,4 +32,7 @@ copy-config:
 docker-image:
 	docker build -t ${USER}/darkroom:latest -f build/Dockerfile .
 
+docker-docs:
+	docker build -t darkroom-docs:latest -f build/Dockerfile.docs .
+
 test-ci: copy-config compile lint format vet test coverage
