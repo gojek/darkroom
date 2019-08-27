@@ -5559,6 +5559,11 @@ regjsparser@^0.6.0:
   dependencies:
     jsesc "~0.5.0"
 
+remarkable-embed@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/remarkable-embed/-/remarkable-embed-0.4.1.tgz#447d3ee8cd51adbe16883e79f045d67e04e47c4b"
+  integrity sha1-RH0+6M1Rrb4WiD558EXWfgTkfEs=
+
 remarkable@^1.7.1:
   version "1.7.4"
   resolved "https://registry.yarnpkg.com/remarkable/-/remarkable-1.7.4.tgz#19073cb960398c87a7d6546eaa5e50d2022fcd00"

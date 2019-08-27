@@ -1,5 +1,6 @@
 language: go
 go: '1.12.x'
+cache: yarn
 
 env:
   global:
@@ -8,7 +9,7 @@ env:
 install: make setup
 script:
   - make test-ci
-  - cd website && yarn build
+  - cd website && yarn install && yarn build && cd ..
 
 before_deploy:
   - docker login docker.io -u $DOCKER_USER -p $DOCKER_PASSWORD
