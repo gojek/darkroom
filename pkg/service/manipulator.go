@@ -14,31 +14,6 @@ import (
 	"github.com/gojek/darkroom/pkg/processor/native"
 )
 
-const (
-	width        = "w"
-	height       = "h"
-	fit          = "fit"
-	crop         = "crop"
-	mono         = "mono"
-	blackHexCode = "000000"
-	flip         = "flip"
-	rotate       = "rot"
-	auto         = "auto"
-	blur         = "blur"
-	compress     = "compress"
-	format       = "format"
-
-	cropDurationKey      = "cropDuration"
-	decodeDurationKey    = "decodeDuration"
-	encodeDurationKey    = "encodeDuration"
-	grayScaleDurationKey = "grayScaleDuration"
-	blurDurationKey      = "blurDuration"
-	resizeDurationKey    = "resizeDuration"
-	flipDurationKey      = "flipDuration"
-	rotateDurationKey    = "rotateDuration"
-	fixOrientationKey    = "fixOrientation"
-)
-
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
 type Manipulator interface {
 	// Process takes ProcessSpec as an argument and returns []byte, error
@@ -80,6 +55,12 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		trackDuration(blurDurationKey, t, spec)
 	}
 
+	var customFmt bool
+	if m.processor.Support(params[fm]) {
+		format = params[fm]
+		customFmt = true
+	}
+
 	autos := strings.Split(params[auto], ",")
 	for _, a := range autos {
 		if a == compress {
@@ -90,9 +71,9 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		} else if a == format {
 			w := spec.IsWebPSupported()
 			if w {
-				f = processor.ExtensionWebP
-			} else if f == processor.ExtensionWebP {
-				f = processor.ExtensionPNG
+				format = processor.FormatWebP
+			} else if format == processor.FormatWebP {
+				format = processor.FormatWebP
 			}
 		}
 	}
@@ -107,12 +88,6 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		t = time.Now()
 		data = m.processor.Rotate(data, angle)
 		trackDuration(rotateDurationKey, t, spec)
-	}
-
-	var customFmt bool
-	if m.processor.Support(params[fm]) {
-		format = params[fm]
-		customFmt = true
 	}
 
 	t = time.Now()

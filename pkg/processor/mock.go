@@ -68,3 +68,8 @@ func (m *MockProcessor) Support(format string) bool {
 	args := m.Called(format)
 	return args.Get(0).(bool)
 }
+
+func (m *MockProcessor) Blur(img image.Image, radius float64) image.Image {
+	args := m.Called(img, radius)
+	return args.Get(0).(image.Image)
+}

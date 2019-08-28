@@ -11,16 +11,19 @@ const (
 	rotate = "rot"
 	auto   = "auto"
 	fm     = "fm"
+	blur   = "blur"
 )
 
 // Query parameter values
 const (
 	blackHexCode = "000000"
 	compress     = "compress"
+	format       = "format"
 )
 
 // Tracking keys
 const (
+	blurDurationKey      = "blurDuration"
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"
 	encodeDurationKey    = "encodeDuration"
