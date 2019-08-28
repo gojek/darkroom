@@ -8,6 +8,7 @@ import (
 	"image/png"
 
 	"github.com/chai2010/webp"
+	"github.com/gojek/darkroom/pkg/processor"
 )
 
 // Encoder is an interface to Encode image and return the encoded byte array or error
@@ -69,14 +70,14 @@ type EncodersOption func(*Encoders)
 // GetEncoder takes an input of image and extension and return the appropriate Encoder for encoding the image
 func (e *Encoders) GetEncoder(img image.Image, ext string) Encoder {
 	switch ext {
-	case "jpg", "jpeg":
+	case processor.ExtensionJPG, processor.ExtensionJPEG:
 		return e.jpegEncoder
-	case "png":
+	case processor.ExtensionPNG:
 		if e.jpegEncoder.Option.Quality != 100 && isOpaque(img) {
 			return e.jpegEncoder
 		}
 		return e.pngEncoder
-	case "webp":
+	case processor.ExtensionWebP:
 		return e.webPEncoder
 	default:
 		return e.noOpEncoder

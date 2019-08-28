@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"github.com/gojek/darkroom/pkg/processor/native"
 	"math"
 	"net/http"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/gojek/darkroom/pkg/processor/native"
 )
 
 const (
@@ -26,6 +26,7 @@ const (
 	auto         = "auto"
 	blur         = "blur"
 	compress     = "compress"
+	format       = "format"
 
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"
@@ -41,26 +42,16 @@ const (
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
 type Manipulator interface {
 	// Process takes ProcessSpec as an argument and returns []byte, error
-	Process(spec ProcessSpec) ([]byte, error)
+	Process(spec processSpec) ([]byte, error)
 }
 
 type manipulator struct {
 	processor processor.Processor
 }
 
-// ProcessSpec defines the specification for a image manipulation job
-type ProcessSpec struct {
-	// Scope defines a scope for the image manipulation job, it can be used for logging/mertrics collection purposes
-	Scope string
-	// ImageData holds the actual image contents to processed
-	ImageData []byte
-	// Params hold the key-value pairs for the processing job and tells the manipulator what to do with the image
-	Params map[string]string
-}
-
 // Process takes ProcessSpec as an argument and returns []byte, error
 // This manipulator uses bild to do the actual image manipulations
-func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
+func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	params := spec.Params
 	var err error
 	t := time.Now()
@@ -83,18 +74,27 @@ func (m *manipulator) Process(spec ProcessSpec) ([]byte, error) {
 		data = m.processor.GrayScale(data)
 		trackDuration(grayScaleDurationKey, t, spec)
 	}
-
 	if radius := CleanFloat(params[blur], 1000); radius > 0 {
 		t = time.Now()
 		data = m.processor.Blur(data, radius)
 		trackDuration(blurDurationKey, t, spec)
 	}
 
-	if params[auto] == compress {
-		orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
-		t = time.Now()
-		data = m.processor.FixOrientation(data, orientation)
-		trackDuration(fixOrientationKey, t, spec)
+	autos := strings.Split(params[auto], ",")
+	for _, a := range autos {
+		if a == compress {
+			orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
+			t = time.Now()
+			data = m.processor.FixOrientation(data, orientation)
+			trackDuration(fixOrientationKey, t, spec)
+		} else if a == format {
+			w := spec.IsWebPSupported()
+			if w {
+				f = processor.ExtensionWebP
+			} else if f == processor.ExtensionWebP {
+				f = processor.ExtensionPNG
+			}
+		}
 	}
 
 	if len(params[flip]) != 0 {
@@ -159,7 +159,7 @@ func GetCropPoint(input string) processor.CropPoint {
 	}
 }
 
-func trackDuration(name string, start time.Time, spec ProcessSpec) *metrics.UpdateOption {
+func trackDuration(name string, start time.Time, spec processSpec) *metrics.UpdateOption {
 	ext := strings.Split(http.DetectContentType(spec.ImageData), "/")[1]
 	updateOption := metrics.UpdateOption{
 		Name:     fmt.Sprintf("%s.%s.%s", name, metrics.GetImageSizeCluster(spec.ImageData), ext),

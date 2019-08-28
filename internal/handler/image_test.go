@@ -3,10 +3,12 @@ package handler
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/service"
 	"github.com/gojek/darkroom/pkg/storage"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +20,7 @@ type ImageHandlerTestSuite struct {
 	suite.Suite
 	deps        *service.Dependencies
 	storage     *mockStorage
-	manipulator *mockManipulator
+	manipulator *service.MockManipulator
 }
 
 func TestImageHandlerSuite(t *testing.T) {
@@ -27,7 +29,7 @@ func TestImageHandlerSuite(t *testing.T) {
 
 func (s *ImageHandlerTestSuite) SetupTest() {
 	s.storage = &mockStorage{}
-	s.manipulator = &mockManipulator{}
+	s.manipulator = &service.MockManipulator{}
 	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator}
 }
 
@@ -58,17 +60,22 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithStorageGetError() {
 func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParameters() {
 	r, _ := http.NewRequest(http.MethodGet, "/image-valid?w=100&h=100", nil)
 	rr := httptest.NewRecorder()
+	maxAge := config.CacheTime()
+	processedData := []byte("processedData")
 
 	params := make(map[string]string)
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.AnythingOfType("ProcessSpec")).Return([]byte("processedData"), nil)
+	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return(processedData, nil)
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
 	assert.Equal(s.T(), "processedData", rr.Body.String())
 	assert.Equal(s.T(), http.StatusOK, rr.Code)
+	assert.Equal(s.T(), fmt.Sprintf("%d", len(processedData)), rr.Header().Get(ContentLengthHeader))
+	assert.Equal(s.T(), fmt.Sprintf("public,max-age=%d", maxAge), rr.Header().Get(CacheControlHeader))
+	assert.Equal(s.T(), "Accept", rr.Header().Get(VaryHeader))
 }
 
 func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessingError() {
@@ -79,21 +86,12 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessing
 	params["w"] = "100"
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
-	s.manipulator.On("Process", mock.AnythingOfType("ProcessSpec")).Return([]byte(nil), errors.New("error"))
+	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return([]byte(nil), errors.New("error"))
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
 	assert.Equal(s.T(), "", rr.Body.String())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, rr.Code)
-}
-
-type mockManipulator struct {
-	mock.Mock
-}
-
-func (m *mockManipulator) Process(spec service.ProcessSpec) ([]byte, error) {
-	args := m.Called(spec)
-	return args.Get(0).([]byte), args.Error(1)
 }
 
 type mockStorage struct {
