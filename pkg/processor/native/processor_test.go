@@ -77,19 +77,19 @@ func (s *BildProcessorSuite) TestBildProcessor_Blur() {
 	var actual, expected []byte
 	var err error
 	cases := []struct {
-		radius float64
+		radius       float64
 		expectedFile string
 	}{
 		{
-			radius: 0.0,
+			radius:       0.0,
 			expectedFile: "_testdata/test.jpg",
 		},
 		{
-			radius: 1.0,
+			radius:       1.0,
 			expectedFile: "_testdata/test_blurred_1.jpg",
 		},
 		{
-			radius: 60.0,
+			radius:       60.0,
 			expectedFile: "_testdata/test_blurred_60.jpg",
 		},
 	}
@@ -104,7 +104,6 @@ func (s *BildProcessorSuite) TestBildProcessor_Blur() {
 		assert.EqualValues(s.T(), actual, expected)
 	}
 }
-
 
 func (s *BildProcessorSuite) TestBildProcessor_Flip() {
 	var actual, expected []byte
