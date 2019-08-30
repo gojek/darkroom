@@ -17,7 +17,6 @@ type BildProcessorSuite struct {
 	srcImage      image.Image
 	watermarkData []byte
 	badData       []byte
-	badImage      image.Image
 	processor     processor.Processor
 }
 
@@ -203,6 +202,7 @@ func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
 		}
 		orientation, _ := GetOrientation(bytes.NewReader(file))
 		img, _, err := s.processor.Decode(file)
+		assert.Nil(s.T(), err)
 		img = s.processor.FixOrientation(img, orientation)
 		actual, err := s.processor.Encode(img, "jpg")
 		assert.Nil(s.T(), err)
