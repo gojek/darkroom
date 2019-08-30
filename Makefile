@@ -12,7 +12,7 @@ compile:
 	go build -o $(APP_EXECUTABLE) main.go
 
 lint:
-	golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
+	@golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
 
 format:
 	go fmt ./...
