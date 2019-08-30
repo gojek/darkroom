@@ -171,7 +171,7 @@ func trackDuration(name string, start time.Time, spec processSpec) *metrics.Upda
 	return &updateOption
 }
 
-// NewManipulator takes in a Processor interface and returns a new manipulator
+// NewManipulator takes in a Processor interface and returns a new Manipulator
 func NewManipulator(processor processor.Processor) Manipulator {
 	return &manipulator{processor: processor}
 }
