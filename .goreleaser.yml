@@ -2,7 +2,7 @@ before:
   hooks:
     - go mod download
 builds:
-  - main: ./cmd/darkroom/
+  - main: .
     goos:
       - linux
       - darwin
