@@ -11,7 +11,7 @@ type config struct {
 	debugMode                       bool
 	port                            int
 	cacheTime                       int
-	source                          source
+	source                          CloudSource
 	enableConcurrentOpacityChecking bool
 }
 
@@ -32,7 +32,7 @@ func newConfig() *config {
 		port = 3000 // Fallback to default port
 	}
 
-	s := source{
+	s := CloudSource{
 		Kind: v.GetString("source.kind"),
 		HystrixCommand: storage.HystrixCommand{
 			Name: v.GetString("source.hystrix.commandName"),
@@ -83,7 +83,7 @@ func CacheTime() int {
 }
 
 // Source returns the source struct after it is initialised from the environment values
-func Source() *source {
+func Source() *CloudSource {
 	return &getConfig().source
 }
 

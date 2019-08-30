@@ -32,7 +32,7 @@ type Cloudfront struct {
 	SecureProtocol bool
 }
 
-type source struct {
+type CloudSource struct {
 	// Kind tells which type of Storage backend should be used
 	Kind string
 	// HystrixCommand provides the hystrix config to be used with the source to add resiliency
@@ -43,7 +43,7 @@ type source struct {
 	PathPrefix string
 }
 
-func (s *source) readValue() {
+func (s *CloudSource) readValue() {
 	v := Viper()
 	if regex.S3Matcher.MatchString(s.Kind) {
 		s.Value = S3Bucket{
