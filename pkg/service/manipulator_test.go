@@ -149,7 +149,7 @@ func Test_trackDuration(t *testing.T) {
 	updateOption := trackDuration(cropDurationKey, time.Now(), NewSpecBuilder().WithImageData(imageData).Build())
 	assert.Equal(t, fmt.Sprintf("%s.%s.%s", cropDurationKey, "<=128KB", "png"), updateOption.Name)
 
-	updateOption = trackDuration(cropDurationKey, time.Now(), NewSpecBuilder().WithImageData(make([]byte, 10, 10)).Build())
+	updateOption = trackDuration(cropDurationKey, time.Now(), NewSpecBuilder().WithImageData(make([]byte, 10)).Build())
 	assert.Equal(t, fmt.Sprintf("%s.%s.%s", cropDurationKey, "<=128KB", "octet-stream"), updateOption.Name)
 }
 

@@ -60,7 +60,7 @@ func waitForShutdown(s *http.Server) {
 	signal.Notify(sig,
 		syscall.SIGINT,
 		syscall.SIGTERM)
-	_ = <-sig
+	<-sig
 	logger.Info("darkroom server shutting down")
 
 	err := s.Shutdown(context.Background())
