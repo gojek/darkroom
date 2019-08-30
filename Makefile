@@ -27,7 +27,7 @@ coverage:
 	goveralls -coverprofile=profile.cov -service=travis-ci
 
 copy-config:
-	cp config.yaml.example config.yaml
+	cp config.example.yaml config.yaml
 
 docker-image:
 	docker build -t ${USER}/darkroom:latest -f build/Dockerfile .
