@@ -21,10 +21,10 @@ type Dependencies struct {
 	Manipulator Manipulator
 }
 
-// NewDependencies constructs new Dependencies based on the config.Source().Kind
+// NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
 func NewDependencies() *Dependencies {
-	s := config.Source()
+	s := config.DataSource()
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor())}
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)

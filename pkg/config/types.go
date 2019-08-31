@@ -32,7 +32,9 @@ type Cloudfront struct {
 	SecureProtocol bool
 }
 
-type CloudSource struct {
+// Source contains the configuration for data source object that will be used, the type of the data source, hystrix command,
+// and the path prefix to restring access
+type Source struct {
 	// Kind tells which type of Storage backend should be used
 	Kind string
 	// HystrixCommand provides the hystrix config to be used with the source to add resiliency
@@ -43,7 +45,7 @@ type CloudSource struct {
 	PathPrefix string
 }
 
-func (s *CloudSource) readValue() {
+func (s *Source) readValue() {
 	v := Viper()
 	if regex.S3Matcher.MatchString(s.Kind) {
 		s.Value = S3Bucket{

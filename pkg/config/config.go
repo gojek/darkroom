@@ -11,7 +11,7 @@ type config struct {
 	debugMode                       bool
 	port                            int
 	cacheTime                       int
-	source                          CloudSource
+	dataSource                      Source
 	enableConcurrentOpacityChecking bool
 }
 
@@ -32,7 +32,7 @@ func newConfig() *config {
 		port = 3000 // Fallback to default port
 	}
 
-	s := CloudSource{
+	s := Source{
 		Kind: v.GetString("source.kind"),
 		HystrixCommand: storage.HystrixCommand{
 			Name: v.GetString("source.hystrix.commandName"),
@@ -52,7 +52,7 @@ func newConfig() *config {
 		debugMode:                       v.GetBool("debug"),
 		port:                            port,
 		cacheTime:                       v.GetInt("cache.time"),
-		source:                          s,
+		dataSource:                      s,
 		enableConcurrentOpacityChecking: v.GetBool("enableConcurrentOpacityChecking"),
 	}
 }
@@ -82,9 +82,9 @@ func CacheTime() int {
 	return getConfig().cacheTime
 }
 
-// Source returns the source struct after it is initialised from the environment values
-func Source() *CloudSource {
-	return &getConfig().source
+// DataSource returns the source struct after it is initialised from the environment values
+func DataSource() *Source {
+	return &getConfig().dataSource
 }
 
 // ConcurrentOpacityCheckingEnabled returns true if we want to process image using multiple cores (checking isOpaque)
