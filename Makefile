@@ -12,7 +12,7 @@ compile:
 	go build -o $(APP_EXECUTABLE) main.go
 
 lint:
-	golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
+	@golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
 
 format:
 	go fmt ./...
@@ -27,7 +27,7 @@ coverage:
 	goveralls -coverprofile=profile.cov -service=travis-ci
 
 copy-config:
-	cp config.yaml.example config.yaml
+	cp config.example.yaml config.yaml
 
 docker-image:
 	docker build -t ${USER}/darkroom:latest -f build/Dockerfile .

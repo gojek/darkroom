@@ -126,7 +126,7 @@ func CleanInt(input string) int {
 	return val % 10000 // Never return value greater than 9999
 }
 
-// CleanAngle takes a string and return a float64 not greater than bound
+// CleanFloat takes a string and return a float64 not greater than bound
 func CleanFloat(input string, bound float64) float64 {
 	val, _ := strconv.ParseFloat(input, 64)
 	if val <= 0 {
@@ -171,7 +171,7 @@ func trackDuration(name string, start time.Time, spec processSpec) *metrics.Upda
 	return &updateOption
 }
 
-// NewManipulator takes in a Processor interface and returns a new manipulator
-func NewManipulator(processor processor.Processor) *manipulator {
+// NewManipulator takes in a Processor interface and returns a new Manipulator
+func NewManipulator(processor processor.Processor) Manipulator {
 	return &manipulator{processor: processor}
 }

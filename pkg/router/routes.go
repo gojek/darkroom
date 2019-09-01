@@ -16,7 +16,7 @@ import (
 
 // NewRouter takes in handler Dependencies and returns mux.Router with default routes
 // and if debug mode is enabled then it also adds pprof routes.
-// It also, adds a PathPrefix to the catch all router if config.Source().PathPrefix is set
+// It also, adds a PathPrefix to catch all route if config.DataSource().PathPrefix is set
 func NewRouter(deps *service.Dependencies) *mux.Router {
 	validateDependencies(deps)
 	r := mux.NewRouter().StrictSlash(true)
@@ -28,7 +28,7 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 	}
 
 	// Catch all handler
-	s := config.Source()
+	s := config.DataSource()
 	if (regex.S3Matcher.MatchString(s.Kind) ||
 		regex.CloudfrontMatcher.MatchString(s.Kind)) &&
 		s.PathPrefix != "" {

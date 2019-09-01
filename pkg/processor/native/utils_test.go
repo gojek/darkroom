@@ -154,13 +154,13 @@ func Test_isOpaqueWithoutFastOpaqueMethodShouldReturnFalse(t *testing.T) {
 	isOpaqueShouldReturnFalse()
 }
 
-type mockImage struct {
+type MockImage struct {
 	rect   image.Rectangle
 	points [][]color.Color
 }
 
-func NewMockImage(rect image.Rectangle) *mockImage {
-	mockImg := &mockImage{
+func NewMockImage(rect image.Rectangle) *MockImage {
+	mockImg := &MockImage{
 		rect: rect,
 	}
 	points := make([][]color.Color, rect.Dy())
@@ -171,18 +171,18 @@ func NewMockImage(rect image.Rectangle) *mockImage {
 	return mockImg
 }
 
-func (im *mockImage) ColorModel() color.Model {
+func (im *MockImage) ColorModel() color.Model {
 	return color.RGBAModel
 }
 
-func (im *mockImage) Bounds() image.Rectangle {
+func (im *MockImage) Bounds() image.Rectangle {
 	return im.rect
 }
 
-func (im *mockImage) At(x, y int) color.Color {
+func (im *MockImage) At(x, y int) color.Color {
 	return im.points[y][x]
 }
 
-func (im *mockImage) Set(x, y int, c color.Color) {
+func (im *MockImage) Set(x, y int, c color.Color) {
 	im.points[y][x] = c
 }

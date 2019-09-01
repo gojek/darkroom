@@ -15,7 +15,7 @@ go get -u github.com/gojek/darkroom
 ## Running the Image Proxy Service
 The project has docker images available. They can be tested locally or can be be deployed to production.
 
-Create a file containing the environment variables mentioned in [`config.yaml.example`](./config.yaml.example) and save it as `config.env`
+Create a file containing the environment variables mentioned in [`config.example.yaml`](./config.example.yaml) and save it as `config.env`
 > Note: Bucket credentials are dummy, you need to provide your own credentials.
 ```bash
 DEBUG=true

@@ -17,7 +17,6 @@ type BildProcessorSuite struct {
 	srcImage      image.Image
 	watermarkData []byte
 	badData       []byte
-	badImage      image.Image
 	processor     processor.Processor
 }
 
@@ -78,19 +77,19 @@ func (s *BildProcessorSuite) TestBildProcessor_Blur() {
 	var actual, expected []byte
 	var err error
 	cases := []struct {
-		radius float64
+		radius       float64
 		expectedFile string
 	}{
 		{
-			radius: 0.0,
+			radius:       0.0,
 			expectedFile: "_testdata/test.jpg",
 		},
 		{
-			radius: 1.0,
+			radius:       1.0,
 			expectedFile: "_testdata/test_blurred_1.jpg",
 		},
 		{
-			radius: 60.0,
+			radius:       60.0,
 			expectedFile: "_testdata/test_blurred_60.jpg",
 		},
 	}
@@ -105,7 +104,6 @@ func (s *BildProcessorSuite) TestBildProcessor_Blur() {
 		assert.EqualValues(s.T(), actual, expected)
 	}
 }
-
 
 func (s *BildProcessorSuite) TestBildProcessor_Flip() {
 	var actual, expected []byte
@@ -203,6 +201,7 @@ func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
 		}
 		orientation, _ := GetOrientation(bytes.NewReader(file))
 		img, _, err := s.processor.Decode(file)
+		assert.Nil(s.T(), err)
 		img = s.processor.FixOrientation(img, orientation)
 		actual, err := s.processor.Encode(img, "jpg")
 		assert.Nil(s.T(), err)
