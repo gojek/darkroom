@@ -16,7 +16,7 @@ import (
 
 // NewRouter takes in handler Dependencies and returns mux.Router with default routes
 // and if debug mode is enabled then it also adds pprof routes.
-// It also, adds a PathPrefix to catch all of the router if config.DataSource().PathPrefix is set
+// It also, adds a PathPrefix to catch all route if config.DataSource().PathPrefix is set
 func NewRouter(deps *service.Dependencies) *mux.Router {
 	validateDependencies(deps)
 	r := mux.NewRouter().StrictSlash(true)
