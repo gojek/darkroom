@@ -5,7 +5,7 @@ go: "1.12.x"
 
 env:
   global:
-    - GO111MODULE=on GITHUB_USER=irfn
+    - GO111MODULE=on
 
 before_install:
   - node --version
