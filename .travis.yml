@@ -2,21 +2,19 @@ services:
   - docker
 language: go
 go: "1.12.x"
-cache: yarn
 
 env:
   global:
     - GO111MODULE=on GITHUB_USER=irfn
 
 before_install:
-  - node --version && which nvm
+  - node --version
 install: make setup
 script:
   - make test-ci
-  - cd website && yarn install && yarn build && cd ..
+  - cd website && npm install && npm run build && cd ..
 
 before_deploy:
-  - nvm use node
   - docker login docker.io -u $DOCKER_USER -p $DOCKER_PASSWORD
   - echo "machine github.com login ${GITHUB_USER} password ${GITHUB_TOKEN}" > ~/.netrc
 
@@ -28,7 +26,7 @@ deploy:
       tags: true
       branch: master
   - provider: script
-    script: cd website && yarn install && GIT_USER="${GITHUB_USER}" yarn run publish-gh-pages
+    script: cd website && npm install && GIT_USER="${GITHUB_USER}" npm run publish-gh-pages
     on:
       branch: master
 
