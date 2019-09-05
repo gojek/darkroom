@@ -8,9 +8,6 @@ env:
   global:
     - GO111MODULE=on GITHUB_USER=irfn
 
-before_install:
-  - docker pull bepsays/ci-goreleaser
-
 install: make setup
 script:
   - make test-ci
