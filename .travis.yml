@@ -1,6 +1,8 @@
 services:
   - docker
 language: go
+node_js:
+  - 10
 go: "1.12.x"
 cache: yarn
 
