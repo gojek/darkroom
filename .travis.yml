@@ -11,7 +11,7 @@ env:
 install: make setup
 script:
   - make test-ci
-  # - cd website && yarn install && yarn build && cd ..
+  - cd website && yarn install && yarn build && cd ..
 
 before_deploy:
   - docker login docker.io -u $DOCKER_USER -p $DOCKER_PASSWORD
@@ -24,10 +24,10 @@ deploy:
     on:
       tags: true
       branch: master
-  # - provider: script
-  #   script: cd website && yarn install && GIT_USER="${GITHUB_USER}" yarn run publish-gh-pages
-  #   on:
-  #     branch: master
+  - provider: script
+    script: cd website && yarn install && GIT_USER="${GITHUB_USER}" yarn run publish-gh-pages
+    on:
+      branch: master
 
 notifications:
   email: false
