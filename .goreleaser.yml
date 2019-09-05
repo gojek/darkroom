@@ -2,7 +2,7 @@ before:
   hooks:
     - go mod download
 builds:
-  - id: darkroom_extended_linux
+  - id: darkroom_linux
     main: .
     goos:
       - linux
@@ -11,19 +11,27 @@ builds:
       - 386
     env:
       - CGO_ENABLED=1
-  - id: darkroom_extended_windows
+  - id: darkroom_windows_32bit
+    main: .
+    goos:
+      - windows
+    goarch:
+      - 386
+    env:
+      - CGO_ENABLED=1
+      - CC=i686-w64-mingw32-gcc
+      - CXX=i686-w64-mingw32-g++
+  - id: darkroom_windows_64bit
     main: .
     goos:
       - windows
     goarch:
       - amd64
-      # TODO: Investigate failing build on windows 32 bit
-      # - 386
     env:
       - CGO_ENABLED=1
       - CC=x86_64-w64-mingw32-gcc
       - CXX=x86_64-w64-mingw32-g++
-  - id: darkroom_extended_darwin
+  - id: darkroom_darwin
     main: .
     goos:
       - darwin
