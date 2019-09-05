@@ -1,8 +1,6 @@
 services:
   - docker
 language: go
-node_js:
-  - 10
 go: "1.12.x"
 cache: yarn
 
@@ -10,12 +8,15 @@ env:
   global:
     - GO111MODULE=on GITHUB_USER=irfn
 
+before_install:
+  - node --version && which nvm
 install: make setup
 script:
   - make test-ci
   - cd website && yarn install && yarn build && cd ..
 
 before_deploy:
+  - nvm use node
   - docker login docker.io -u $DOCKER_USER -p $DOCKER_PASSWORD
   - echo "machine github.com login ${GITHUB_USER} password ${GITHUB_TOKEN}" > ~/.netrc
 
