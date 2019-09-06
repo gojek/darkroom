@@ -72,3 +72,4 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+      - "^website"
