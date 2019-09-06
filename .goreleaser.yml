@@ -2,14 +2,46 @@ before:
   hooks:
     - go mod download
 builds:
-  - main: .
+  - id: darkroom_linux
+    main: .
     goos:
       - linux
-      - darwin
-      - windows
     goarch:
       - amd64
       - 386
+    env:
+      - CGO_ENABLED=1
+  - id: darkroom_windows_32bit
+    main: .
+    goos:
+      - windows
+    goarch:
+      - 386
+    env:
+      - CGO_ENABLED=1
+      - CC=i686-w64-mingw32-gcc
+      - CXX=i686-w64-mingw32-g++
+  - id: darkroom_windows_64bit
+    main: .
+    goos:
+      - windows
+    goarch:
+      - amd64
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+  - id: darkroom_darwin
+    main: .
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - 386
+    env:
+      - CGO_ENABLED=1
+      - CC=o64-clang
+      - CXX=o64-clang++
 dockers:
   - dockerfile: build/Dockerfile.goreleaser
     goos: linux
@@ -21,22 +53,23 @@ env:
   - CGO_ENABLED=1
   - GO111MODULE=on
 archives:
-- replacements:
-    darwin: macOS
-    linux: Linux
-    windows: Windows
-    386: 32-bit
-    amd64: 64-bit
-  format_overrides:
-    - goos: windows
-      format: zip
+  - replacements:
+      darwin: macOS
+      linux: Linux
+      windows: Windows
+      386: 32-bit
+      amd64: 64-bit
+    format_overrides:
+      - goos: windows
+        format: zip
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - "^docs:"
+      - "^test:"
+      - "^website"
