@@ -3,6 +3,8 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"
@@ -39,15 +41,9 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		var err error
 		data = res.Data()
 
-		params := make(map[string]string)
-		values := r.URL.Query()
-		if len(values) > 0 {
-			for v := range values {
-				if len(values.Get(v)) != 0 {
-					params[v] = values.Get(v)
-				}
-			}
-			data, err = deps.Manipulator.Process(service.NewSpecBuilder().WithImageData(data).WithParams(params).Build())
+		params := getParams(r.URL.Query())
+		if len(*params) > 0 {
+			data, err = deps.Manipulator.Process(service.NewSpecBuilder().WithImageData(data).WithParams(*params).Build())
 			if err != nil {
 				l.Errorf("error from Manipulator.Process: %s", err)
 				metrics.Update(metrics.UpdateOption{Name: ProcessorErrorKey, Type: metrics.Count})
@@ -56,10 +52,26 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 			}
 		}
 
-		cl, _ := w.Write([]byte(data))
+		cl, _ := w.Write(data)
 		w.Header().Set(ContentLengthHeader, fmt.Sprintf("%d", cl))
 		w.Header().Set(CacheControlHeader, fmt.Sprintf("public,max-age=%d", config.CacheTime()))
 		// Ref to Google CDN we support: https://cloud.google.com/cdn/docs/caching#cacheability
 		w.Header().Set(VaryHeader, "Accept")
 	}
+}
+
+func getParams(values url.Values) *map[string]string {
+	params := make(map[string]string)
+	for _, param := range config.DefaultParams() {
+		if strings.Contains(param, "=") {
+			p := strings.Split(param, "=")
+			params[p[0]] = p[1]
+		}
+	}
+	for v := range values {
+		if len(values.Get(v)) != 0 {
+			params[v] = values.Get(v)
+		}
+	}
+	return &params
 }
