@@ -1,11 +1,12 @@
 package config
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestConfigCases(t *testing.T) {
+func TestConfigCasesWithStringValues(t *testing.T) {
 	v := Viper()
 	cases := []struct {
 		key      string
@@ -14,6 +15,10 @@ func TestConfigCases(t *testing.T) {
 		{
 			key:      "log.level",
 			callFunc: LogLevel,
+		},
+		{
+			key:      "defaultParams",
+			callFunc: DefaultParams,
 		},
 	}
 

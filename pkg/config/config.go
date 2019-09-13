@@ -1,9 +1,10 @@
 package config
 
 import (
+	"sync"
+
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/gojek/darkroom/pkg/storage"
-	"sync"
 )
 
 type config struct {
@@ -13,6 +14,7 @@ type config struct {
 	cacheTime                       int
 	dataSource                      Source
 	enableConcurrentOpacityChecking bool
+	defaultParams                   string
 }
 
 var instance *config
@@ -54,6 +56,7 @@ func newConfig() *config {
 		cacheTime:                       v.GetInt("cache.time"),
 		dataSource:                      s,
 		enableConcurrentOpacityChecking: v.GetBool("enableConcurrentOpacityChecking"),
+		defaultParams:                   v.GetString("defaultParams"),
 	}
 }
 
@@ -90,4 +93,9 @@ func DataSource() *Source {
 // ConcurrentOpacityCheckingEnabled returns true if we want to process image using multiple cores (checking isOpaque)
 func ConcurrentOpacityCheckingEnabled() bool {
 	return getConfig().enableConcurrentOpacityChecking
+}
+
+// DefaultParams returns string of default parameters which will be applied to all image request, following the existing contract
+func DefaultParams() string {
+	return getConfig().defaultParams
 }
