@@ -1,6 +1,7 @@
 package config
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/afex/hystrix-go/hystrix"
@@ -95,7 +96,7 @@ func ConcurrentOpacityCheckingEnabled() bool {
 	return getConfig().enableConcurrentOpacityChecking
 }
 
-// DefaultParams returns string of default parameters which will be applied to all image request, following the existing contract
-func DefaultParams() string {
-	return getConfig().defaultParams
+// DefaultParams returns []string of default parameters (separated by semicolon) which will be applied to all image request, following the existing contract
+func DefaultParams() []string {
+	return strings.Split(getConfig().defaultParams, ";")
 }

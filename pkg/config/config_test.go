@@ -16,10 +16,6 @@ func TestConfigCasesWithStringValues(t *testing.T) {
 			key:      "log.level",
 			callFunc: LogLevel,
 		},
-		{
-			key:      "defaultParams",
-			callFunc: DefaultParams,
-		},
 	}
 
 	for _, c := range cases {
@@ -66,4 +62,23 @@ func TestConfigCasesWithIntValues(t *testing.T) {
 	}
 
 	assert.Equal(t, 0, v.GetInt("nonexistingkey"))
+}
+
+func TestConfigCasesWithStringSliceValues(t *testing.T) {
+	v := Viper()
+	v.Set("defaultParams", "auto=compress")
+	Update()
+	cases := []struct {
+		key      string
+		callFunc func() []string
+	}{
+		{
+			key:      "defaultParams",
+			callFunc: DefaultParams,
+		},
+	}
+
+	for _, c := range cases {
+		assert.Equal(t, v.GetStringSlice(c.key), c.callFunc())
+	}
 }
