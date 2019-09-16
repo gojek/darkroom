@@ -54,6 +54,11 @@ func TestGetParams(t *testing.T) {
 			defaultParams: "foo=foo",
 			expectedRes:   &map[string]string{"foo": "foo,bar"},
 		},
+		{
+			values:        map[string][]string{"foo": {"bar"}},
+			defaultParams: "invalid",
+			expectedRes:   &map[string]string{"foo": "bar"},
+		},
 	}
 	for _, c := range cases {
 		v := config.Viper()
