@@ -33,6 +33,37 @@ func (s *ImageHandlerTestSuite) SetupTest() {
 	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator}
 }
 
+func TestGetParams(t *testing.T) {
+	cases := []struct {
+		values        map[string][]string
+		defaultParams string
+		expectedRes   *map[string]string
+	}{
+		{
+			values:        map[string][]string{"foo": {"bar"}},
+			defaultParams: "bar=foo",
+			expectedRes:   &map[string]string{"foo": "bar", "bar": "foo"},
+		},
+		{
+			values:        map[string][]string{},
+			defaultParams: "bar=foo",
+			expectedRes:   &map[string]string{"bar": "foo"},
+		},
+		{
+			values:        map[string][]string{"foo": {"bar"}},
+			defaultParams: "foo=foo",
+			expectedRes:   &map[string]string{"foo": "foo,bar"},
+		},
+	}
+	for _, c := range cases {
+		v := config.Viper()
+		v.Set("defaultParams", c.defaultParams)
+		config.Update()
+
+		assert.Equal(t, c.expectedRes, getParams(c.values))
+	}
+}
+
 func (s *ImageHandlerTestSuite) TestImageHandler() {
 	r, _ := http.NewRequest(http.MethodGet, "/image-valid", nil)
 	rr := httptest.NewRecorder()

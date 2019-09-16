@@ -70,7 +70,11 @@ func getParams(values url.Values) *map[string]string {
 	}
 	for v := range values {
 		if len(values.Get(v)) != 0 {
-			params[v] = values.Get(v)
+			if params[v] != "" {
+				params[v] = fmt.Sprintf("%s,%s", params[v], values.Get(v))
+			} else {
+				params[v] = values.Get(v)
+			}
 		}
 	}
 	return &params
