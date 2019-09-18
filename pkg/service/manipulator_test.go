@@ -8,8 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gojek/darkroom/pkg/config"
-
 	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/gojek/darkroom/pkg/processor/native"
 	"github.com/stretchr/testify/assert"
@@ -147,10 +145,6 @@ func TestGetParams(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		v := config.Viper()
-		v.Set("defaultParams", c.defaultParams)
-		config.Update()
-
 		assert.Equal(t, c.expectedRes, joinParams(c.params, c.defaultParams))
 	}
 }
