@@ -47,13 +47,14 @@ type Manipulator interface {
 
 type manipulator struct {
 	processor     processor.Processor
-	defaultParams []string
+	defaultParams map[string]string
 }
 
 // Process takes ProcessSpec as an argument and returns []byte, error
 // This manipulator uses bild to do the actual image manipulations
 func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	params := spec.Params
+	params = joinParams(params, m.defaultParams)
 	var err error
 	t := time.Now()
 	data, f, err := m.processor.Decode(spec.ImageData)
@@ -118,6 +119,21 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	return src, err
 }
 
+func joinParams(params map[string]string, defaultParams map[string]string) map[string]string {
+	fp := make(map[string]string)
+	for p := range defaultParams {
+		fp[p] = defaultParams[p]
+	}
+	for p := range params {
+		if fp[p] != "" {
+			fp[p] = fmt.Sprintf("%s,%s", defaultParams[p], params[p])
+		} else {
+			fp[p] = params[p]
+		}
+	}
+	return fp
+}
+
 // CleanInt takes a string and return an int not greater than 9999
 func CleanInt(input string) int {
 	val, _ := strconv.Atoi(input)
@@ -173,7 +189,7 @@ func trackDuration(name string, start time.Time, spec processSpec) *metrics.Upda
 }
 
 // NewManipulator takes in a Processor interface and returns a new Manipulator
-func NewManipulator(processor processor.Processor, defaultParams []string) Manipulator {
+func NewManipulator(processor processor.Processor, defaultParams map[string]string) Manipulator {
 	return &manipulator{
 		processor:     processor,
 		defaultParams: defaultParams,
