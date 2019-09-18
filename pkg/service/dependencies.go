@@ -25,7 +25,7 @@ type Dependencies struct {
 // Currently, it supports only one Manipulator
 func NewDependencies() *Dependencies {
 	s := config.DataSource()
-	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor())}
+	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), []string{})}
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
 	} else if regex.S3Matcher.MatchString(s.Kind) {

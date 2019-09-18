@@ -46,7 +46,8 @@ type Manipulator interface {
 }
 
 type manipulator struct {
-	processor processor.Processor
+	processor     processor.Processor
+	defaultParams []string
 }
 
 // Process takes ProcessSpec as an argument and returns []byte, error
@@ -172,6 +173,9 @@ func trackDuration(name string, start time.Time, spec processSpec) *metrics.Upda
 }
 
 // NewManipulator takes in a Processor interface and returns a new Manipulator
-func NewManipulator(processor processor.Processor) Manipulator {
-	return &manipulator{processor: processor}
+func NewManipulator(processor processor.Processor, defaultParams []string) Manipulator {
+	return &manipulator{
+		processor:     processor,
+		defaultParams: defaultParams,
+	}
 }
