@@ -2,6 +2,7 @@
 package service
 
 import (
+	"strings"
 	"time"
 
 	"github.com/gojek/darkroom/pkg/config"
@@ -25,7 +26,7 @@ type Dependencies struct {
 // Currently, it supports only one Manipulator
 func NewDependencies() *Dependencies {
 	s := config.DataSource()
-	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), map[string]string{})}
+	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams())}
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
 	} else if regex.S3Matcher.MatchString(s.Kind) {
@@ -34,6 +35,17 @@ func NewDependencies() *Dependencies {
 		deps.Storage = NewCloudfrontStorage(s.Value.(config.Cloudfront), s.HystrixCommand)
 	}
 	return deps
+}
+
+func getDefaultParams() map[string]string {
+	params := make(map[string]string)
+	for _, param := range config.DefaultParams() {
+		if strings.Contains(param, "=") {
+			p := strings.Split(param, "=")
+			params[p[0]] = p[1]
+		}
+	}
+	return params
 }
 
 // NewS3Storage create a new s3.Storage struct from the config.S3Bucket and the HystrixCommand
