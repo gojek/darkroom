@@ -3,8 +3,6 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"net/url"
-	"strings"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"
@@ -41,9 +39,15 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		var err error
 		data = res.Data()
 
-		params := getParams(r.URL.Query())
-		if len(*params) > 0 {
-			data, err = deps.Manipulator.Process(service.NewSpecBuilder().WithImageData(data).WithParams(*params).Build())
+		params := make(map[string]string)
+		values := r.URL.Query()
+		if len(values) > 0 {
+			for v := range values {
+				if len(values.Get(v)) != 0 {
+					params[v] = values.Get(v)
+				}
+			}
+			data, err = deps.Manipulator.Process(service.NewSpecBuilder().WithImageData(data).WithParams(params).Build())
 			if err != nil {
 				l.Errorf("error from Manipulator.Process: %s", err)
 				metrics.Update(metrics.UpdateOption{Name: ProcessorErrorKey, Type: metrics.Count})
@@ -58,24 +62,4 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		// Ref to Google CDN we support: https://cloud.google.com/cdn/docs/caching#cacheability
 		w.Header().Set(VaryHeader, "Accept")
 	}
-}
-
-func getParams(values url.Values) *map[string]string {
-	params := make(map[string]string)
-	for _, param := range config.DefaultParams() {
-		if strings.Contains(param, "=") {
-			p := strings.Split(param, "=")
-			params[p[0]] = p[1]
-		}
-	}
-	for v := range values {
-		if len(values.Get(v)) != 0 {
-			if params[v] != "" {
-				params[v] = fmt.Sprintf("%s,%s", params[v], values.Get(v))
-			} else {
-				params[v] = values.Get(v)
-			}
-		}
-	}
-	return &params
 }
