@@ -15,7 +15,7 @@ import (
 )
 
 func TestNewManipulator(t *testing.T) {
-	m := NewManipulator(native.NewBildProcessor(), map[string]string{})
+	m := NewManipulator(native.NewBildProcessor(), nil)
 	assert.NotNil(t, m)
 }
 
@@ -23,7 +23,7 @@ func TestNewManipulator(t *testing.T) {
 func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *testing.T) {
 	// Use real processor to ensure that right encoder is being used
 	p := native.NewBildProcessor()
-	m := NewManipulator(p, map[string]string{})
+	m := NewManipulator(p, nil)
 
 	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.webp")
 	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_webp_to_png.png")
@@ -41,7 +41,7 @@ func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *test
 func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T) {
 	// Use real processor to ensure that right encoder is being used
 	p := native.NewBildProcessor()
-	m := NewManipulator(p, map[string]string{})
+	m := NewManipulator(p, nil)
 
 	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.png")
 	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_png_to_webp.webp")
@@ -58,7 +58,7 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 
 func TestManipulator_Process(t *testing.T) {
 	mp := &mockProcessor{}
-	m := NewManipulator(mp, map[string]string{})
+	m := NewManipulator(mp, nil)
 	params := make(map[string]string)
 
 	input := []byte("inputData")
@@ -71,7 +71,7 @@ func TestManipulator_Process(t *testing.T) {
 
 	// Create new struct for asserting expectations
 	mp = &mockProcessor{}
-	m = NewManipulator(mp, map[string]string{})
+	m = NewManipulator(mp, nil)
 	mp.On("Decode", input).Return(decoded, "png", nil)
 	mp.On("Encode", decoded, "png").Return(input, nil)
 	mp.On("Crop", decoded, 100, 100, processor.CropCenter).Return(decoded, nil)
@@ -129,7 +129,7 @@ func TestGetParams(t *testing.T) {
 			expectedRes:   map[string]string{"foo": "bar", "bar": "foo"},
 		},
 		{
-			params:        map[string]string{},
+			params:        nil,
 			defaultParams: map[string]string{"bar": "foo"},
 			expectedRes:   map[string]string{"bar": "foo"},
 		},
@@ -140,7 +140,7 @@ func TestGetParams(t *testing.T) {
 		},
 		{
 			params:        map[string]string{"foo": "bar"},
-			defaultParams: map[string]string{},
+			defaultParams: nil,
 			expectedRes:   map[string]string{"foo": "bar"},
 		},
 	}
