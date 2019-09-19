@@ -56,7 +56,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 			}
 		}
 
-		cl, _ := w.Write([]byte(data))
+		cl, _ := w.Write(data)
 		w.Header().Set(ContentLengthHeader, fmt.Sprintf("%d", cl))
 		w.Header().Set(CacheControlHeader, fmt.Sprintf("public,max-age=%d", config.CacheTime()))
 		// Ref to Google CDN we support: https://cloud.google.com/cdn/docs/caching#cacheability

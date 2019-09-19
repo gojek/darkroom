@@ -16,6 +16,33 @@ func TestNewDependencies(t *testing.T) {
 	assert.Nil(t, deps.Storage)
 }
 
+func TestGetDefaultParams(t *testing.T) {
+	cases := []struct {
+		defaultParams string
+		expectedRes   map[string]string
+	}{
+		{
+			defaultParams: "foo=bar",
+			expectedRes:   map[string]string{"foo": "bar"},
+		},
+		{
+			defaultParams: "foo=foo,bar",
+			expectedRes:   map[string]string{"foo": "foo,bar"},
+		},
+		{
+			defaultParams: "invalid",
+			expectedRes:   map[string]string{},
+		},
+	}
+	for _, c := range cases {
+		v := config.Viper()
+		v.Set("defaultParams", c.defaultParams)
+		config.Update()
+
+		assert.Equal(t, c.expectedRes, getDefaultParams())
+	}
+}
+
 func TestNewDependenciesWithWebFolderStorage(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "WebFolder")

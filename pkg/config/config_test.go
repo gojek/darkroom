@@ -1,11 +1,12 @@
 package config
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestConfigCases(t *testing.T) {
+func TestConfigCasesWithStringValues(t *testing.T) {
 	v := Viper()
 	cases := []struct {
 		key      string
@@ -61,4 +62,23 @@ func TestConfigCasesWithIntValues(t *testing.T) {
 	}
 
 	assert.Equal(t, 0, v.GetInt("nonexistingkey"))
+}
+
+func TestConfigCasesWithStringSliceValues(t *testing.T) {
+	v := Viper()
+	v.Set("defaultParams", "auto=compress")
+	Update()
+	cases := []struct {
+		key      string
+		callFunc func() []string
+	}{
+		{
+			key:      "defaultParams",
+			callFunc: DefaultParams,
+		},
+	}
+
+	for _, c := range cases {
+		assert.Equal(t, v.GetStringSlice(c.key), c.callFunc())
+	}
 }
