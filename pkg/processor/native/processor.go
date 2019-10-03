@@ -28,6 +28,13 @@ type ProcessorOption func(*BildProcessor)
 
 // Crop takes an input image, width, height and a CropPoint and returns the cropped image
 func (bp *BildProcessor) Crop(img image.Image, width, height int, point processor.CropPoint) image.Image {
+	if width == 0 || height == 0 {
+		if width == 0 && height == 0 {
+			return img
+		}
+		return bp.Resize(img, width, height)
+	}
+
 	w, h := getResizeWidthAndHeightForCrop(width, height, img.Bounds().Dx(), img.Bounds().Dy())
 	img = transform.Resize(img, w, h, transform.Linear)
 	x0, y0 := getStartingPointForCrop(w, h, width, height, point)
