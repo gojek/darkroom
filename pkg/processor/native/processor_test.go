@@ -51,12 +51,45 @@ func (s *BildProcessorSuite) TestBildProcessor_ResizeWithSameWidthAndHeight() {
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Crop() {
-	out := s.processor.Crop(s.srcImage, 500, 500, processor.CropCenter)
+	cases := []struct {
+		w         int
+		h         int
+		expectedW int
+		expectedH int
+	}{
+		{
+			w:         500,
+			h:         500,
+			expectedW: 500,
+			expectedH: 500,
+		},
+		{
+			w:         500,
+			h:         0,
+			expectedW: 500,
+			expectedH: 375,
+		},
+		{
+			w:         0,
+			h:         500,
+			expectedW: 666,
+			expectedH: 500,
+		},
+		{
+			w:         0,
+			h:         0,
+			expectedW: 500,
+			expectedH: 375,
+		},
+	}
+	for _, c := range cases {
+		out := s.processor.Crop(s.srcImage, c.w, c.h, processor.CropCenter)
 
-	assert.NotNil(s.T(), out)
+		assert.NotNil(s.T(), out)
 
-	assert.Equal(s.T(), 500, out.Bounds().Dx())
-	assert.Equal(s.T(), 500, out.Bounds().Dy())
+		assert.Equal(s.T(), c.expectedW, out.Bounds().Dx())
+		assert.Equal(s.T(), c.expectedH, out.Bounds().Dy())
+	}
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Grayscale() {
