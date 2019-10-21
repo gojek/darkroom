@@ -23,9 +23,9 @@ type BildProcessorSuite struct {
 
 func (s *BildProcessorSuite) SetupSuite() {
 	s.processor = NewBildProcessor()
-	s.srcData, _ = ioutil.ReadFile("_testdata/test.png")
+	s.srcData, _ = ioutil.ReadFile("../_testdata/test.png")
 	s.srcImage, _, _ = s.processor.Decode(s.srcData)
-	s.watermarkData, _ = ioutil.ReadFile("_testdata/overlay.png")
+	s.watermarkData, _ = ioutil.ReadFile("../_testdata/overlay.png")
 	s.badData = []byte("badImage.ext")
 }
 
@@ -39,6 +39,16 @@ func (s *BildProcessorSuite) TestBildProcessor_Resize() {
 	assert.NotNil(s.T(), out)
 	assert.Equal(s.T(), 600, out.Bounds().Dx())
 	assert.Equal(s.T(), 450, out.Bounds().Dy())
+}
+
+func BenchmarkBildProcessor_Resize(b *testing.B) {
+	p := NewBildProcessor()
+	img, _ := ioutil.ReadFile("../_testdata/test.jpg")
+	for n := 0; n < b.N; n++ {
+		data, f, _ := p.Decode(img)
+		i := p.Resize(data, 3000, 4000)
+		_, _ = p.Encode(i, f)
+	}
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_ResizeWithSameWidthAndHeight() {
@@ -67,7 +77,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Grayscale() {
 	actual, err = s.processor.Encode(out, "png")
 	assert.NotNil(s.T(), actual)
 	assert.Nil(s.T(), err)
-	expected, err = ioutil.ReadFile("_testdata/test_grayscaled.png")
+	expected, err = ioutil.ReadFile("../_testdata/test_grayscaled.png")
 	assert.NotNil(s.T(), expected)
 	assert.Nil(s.T(), err)
 
@@ -78,20 +88,20 @@ func (s *BildProcessorSuite) TestBildProcessor_Blur() {
 	var actual, expected []byte
 	var err error
 	cases := []struct {
-		radius float64
+		radius       float64
 		expectedFile string
 	}{
 		{
-			radius: 0.0,
-			expectedFile: "_testdata/test.jpg",
+			radius:       0.0,
+			expectedFile: "../_testdata/test.jpg",
 		},
 		{
-			radius: 1.0,
-			expectedFile: "_testdata/test_blurred_1.jpg",
+			radius:       1.0,
+			expectedFile: "../_testdata/test_blurred_1.jpg",
 		},
 		{
-			radius: 60.0,
-			expectedFile: "_testdata/test_blurred_60.jpg",
+			radius:       60.0,
+			expectedFile: "../_testdata/test_blurred_60.jpg",
 		},
 	}
 	for _, c := range cases {
@@ -106,7 +116,6 @@ func (s *BildProcessorSuite) TestBildProcessor_Blur() {
 	}
 }
 
-
 func (s *BildProcessorSuite) TestBildProcessor_Flip() {
 	var actual, expected []byte
 	var err error
@@ -116,15 +125,15 @@ func (s *BildProcessorSuite) TestBildProcessor_Flip() {
 	}{
 		{
 			flipMode: "v",
-			testFile: "_testdata/test_flipedV.jpg",
+			testFile: "../_testdata/test_flipedV.jpg",
 		},
 		{
 			flipMode: "h",
-			testFile: "_testdata/test_flipedH.jpg",
+			testFile: "../_testdata/test_flipedH.jpg",
 		},
 		{
 			flipMode: "vh",
-			testFile: "_testdata/test_flipedVH.jpg",
+			testFile: "../_testdata/test_flipedVH.jpg",
 		},
 	}
 
@@ -149,15 +158,15 @@ func (s *BildProcessorSuite) TestBildProcessor_Rotate() {
 	}{
 		{
 			angle:    90.0,
-			testFile: "_testdata/test_rotated90.jpg",
+			testFile: "../_testdata/test_rotated90.jpg",
 		},
 		{
 			angle:    175,
-			testFile: "_testdata/test_rotated175.jpg",
+			testFile: "../_testdata/test_rotated175.jpg",
 		},
 		{
 			angle:    450.0,
-			testFile: "_testdata/test_rotated90.jpg",
+			testFile: "../_testdata/test_rotated90.jpg",
 		},
 	}
 
@@ -227,7 +236,7 @@ func (s *BildProcessorSuite) TestBildProcessor_WithEncoders() {
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Decode_GivenWebPImageShouldBeAbleToDecodeProperly() {
-	data, _ := ioutil.ReadFile("_testdata/test.webp")
+	data, _ := ioutil.ReadFile("../_testdata/test.webp")
 	_, ext, err := s.processor.Decode(data)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), "webp", ext)

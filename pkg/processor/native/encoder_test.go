@@ -27,7 +27,7 @@ func (s *EncoderSuite) SetupSuite() {
 	s.encoders = NewEncoders()
 
 	s.processor = NewBildProcessor()
-	data, err := ioutil.ReadFile("_testdata/test.png")
+	data, err := ioutil.ReadFile("../_testdata/test.png")
 	if err != nil {
 		panic(err)
 	}
