@@ -38,6 +38,7 @@ const (
 	flipDurationKey      = "flipDuration"
 	rotateDurationKey    = "rotateDuration"
 	fixOrientationKey    = "fixOrientation"
+	scaleDurationKey     = "scaleDuration"
 )
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
@@ -70,7 +71,7 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	} else if params[fit] == scale {
 		t = time.Now()
 		data = m.processor.Scale(data, CleanInt(params[width]), CleanInt(params[height]))
-		trackDuration(resizeDurationKey, t, spec)
+		trackDuration(scaleDurationKey, t, spec)
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		t = time.Now()
 		data = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
