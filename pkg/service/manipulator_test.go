@@ -86,6 +86,13 @@ func TestManipulator_Process(t *testing.T) {
 	params[height] = "100"
 	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
 
+	mp.On("Scale", decoded, 100, 100).Return(decoded, nil)
+	params = make(map[string]string)
+	params[width] = "100"
+	params[height] = "100"
+	params[fit] = scale
+	_, _ = m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
+
 	mp.On("GrayScale", decoded).Return(decoded, nil)
 	params = make(map[string]string)
 	params[mono] = blackHexCode
@@ -195,6 +202,11 @@ func (m *mockProcessor) Crop(img image.Image, width, height int, point processor
 }
 
 func (m *mockProcessor) Resize(img image.Image, width, height int) image.Image {
+	args := m.Called(img, width, height)
+	return args.Get(0).(image.Image)
+}
+
+func (m *mockProcessor) Scale(img image.Image, width, height int) image.Image {
 	args := m.Called(img, width, height)
 	return args.Get(0).(image.Image)
 }

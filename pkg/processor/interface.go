@@ -8,6 +8,9 @@ type Processor interface {
 	Crop(image image.Image, width, height int, point CropPoint) image.Image
 	// Resize takes an image.Image, width and height and returns the re-sized image
 	Resize(image image.Image, width, height int) image.Image
+	// Scale takes an input image, width and height and returns the re-sized
+	// image without maintaining the original aspect ratio
+	Scale(image image.Image, width, height int) image.Image
 	// GrayScale takes an input byte array and returns the grayscaled byte array or error
 	GrayScale(image image.Image) image.Image
 	// Blur takes an input byte array and returns the blurred byte array by the specified

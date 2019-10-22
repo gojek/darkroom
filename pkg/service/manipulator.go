@@ -27,6 +27,7 @@ const (
 	blur         = "blur"
 	compress     = "compress"
 	format       = "format"
+	scale        = "scale"
 
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"
@@ -37,6 +38,7 @@ const (
 	flipDurationKey      = "flipDuration"
 	rotateDurationKey    = "rotateDuration"
 	fixOrientationKey    = "fixOrientation"
+	scaleDurationKey     = "scaleDuration"
 )
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
@@ -66,11 +68,16 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		t = time.Now()
 		data = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
 		trackDuration(cropDurationKey, t, spec)
+	} else if params[fit] == scale {
+		t = time.Now()
+		data = m.processor.Scale(data, CleanInt(params[width]), CleanInt(params[height]))
+		trackDuration(scaleDurationKey, t, spec)
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		t = time.Now()
 		data = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
 		trackDuration(resizeDurationKey, t, spec)
 	}
+
 	if params[mono] == blackHexCode {
 		t = time.Now()
 		data = m.processor.GrayScale(data)
