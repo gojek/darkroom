@@ -27,6 +27,7 @@ const (
 	blur         = "blur"
 	compress     = "compress"
 	format       = "format"
+	scale        = "scale"
 
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"

@@ -58,6 +58,12 @@ func (bp *BildProcessor) Resize(img image.Image, width, height int) image.Image 
 	return img
 }
 
+// Scale takes an input image, width and height and returns the re-sized
+// image without maintaining the original aspect ratio
+func (bp *BildProcessor) Scale(img image.Image, width, height int) image.Image {
+	return transform.Resize(img, width, height, transform.Linear)
+}
+
 // Watermark takes an input byte array, overlay byte array and opacity value
 // and returns the watermarked image bytes or error
 func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error) {

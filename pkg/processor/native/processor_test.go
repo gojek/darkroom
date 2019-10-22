@@ -50,6 +50,14 @@ func (s *BildProcessorSuite) TestBildProcessor_ResizeWithSameWidthAndHeight() {
 	assert.Equal(s.T(), &s.srcImage, &out)
 }
 
+func (s *BildProcessorSuite) TestBildProcessor_Scale() {
+	actual := s.processor.Scale(s.srcImage, 1000, 1000)
+	encoded, _ := s.processor.Encode(actual, "jpg")
+	expected, _ := ioutil.ReadFile("_testdata/test_scaled.jpg")
+
+	assert.Equal(s.T(), encoded, expected)
+}
+
 func (s *BildProcessorSuite) TestBildProcessor_Crop() {
 	cases := []struct {
 		w         int
