@@ -13,7 +13,8 @@ import (
 
 type BildProcessorSuite struct {
 	suite.Suite
-	srcData       []byte
+	srcPNGData    []byte
+	srcJPGData    []byte
 	srcImage      image.Image
 	watermarkData []byte
 	badData       []byte
@@ -22,8 +23,9 @@ type BildProcessorSuite struct {
 
 func (s *BildProcessorSuite) SetupSuite() {
 	s.processor = NewBildProcessor()
-	s.srcData, _ = ioutil.ReadFile("_testdata/test.png")
-	s.srcImage, _, _ = s.processor.Decode(s.srcData)
+	s.srcPNGData, _ = ioutil.ReadFile("_testdata/test.png")
+	s.srcJPGData, _ = ioutil.ReadFile("_testdata/test.jpg")
+	s.srcImage, _, _ = s.processor.Decode(s.srcPNGData)
 	s.watermarkData, _ = ioutil.ReadFile("_testdata/overlay.png")
 	s.badData = []byte("badImage.ext")
 }
@@ -213,12 +215,17 @@ func (s *BildProcessorSuite) TestBildProcessor_Rotate() {
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Watermark() {
-	output, err := s.processor.Watermark(s.srcData, s.watermarkData, 200)
-
+	output, err := s.processor.Watermark(s.srcPNGData, s.watermarkData, 200)
+	expectedRes, _ := ioutil.ReadFile("_testdata/test_watermark_result.png")
 	assert.NotNil(s.T(), output)
 	assert.Nil(s.T(), err)
+	assert.Equal(s.T(), expectedRes, output)
 
-	assert.NotEqual(s.T(), s.srcData, output)
+	output, err = s.processor.Watermark(s.srcJPGData, s.watermarkData, 200)
+	expectedRes, _ = ioutil.ReadFile("_testdata/test_watermark_result.jpg")
+	assert.NotNil(s.T(), output)
+	assert.Nil(s.T(), err)
+	assert.Equal(s.T(), expectedRes, output)
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
@@ -255,7 +262,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Watermark_WithBadInput() {
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), output)
 
-	output, err = s.processor.Watermark(s.srcData, s.badData, 255)
+	output, err = s.processor.Watermark(s.srcPNGData, s.badData, 255)
 	assert.NotNil(s.T(), err)
 	assert.Nil(s.T(), output)
 }
