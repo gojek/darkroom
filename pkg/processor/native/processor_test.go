@@ -215,7 +215,15 @@ func (s *BildProcessorSuite) TestBildProcessor_Rotate() {
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Watermark() {
-	output, err := s.processor.Watermark(s.srcPNGData, s.watermarkData, 200)
+	output, err := s.processor.Watermark(s.badData, s.watermarkData, 255)
+	assert.NotNil(s.T(), err)
+	assert.Nil(s.T(), output)
+
+	output, err = s.processor.Watermark(s.srcPNGData, s.badData, 255)
+	assert.NotNil(s.T(), err)
+	assert.Nil(s.T(), output)
+
+	output, err = s.processor.Watermark(s.srcPNGData, s.watermarkData, 200)
 	expectedRes, _ := ioutil.ReadFile("_testdata/test_watermark_result.png")
 	assert.NotNil(s.T(), output)
 	assert.Nil(s.T(), err)
@@ -255,16 +263,6 @@ func (s *BildProcessorSuite) TestBildProcessor_FixOrientation() {
 		assert.Nil(s.T(), err)
 		assert.EqualValues(s.T(), expected, actual)
 	}
-}
-
-func (s *BildProcessorSuite) TestBildProcessor_Watermark_WithBadInput() {
-	output, err := s.processor.Watermark(s.badData, s.watermarkData, 255)
-	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), output)
-
-	output, err = s.processor.Watermark(s.srcPNGData, s.badData, 255)
-	assert.NotNil(s.T(), err)
-	assert.Nil(s.T(), output)
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_WithEncoders() {
