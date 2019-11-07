@@ -71,6 +71,9 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 	if err != nil {
 		return nil, err
 	}
+	if f != processor.ExtensionPNG {
+		baseImg = clone.AsRGBA(baseImg)
+	}
 	overlayImg, _, err := bp.Decode(overlay)
 	if err != nil {
 		return nil, err
