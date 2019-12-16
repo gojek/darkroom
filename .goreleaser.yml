@@ -11,6 +11,8 @@ builds:
       - 386
     env:
       - CGO_ENABLED=1
+    ldflags:
+      - -w -s -extldflags "-static"
   - id: darkroom_windows_32bit
     main: .
     goos:
