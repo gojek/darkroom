@@ -297,4 +297,16 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 	expected, _ := ioutil.ReadFile("./_testdata/overlay/overlay_5.jpg")
 	assert.Equal(s.T(), expected, output)
 	assert.Nil(s.T(), err)
+
+	output, err = s.processor.Overlay(baseImg, []*processor.OverlayProps{
+		{
+			Img:              overlay,
+			Point:            processor.PointTopLeft,
+			WidthPercentage:  50.0,
+			HeightPercentage: 50.0,
+		},
+	})
+	expected, _ = ioutil.ReadFile("./_testdata/overlay/overlay_1.jpg")
+	assert.Equal(s.T(), expected, output)
+	assert.Nil(s.T(), err)
 }

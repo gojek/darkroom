@@ -197,8 +197,7 @@ func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayProps
 	overlayImg = transform.Resize(overlayImg, int(dWidth), int(dWidth*ratio), transform.Linear)
 
 	// Anchor point for overlaying
-	x := float64(baseImg.Bounds().Dx()-overlayImg.Bounds().Dx()) * (overlays[0].WidthPercentage / 100.0)
-	y := float64(baseImg.Bounds().Dy()-overlayImg.Bounds().Dy()) * (overlays[0].HeightPercentage / 100.0)
+	x, y := getStartingPointForCrop(baseImg.Bounds().Dx(), baseImg.Bounds().Dy(), overlayImg.Bounds().Dx(), overlayImg.Bounds().Dy(), overlays[0].Point)
 	offset := image.Pt(int(x), int(y))
 
 	// Performing overlay
