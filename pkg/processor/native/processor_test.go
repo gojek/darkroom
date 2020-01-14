@@ -391,6 +391,23 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 				},
 			},
 		},
+		{
+			expected: "./_testdata/overlay/overlay_19.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointTopLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+				{
+					Img:              overlay,
+					Point:            processor.PointBottomRight,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

@@ -172,6 +172,36 @@ func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.
 	}
 }
 
+type overlayResult struct {
+	overlayImg image.Image
+	offset     image.Point
+	index      int
+	err        error
+}
+
+func (bp *BildProcessor) transformOverlay(i, w, h int, op *processor.OverlayProps, c *chan overlayResult) {
+	overlayImg, _, err := bp.Decode(op.Img)
+	if err != nil {
+		*c <- overlayResult{index: i, err: err}
+	}
+
+	ratio := float64(overlayImg.Bounds().Dy()) / float64(overlayImg.Bounds().Dx())
+	dWidth := float64(w) * (op.WidthPercentage / 100.0)
+
+	// Resizing overlay image according to base image
+	overlayImg = transform.Resize(overlayImg, int(dWidth), int(dWidth*ratio), transform.Linear)
+
+	// Anchor point for overlaying
+	x, y := getStartingPointForCrop(w, h, overlayImg.Bounds().Dx(), overlayImg.Bounds().Dy(), op.Point)
+	offset := image.Pt(int(x), int(y))
+	*c <- overlayResult{
+		overlayImg: overlayImg,
+		offset:     offset,
+		index:      i,
+		err:        nil,
+	}
+}
+
 // Overlay takes a base image and array of overlay images and returns the final overlayed image bytes or error
 func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayProps) ([]byte, error) {
 	if len(overlays) == 0 {
@@ -185,23 +215,21 @@ func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayProps
 	if f != processor.ExtensionPNG {
 		baseImg = clone.AsRGBA(baseImg)
 	}
-	overlayImg, _, err := bp.Decode(overlays[0].Img)
-	if err != nil {
-		return nil, err
+
+	c := make(chan overlayResult, len(overlays))
+	w := baseImg.Bounds().Dx()
+	h := baseImg.Bounds().Dy()
+	for i, overlay := range overlays {
+		go bp.transformOverlay(i, w, h, overlay, &c)
 	}
 
-	ratio := float64(overlayImg.Bounds().Dy()) / float64(overlayImg.Bounds().Dx())
-	dWidth := float64(baseImg.Bounds().Dx()) * (overlays[0].WidthPercentage / 100.0)
-
-	// Resizing overlay image according to base image
-	overlayImg = transform.Resize(overlayImg, int(dWidth), int(dWidth*ratio), transform.Linear)
-
-	// Anchor point for overlaying
-	x, y := getStartingPointForCrop(baseImg.Bounds().Dx(), baseImg.Bounds().Dy(), overlayImg.Bounds().Dx(), overlayImg.Bounds().Dy(), overlays[0].Point)
-	offset := image.Pt(int(x), int(y))
-
-	// Performing overlay
-	draw.DrawMask(baseImg.(draw.Image), overlayImg.Bounds().Add(offset), overlayImg, image.ZP, nil, image.ZP, draw.Over)
+	for i := 0; i < len(overlays); i++ {
+		cr := <-c
+		if cr.err == nil {
+			// Performing overlay
+			draw.DrawMask(baseImg.(draw.Image), cr.overlayImg.Bounds().Add(cr.offset), cr.overlayImg, image.ZP, nil, image.ZP, draw.Over)
+		}
+	}
 
 	return bp.Encode(baseImg, f)
 }
