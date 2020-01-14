@@ -282,31 +282,44 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 	baseImg, _ := ioutil.ReadFile("./_testdata/test.jpg")
 	overlay, _ := ioutil.ReadFile("./_testdata/overlay.png")
 
-	output, err := s.processor.Overlay(baseImg, nil)
-	assert.Equal(s.T(), baseImg, output)
-	assert.Nil(s.T(), err)
+	type testCase struct {
+		expected string
+		overlays []*processor.OverlayProps
+	}
 
-	output, err = s.processor.Overlay(baseImg, []*processor.OverlayProps{
+	testCases := []testCase{
 		{
-			Img:              overlay,
-			Point:            processor.PointCenter,
-			WidthPercentage:  50.0,
-			HeightPercentage: 50.0,
+			expected: "./_testdata/test.jpg",
+			overlays: []*processor.OverlayProps{},
 		},
-	})
-	expected, _ := ioutil.ReadFile("./_testdata/overlay/overlay_5.jpg")
-	assert.Equal(s.T(), expected, output)
-	assert.Nil(s.T(), err)
+		{
+			expected: "./_testdata/overlay/overlay_5.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointCenter,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_1.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointTopLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+	}
 
-	output, err = s.processor.Overlay(baseImg, []*processor.OverlayProps{
-		{
-			Img:              overlay,
-			Point:            processor.PointTopLeft,
-			WidthPercentage:  50.0,
-			HeightPercentage: 50.0,
-		},
-	})
-	expected, _ = ioutil.ReadFile("./_testdata/overlay/overlay_1.jpg")
-	assert.Equal(s.T(), expected, output)
-	assert.Nil(s.T(), err)
+	for _, tc := range testCases {
+		o, err := s.processor.Overlay(baseImg, tc.overlays)
+		e, _ := ioutil.ReadFile(tc.expected)
+		assert.Equal(s.T(), e, o)
+		assert.Nil(s.T(), err)
+	}
 }
