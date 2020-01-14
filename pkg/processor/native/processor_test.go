@@ -293,6 +293,50 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			overlays: []*processor.OverlayProps{},
 		},
 		{
+			expected: "./_testdata/overlay/overlay_1.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointTopLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_2.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointTop,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_3.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointTopRight,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_4.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
 			expected: "./_testdata/overlay/overlay_5.jpg",
 			overlays: []*processor.OverlayProps{
 				{
@@ -304,11 +348,44 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_1.jpg",
+			expected: "./_testdata/overlay/overlay_6.jpg",
 			overlays: []*processor.OverlayProps{
 				{
 					Img:              overlay,
-					Point:            processor.PointTopLeft,
+					Point:            processor.PointRight,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_7.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointBottomLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_8.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointBottom,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_9.jpg",
+			overlays: []*processor.OverlayProps{
+				{
+					Img:              overlay,
+					Point:            processor.PointBottomRight,
 					WidthPercentage:  50.0,
 					HeightPercentage: 50.0,
 				},
