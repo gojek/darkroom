@@ -93,7 +93,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Crop() {
 		},
 	}
 	for _, c := range cases {
-		out := s.processor.Crop(s.srcImage, c.w, c.h, processor.CropCenter)
+		out := s.processor.Crop(s.srcImage, c.w, c.h, processor.PointCenter)
 
 		assert.NotNil(s.T(), out)
 
@@ -276,4 +276,14 @@ func (s *BildProcessorSuite) TestBildProcessor_Decode_GivenWebPImageShouldBeAble
 	_, ext, err := s.processor.Decode(data)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), "webp", ext)
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
+	baseImg, err := ioutil.ReadFile("./_testdata/test.jpg")
+	if err != nil {
+		panic(err)
+	}
+	output, err := s.processor.Overlay(baseImg, nil)
+	assert.Equal(s.T(), baseImg, output)
+	assert.Nil(s.T(), err)
 }

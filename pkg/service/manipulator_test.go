@@ -74,7 +74,7 @@ func TestManipulator_Process(t *testing.T) {
 	m = NewManipulator(mp, nil)
 	mp.On("Decode", input).Return(decoded, "png", nil)
 	mp.On("Encode", decoded, "png").Return(input, nil)
-	mp.On("Crop", decoded, 100, 100, processor.CropCenter).Return(decoded, nil)
+	mp.On("Crop", decoded, 100, 100, processor.PointCenter).Return(decoded, nil)
 	params[fit] = crop
 	params[width] = "100"
 	params[height] = "100"
@@ -157,16 +157,16 @@ func TestGetParams(t *testing.T) {
 }
 
 func TestGetCropPoint(t *testing.T) {
-	assert.Equal(t, processor.CropCenter, GetCropPoint(""))
-	assert.Equal(t, processor.CropTop, GetCropPoint("top"))
-	assert.Equal(t, processor.CropTopLeft, GetCropPoint("top,left"))
-	assert.Equal(t, processor.CropTopRight, GetCropPoint("top,right"))
-	assert.Equal(t, processor.CropLeft, GetCropPoint("left"))
-	assert.Equal(t, processor.CropRight, GetCropPoint("right"))
-	assert.Equal(t, processor.CropBottom, GetCropPoint("bottom"))
-	assert.Equal(t, processor.CropBottomLeft, GetCropPoint("bottom,left"))
-	assert.Equal(t, processor.CropBottomRight, GetCropPoint("bottom,right"))
-	assert.Equal(t, processor.CropCenter, GetCropPoint("random"))
+	assert.Equal(t, processor.PointCenter, GetCropPoint(""))
+	assert.Equal(t, processor.PointTop, GetCropPoint("top"))
+	assert.Equal(t, processor.PointTopLeft, GetCropPoint("top,left"))
+	assert.Equal(t, processor.PointTopRight, GetCropPoint("top,right"))
+	assert.Equal(t, processor.PointLeft, GetCropPoint("left"))
+	assert.Equal(t, processor.PointRight, GetCropPoint("right"))
+	assert.Equal(t, processor.PointBottom, GetCropPoint("bottom"))
+	assert.Equal(t, processor.PointBottomLeft, GetCropPoint("bottom,left"))
+	assert.Equal(t, processor.PointBottomRight, GetCropPoint("bottom,right"))
+	assert.Equal(t, processor.PointCenter, GetCropPoint("random"))
 }
 
 func TestCleanInt(t *testing.T) {
@@ -196,7 +196,7 @@ type mockProcessor struct {
 	mock.Mock
 }
 
-func (m *mockProcessor) Crop(img image.Image, width, height int, point processor.CropPoint) image.Image {
+func (m *mockProcessor) Crop(img image.Image, width, height int, point processor.Point) image.Image {
 	args := m.Called(img, width, height, point)
 	return args.Get(0).(image.Image)
 }

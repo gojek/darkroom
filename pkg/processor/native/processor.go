@@ -26,8 +26,8 @@ type BildProcessor struct {
 // ProcessorOption represents builder function for BildProcessor
 type ProcessorOption func(*BildProcessor)
 
-// Crop takes an input image, width, height and a CropPoint and returns the cropped image
-func (bp *BildProcessor) Crop(img image.Image, width, height int, point processor.CropPoint) image.Image {
+// Crop takes an input image, width, height and a Point and returns the cropped image
+func (bp *BildProcessor) Crop(img image.Image, width, height int, point processor.Point) image.Image {
 	if width == 0 || height == 0 {
 		if width == 0 && height == 0 {
 			return img
@@ -170,6 +170,11 @@ func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.
 	default:
 		return img
 	}
+}
+
+// Overlay takes a base image and array of overlay images and returns the final overlayed image bytes or error
+func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayProps) ([]byte, error) {
+	return base, nil
 }
 
 // WithEncoders is a builder function to set custom Encoders for BildProcessor

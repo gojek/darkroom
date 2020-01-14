@@ -1,27 +1,27 @@
 package processor
 
-// CropPoint specifies which focus point in the image should be considered while cropping
-type CropPoint int
+// Point specifies which focus point in the image should be considered while cropping
+type Point int
 
 const (
-	// CropTopLeft crops an image with focus point at top-left
-	CropTopLeft CropPoint = 1
-	// CropTop crops an image with focus point at top
-	CropTop CropPoint = 2
-	// CropTopRight crops an image with focus point at top-right
-	CropTopRight CropPoint = 3
-	// CropLeft crops an image with focus point at left
-	CropLeft CropPoint = 4
-	// CropCenter crops an image with focus point at center
-	CropCenter CropPoint = 5
-	// CropRight crops an image with focus point at right
-	CropRight CropPoint = 6
-	// CropBottomLeft crops an image with focus point at bottom-left
-	CropBottomLeft CropPoint = 7
-	// CropBottom crops an image with focus point at bottom
-	CropBottom CropPoint = 8
-	// CropBottomRight crops an image with focus point at bottom-right
-	CropBottomRight CropPoint = 9
+	// PointTopLeft crops an image with focus point at top-left
+	PointTopLeft Point = 1
+	// PointTop crops an image with focus point at top
+	PointTop Point = 2
+	// PointTopRight crops an image with focus point at top-right
+	PointTopRight Point = 3
+	// PointLeft crops an image with focus point at left
+	PointLeft Point = 4
+	// PointCenter crops an image with focus point at center
+	PointCenter Point = 5
+	// PointRight crops an image with focus point at right
+	PointRight Point = 6
+	// PointBottomLeft crops an image with focus point at bottom-left
+	PointBottomLeft Point = 7
+	// PointBottom crops an image with focus point at bottom
+	PointBottom Point = 8
+	// PointBottomRight crops an image with focus point at bottom-right
+	PointBottomRight Point = 9
 
 	ExtensionWebP = "webp"
 	ExtensionPNG  = "png"
