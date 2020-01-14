@@ -279,11 +279,22 @@ func (s *BildProcessorSuite) TestBildProcessor_Decode_GivenWebPImageShouldBeAble
 }
 
 func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
-	baseImg, err := ioutil.ReadFile("./_testdata/test.jpg")
-	if err != nil {
-		panic(err)
-	}
+	baseImg, _ := ioutil.ReadFile("./_testdata/test.jpg")
+	overlay, _ := ioutil.ReadFile("./_testdata/overlay.png")
+
 	output, err := s.processor.Overlay(baseImg, nil)
 	assert.Equal(s.T(), baseImg, output)
+	assert.Nil(s.T(), err)
+
+	output, err = s.processor.Overlay(baseImg, []*processor.OverlayProps{
+		{
+			Img:              overlay,
+			Point:            processor.PointCenter,
+			WidthPercentage:  50.0,
+			HeightPercentage: 50.0,
+		},
+	})
+	expected, _ := ioutil.ReadFile("./_testdata/overlay/overlay_5.jpg")
+	assert.Equal(s.T(), expected, output)
 	assert.Nil(s.T(), err)
 }

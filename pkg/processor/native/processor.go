@@ -174,7 +174,37 @@ func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.
 
 // Overlay takes a base image and array of overlay images and returns the final overlayed image bytes or error
 func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayProps) ([]byte, error) {
-	return base, nil
+	if len(overlays) == 0 {
+		return base, nil
+	}
+
+	baseImg, f, err := bp.Decode(base)
+	if err != nil {
+		return nil, err
+	}
+	if f != processor.ExtensionPNG {
+		baseImg = clone.AsRGBA(baseImg)
+	}
+	overlayImg, _, err := bp.Decode(overlays[0].Img)
+	if err != nil {
+		return nil, err
+	}
+
+	ratio := float64(overlayImg.Bounds().Dy()) / float64(overlayImg.Bounds().Dx())
+	dWidth := float64(baseImg.Bounds().Dx()) * (overlays[0].WidthPercentage / 100.0)
+
+	// Resizing overlay image according to base image
+	overlayImg = transform.Resize(overlayImg, int(dWidth), int(dWidth*ratio), transform.Linear)
+
+	// Anchor point for overlaying
+	x := float64(baseImg.Bounds().Dx()-overlayImg.Bounds().Dx()) * (overlays[0].WidthPercentage / 100.0)
+	y := float64(baseImg.Bounds().Dy()-overlayImg.Bounds().Dy()) * (overlays[0].HeightPercentage / 100.0)
+	offset := image.Pt(int(x), int(y))
+
+	// Performing overlay
+	draw.DrawMask(baseImg.(draw.Image), overlayImg.Bounds().Add(offset), overlayImg, image.ZP, nil, image.ZP, draw.Over)
+
+	return bp.Encode(baseImg, f)
 }
 
 // WithEncoders is a builder function to set custom Encoders for BildProcessor

@@ -3,6 +3,6 @@ package processor
 type OverlayProps struct {
 	Img              []byte
 	Point            Point
-	WidthPercentage  int8
-	HeightPercentage int8
+	WidthPercentage  float64
+	HeightPercentage float64
 }
