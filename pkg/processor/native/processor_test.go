@@ -284,17 +284,17 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 
 	type testCase struct {
 		expected string
-		overlays []*processor.OverlayProps
+		overlays []*processor.OverlayAttrs
 	}
 
 	testCases := []testCase{
 		{
 			expected: "./_testdata/test.jpg",
-			overlays: []*processor.OverlayProps{},
+			overlays: []*processor.OverlayAttrs{},
 		},
 		{
 			expected: "./_testdata/overlay/overlay_1.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointTopLeft,
@@ -305,7 +305,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_2.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointTop,
@@ -316,7 +316,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_3.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointTopRight,
@@ -327,7 +327,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_4.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointLeft,
@@ -338,7 +338,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_5.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointCenter,
@@ -349,7 +349,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_6.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointRight,
@@ -360,7 +360,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_7.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointBottomLeft,
@@ -371,7 +371,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_8.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointBottom,
@@ -382,7 +382,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_9.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointBottomRight,
@@ -393,7 +393,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 		},
 		{
 			expected: "./_testdata/overlay/overlay_19.jpg",
-			overlays: []*processor.OverlayProps{
+			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
 					Point:            processor.PointTopLeft,

@@ -34,6 +34,6 @@ type Processor interface {
 	// and returns the image with its EXIF orientation fixed
 	FixOrientation(img image.Image, orientation int) image.Image
 	// Overlay takes an input byte array as the base image and
-	// an array of OverlayProps to be placed as overlays to the base image
-	Overlay(base []byte, overlays []*OverlayProps) ([]byte, error)
+	// an array of OverlayAttrs to be placed as overlays to the base image
+	Overlay(base []byte, overlays []*OverlayAttrs) ([]byte, error)
 }

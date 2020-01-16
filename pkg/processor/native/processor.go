@@ -145,8 +145,8 @@ type overlayResult struct {
 	err        error
 }
 
-func (bp *BildProcessor) transformOverlay(i, w, h int, op *processor.OverlayProps, c *chan overlayResult) {
-	overlayImg, _, err := bp.Decode(op.Img)
+func (bp *BildProcessor) transformOverlay(i, w, h int, oa *processor.OverlayAttrs, c *chan overlayResult) {
+	overlayImg, _, err := bp.Decode(oa.Img)
 	fmt.Print(overlayImg)
 	if err != nil {
 		*c <- overlayResult{index: i, err: err}
@@ -156,13 +156,13 @@ func (bp *BildProcessor) transformOverlay(i, w, h int, op *processor.OverlayProp
 	}
 
 	ratio := float64(overlayImg.Bounds().Dy()) / float64(overlayImg.Bounds().Dx())
-	dWidth := float64(w) * (op.WidthPercentage / 100.0)
+	dWidth := float64(w) * (oa.WidthPercentage / 100.0)
 
 	// Resizing overlay image according to base image
 	overlayImg = transform.Resize(overlayImg, int(dWidth), int(dWidth*ratio), transform.Linear)
 
 	// Anchor point for overlaying
-	x, y := getStartingPointForCrop(w, h, overlayImg.Bounds().Dx(), overlayImg.Bounds().Dy(), op.Point)
+	x, y := getStartingPointForCrop(w, h, overlayImg.Bounds().Dx(), overlayImg.Bounds().Dy(), oa.Point)
 	offset := image.Pt(x, y)
 	*c <- overlayResult{
 		overlayImg: overlayImg,
@@ -183,7 +183,7 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 		baseImg = clone.AsRGBA(baseImg)
 	}
 
-	op := processor.OverlayProps{
+	oa := processor.OverlayAttrs{
 		Img:              overlay,
 		Point:            processor.PointCenter,
 		WidthPercentage:  50.0,
@@ -192,7 +192,7 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 	c := make(chan overlayResult)
 	w := baseImg.Bounds().Dx()
 	h := baseImg.Bounds().Dy()
-	go bp.transformOverlay(0, w, h, &op, &c)
+	go bp.transformOverlay(0, w, h, &oa, &c)
 	cr := <-c
 
 	if cr.err != nil {
@@ -209,7 +209,7 @@ func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) (
 }
 
 // Overlay takes a base image and array of overlay images and returns the final overlayed image bytes or error
-func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayProps) ([]byte, error) {
+func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayAttrs) ([]byte, error) {
 	if len(overlays) == 0 {
 		return base, nil
 	}

@@ -1,6 +1,6 @@
 package processor
 
-type OverlayProps struct {
+type OverlayAttrs struct {
 	Img              []byte
 	Point            Point
 	WidthPercentage  float64
