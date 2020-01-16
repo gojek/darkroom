@@ -77,29 +77,29 @@ func getResizeWidthAndHeightForCrop(rw, rh, aw, ah int) (int, int) {
 }
 
 // w: scaled width, h: scaled height, rw: required width, rh: required height
-func getStartingPointForCrop(w, h, rw, rh int, cropPoint processor.CropPoint) (int, int) {
+func getStartingPointForCrop(w, h, rw, rh int, cropPoint processor.Point) (int, int) {
 	x := (w - rw) / 2
 	y := (h - rh) / 2
 
 	switch cropPoint {
-	case processor.CropTop:
+	case processor.PointTop:
 		y = 0
-	case processor.CropTopLeft:
+	case processor.PointTopLeft:
 		x = 0
 		y = 0
-	case processor.CropTopRight:
+	case processor.PointTopRight:
 		x = w - rw
 		y = 0
-	case processor.CropLeft:
+	case processor.PointLeft:
 		x = 0
-	case processor.CropRight:
+	case processor.PointRight:
 		x = w - rw
-	case processor.CropBottom:
+	case processor.PointBottom:
 		y = h - rh
-	case processor.CropBottomLeft:
+	case processor.PointBottomLeft:
 		x = 0
 		y = h - rh
-	case processor.CropBottomRight:
+	case processor.PointBottomRight:
 		x = w - rw
 		y = h - rh
 	}

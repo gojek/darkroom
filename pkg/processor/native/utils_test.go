@@ -56,47 +56,47 @@ func TestGetResizeWidthAndHeightForFitCrop(t *testing.T) {
 
 func TestGetStartingPointForCrop(t *testing.T) {
 	//center
-	x, y := getStartingPointForCrop(500, 500, 300, 500, processor.CropCenter)
+	x, y := getStartingPointForCrop(500, 500, 300, 500, processor.PointCenter)
 	assert.Equal(t, 100, x)
 	assert.Equal(t, 0, y)
 
 	//top
-	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.CropTop)
+	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.PointTop)
 	assert.Equal(t, 100, x)
 	assert.Equal(t, 0, y)
 
 	//topLeft
-	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.CropTopLeft)
+	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.PointTopLeft)
 	assert.Equal(t, 0, x)
 	assert.Equal(t, 0, y)
 
 	//topRight
-	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.CropTopRight)
+	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.PointTopRight)
 	assert.Equal(t, 200, x)
 	assert.Equal(t, 0, y)
 
 	//left
-	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.CropLeft)
+	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.PointLeft)
 	assert.Equal(t, 0, x)
 	assert.Equal(t, 0, y)
 
 	//right
-	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.CropRight)
+	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.PointRight)
 	assert.Equal(t, 200, x)
 	assert.Equal(t, 0, y)
 
 	//bottom
-	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.CropBottom)
+	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.PointBottom)
 	assert.Equal(t, 100, x)
 	assert.Equal(t, 0, y)
 
 	//bottomLeft
-	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.CropBottomLeft)
+	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.PointBottomLeft)
 	assert.Equal(t, 0, x)
 	assert.Equal(t, 0, y)
 
 	//bottomRight
-	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.CropBottomRight)
+	x, y = getStartingPointForCrop(500, 500, 300, 500, processor.PointBottomRight)
 	assert.Equal(t, 200, x)
 	assert.Equal(t, 0, y)
 }

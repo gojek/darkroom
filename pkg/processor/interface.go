@@ -4,8 +4,8 @@ import "image"
 
 // Processor interface for performing operations on image bytes
 type Processor interface {
-	// Crop takes an image.Image, width, height and a CropPoint and returns the cropped image
-	Crop(image image.Image, width, height int, point CropPoint) image.Image
+	// Crop takes an image.Image, width, height and a Point and returns the cropped image
+	Crop(image image.Image, width, height int, point Point) image.Image
 	// Resize takes an image.Image, width and height and returns the re-sized image
 	Resize(image image.Image, width, height int) image.Image
 	// Scale takes an input image, width and height and returns the re-sized
@@ -33,4 +33,7 @@ type Processor interface {
 	// FixOrientation takes an image and it's EXIF orientation (if exist)
 	// and returns the image with its EXIF orientation fixed
 	FixOrientation(img image.Image, orientation int) image.Image
+	// Overlay takes an input byte array as the base image and
+	// an array of OverlayAttrs to be placed as overlays to the base image
+	Overlay(base []byte, overlays []*OverlayAttrs) ([]byte, error)
 }

@@ -159,27 +159,27 @@ func CleanFloat(input string, bound float64) float64 {
 	return math.Mod(val, bound) // Never return value greater than bound
 }
 
-// GetCropPoint takes a string and returns the type CropPoint
-func GetCropPoint(input string) processor.CropPoint {
+// GetCropPoint takes a string and returns the type Point
+func GetCropPoint(input string) processor.Point {
 	switch input {
 	case "top":
-		return processor.CropTop
+		return processor.PointTop
 	case "top,left":
-		return processor.CropTopLeft
+		return processor.PointTopLeft
 	case "top,right":
-		return processor.CropTopRight
+		return processor.PointTopRight
 	case "left":
-		return processor.CropLeft
+		return processor.PointLeft
 	case "right":
-		return processor.CropRight
+		return processor.PointRight
 	case "bottom":
-		return processor.CropBottom
+		return processor.PointBottom
 	case "bottom,left":
-		return processor.CropBottomLeft
+		return processor.PointBottomLeft
 	case "bottom,right":
-		return processor.CropBottomRight
+		return processor.PointBottomRight
 	default:
-		return processor.CropCenter
+		return processor.PointCenter
 	}
 }
 

@@ -2,6 +2,7 @@ package native
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -26,8 +27,8 @@ type BildProcessor struct {
 // ProcessorOption represents builder function for BildProcessor
 type ProcessorOption func(*BildProcessor)
 
-// Crop takes an input image, width, height and a CropPoint and returns the cropped image
-func (bp *BildProcessor) Crop(img image.Image, width, height int, point processor.CropPoint) image.Image {
+// Crop takes an input image, width, height and a Point and returns the cropped image
+func (bp *BildProcessor) Crop(img image.Image, width, height int, point processor.Point) image.Image {
 	if width == 0 || height == 0 {
 		if width == 0 && height == 0 {
 			return img
@@ -62,41 +63,6 @@ func (bp *BildProcessor) Resize(img image.Image, width, height int) image.Image 
 // image without maintaining the original aspect ratio
 func (bp *BildProcessor) Scale(img image.Image, width, height int) image.Image {
 	return transform.Resize(img, width, height, transform.Linear)
-}
-
-// Watermark takes an input byte array, overlay byte array and opacity value
-// and returns the watermarked image bytes or error
-func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error) {
-	baseImg, f, err := bp.Decode(base)
-	if err != nil {
-		return nil, err
-	}
-	if f != processor.ExtensionPNG {
-		baseImg = clone.AsRGBA(baseImg)
-	}
-	overlayImg, _, err := bp.Decode(overlay)
-	if err != nil {
-		return nil, err
-	}
-
-	ratio := float64(overlayImg.Bounds().Dy()) / float64(overlayImg.Bounds().Dx())
-	dWidth := float64(baseImg.Bounds().Dx()) / 2.0
-
-	// Resizing overlay image according to base image
-	overlayImg = transform.Resize(overlayImg, int(dWidth), int(dWidth*ratio), transform.Linear)
-
-	// Anchor point for overlaying
-	x := (baseImg.Bounds().Dx() - overlayImg.Bounds().Dx()) / 2
-	y := (baseImg.Bounds().Dy() - overlayImg.Bounds().Dy()) / 2
-	offset := image.Pt(int(x), int(y))
-
-	// Mask image (that is just a solid light gray image)
-	mask := image.NewUniform(color.Alpha{A: opacity})
-
-	// Performing overlay
-	draw.DrawMask(baseImg.(draw.Image), overlayImg.Bounds().Add(offset), overlayImg, image.ZP, mask, image.ZP, draw.Over)
-
-	return bp.Encode(baseImg, f)
 }
 
 // GrayScale takes an input image and returns the grayscaled image
@@ -170,6 +136,108 @@ func (bp *BildProcessor) FixOrientation(img image.Image, orientation int) image.
 	default:
 		return img
 	}
+}
+
+type overlayResult struct {
+	overlayImg image.Image
+	offset     image.Point
+	index      int
+	err        error
+}
+
+func (bp *BildProcessor) transformOverlay(i, w, h int, oa *processor.OverlayAttrs, c *chan overlayResult) {
+	overlayImg, _, err := bp.Decode(oa.Img)
+	fmt.Print(overlayImg)
+	if err != nil {
+		*c <- overlayResult{index: i, err: err}
+	}
+	if overlayImg == nil {
+		*c <- overlayResult{index: i, err: fmt.Errorf("overlay byte cannot be decoded into image")}
+	}
+
+	ratio := float64(overlayImg.Bounds().Dy()) / float64(overlayImg.Bounds().Dx())
+	dWidth := float64(w) * (oa.WidthPercentage / 100.0)
+
+	// Resizing overlay image according to base image
+	overlayImg = transform.Resize(overlayImg, int(dWidth), int(dWidth*ratio), transform.Linear)
+
+	// Anchor point for overlaying
+	x, y := getStartingPointForCrop(w, h, overlayImg.Bounds().Dx(), overlayImg.Bounds().Dy(), oa.Point)
+	offset := image.Pt(x, y)
+	*c <- overlayResult{
+		overlayImg: overlayImg,
+		offset:     offset,
+		index:      i,
+		err:        nil,
+	}
+}
+
+// Watermark takes an input byte array, overlay byte array and opacity value
+// and returns the watermarked image bytes or error
+func (bp *BildProcessor) Watermark(base []byte, overlay []byte, opacity uint8) ([]byte, error) {
+	baseImg, f, err := bp.Decode(base)
+	if err != nil {
+		return nil, err
+	}
+	if f != processor.ExtensionPNG {
+		baseImg = clone.AsRGBA(baseImg)
+	}
+
+	oa := processor.OverlayAttrs{
+		Img:              overlay,
+		Point:            processor.PointCenter,
+		WidthPercentage:  50.0,
+		HeightPercentage: 50.0,
+	}
+	c := make(chan overlayResult)
+	w := baseImg.Bounds().Dx()
+	h := baseImg.Bounds().Dy()
+	go bp.transformOverlay(0, w, h, &oa, &c)
+	cr := <-c
+
+	if cr.err != nil {
+		return nil, cr.err
+	}
+
+	// Mask image (that is just a solid light gray image)
+	mask := image.NewUniform(color.Alpha{A: opacity})
+
+	// Performing overlay
+	draw.DrawMask(baseImg.(draw.Image), cr.overlayImg.Bounds().Add(cr.offset), cr.overlayImg, image.ZP, mask, image.ZP, draw.Over)
+
+	return bp.Encode(baseImg, f)
+}
+
+// Overlay takes a base image and array of overlay images and returns the final overlayed image bytes or error
+func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayAttrs) ([]byte, error) {
+	if len(overlays) == 0 {
+		return base, nil
+	}
+
+	baseImg, f, err := bp.Decode(base)
+	if err != nil {
+		return nil, err
+	}
+	if f != processor.ExtensionPNG {
+		baseImg = clone.AsRGBA(baseImg)
+	}
+
+	c := make(chan overlayResult, len(overlays))
+	w := baseImg.Bounds().Dx()
+	h := baseImg.Bounds().Dy()
+	for i, overlay := range overlays {
+		go bp.transformOverlay(i, w, h, overlay, &c)
+	}
+
+	for i := 0; i < len(overlays); i++ {
+		cr := <-c
+		if cr.err == nil {
+			// Performing overlay
+			draw.DrawMask(baseImg.(draw.Image), cr.overlayImg.Bounds().Add(cr.offset), cr.overlayImg, image.ZP, nil, image.ZP, draw.Over)
+		}
+	}
+
+	return bp.Encode(baseImg, f)
 }
 
 // WithEncoders is a builder function to set custom Encoders for BildProcessor

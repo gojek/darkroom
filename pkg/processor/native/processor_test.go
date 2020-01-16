@@ -93,7 +93,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Crop() {
 		},
 	}
 	for _, c := range cases {
-		out := s.processor.Crop(s.srcImage, c.w, c.h, processor.CropCenter)
+		out := s.processor.Crop(s.srcImage, c.w, c.h, processor.PointCenter)
 
 		assert.NotNil(s.T(), out)
 
@@ -276,4 +276,144 @@ func (s *BildProcessorSuite) TestBildProcessor_Decode_GivenWebPImageShouldBeAble
 	_, ext, err := s.processor.Decode(data)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), "webp", ext)
+}
+
+func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
+	baseImg, _ := ioutil.ReadFile("./_testdata/test.jpg")
+	overlay, _ := ioutil.ReadFile("./_testdata/overlay.png")
+
+	type testCase struct {
+		expected string
+		overlays []*processor.OverlayAttrs
+	}
+
+	testCases := []testCase{
+		{
+			expected: "./_testdata/test.jpg",
+			overlays: []*processor.OverlayAttrs{},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_1.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointTopLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_2.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointTop,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_3.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointTopRight,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_4.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_5.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointCenter,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_6.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointRight,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_7.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointBottomLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_8.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointBottom,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_9.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointBottomRight,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+		{
+			expected: "./_testdata/overlay/overlay_19.jpg",
+			overlays: []*processor.OverlayAttrs{
+				{
+					Img:              overlay,
+					Point:            processor.PointTopLeft,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+				{
+					Img:              overlay,
+					Point:            processor.PointBottomRight,
+					WidthPercentage:  50.0,
+					HeightPercentage: 50.0,
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		o, err := s.processor.Overlay(baseImg, tc.overlays)
+		e, _ := ioutil.ReadFile(tc.expected)
+		assert.Equal(s.T(), e, o)
+		assert.Nil(s.T(), err)
+	}
 }
