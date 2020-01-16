@@ -5,14 +5,14 @@
         <link>https://www.gojek.io/darkroom/blog</link>
         <description>The best place to stay up-to-date with the latest Darkroom news and events.</description>
         <lastBuildDate>Wed, 14 Aug 2019 06:00:00 GMT</lastBuildDate>
-        <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
             <title>Darkroom Blog</title>
             <url>https://www.gojek.io/darkroom/img/darkroom-logo.png</url>
             <link>https://www.gojek.io/darkroom/blog</link>
         </image>
-        <copyright>Copyright © 2019 Gojek </copyright>
+        <copyright>Copyright © 2020 Gojek </copyright>
         <item>
             <title><![CDATA[New Version 0.0.4]]></title>
             <link>https://www.gojek.io/darkroom/blog/2019/08/14/new-version-1.0.0.html</link>
