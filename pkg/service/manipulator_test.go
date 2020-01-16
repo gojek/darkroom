@@ -259,3 +259,12 @@ func (m *mockProcessor) FixOrientation(img image.Image, orientation int) image.I
 	args := m.Called(img, orientation)
 	return args.Get(0).(image.Image)
 }
+
+func (m *mockProcessor) Overlay(base []byte, overlays []*processor.OverlayAttrs) ([]byte, error) {
+	args := m.Called(base, overlays)
+	b := args.Get(0).([]byte)
+	if args.Get(1) == nil {
+		return b, nil
+	}
+	return b, args.Get(1).(error)
+}
