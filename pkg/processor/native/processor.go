@@ -147,7 +147,6 @@ type overlayResult struct {
 
 func (bp *BildProcessor) transformOverlay(i, w, h int, oa *processor.OverlayAttrs, c *chan overlayResult) {
 	overlayImg, _, err := bp.Decode(oa.Img)
-	fmt.Print(overlayImg)
 	if err != nil {
 		*c <- overlayResult{index: i, err: err}
 	}
