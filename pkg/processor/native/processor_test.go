@@ -293,7 +293,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			overlays: []*processor.OverlayAttrs{},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_1.jpg",
+			expected: "./_testdata/overlay/overlay_1.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -304,7 +304,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_2.jpg",
+			expected: "./_testdata/overlay/overlay_2.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -315,7 +315,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_3.jpg",
+			expected: "./_testdata/overlay/overlay_3.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -326,7 +326,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_4.jpg",
+			expected: "./_testdata/overlay/overlay_4.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -337,7 +337,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_5.jpg",
+			expected: "./_testdata/overlay/overlay_5.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -348,7 +348,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_6.jpg",
+			expected: "./_testdata/overlay/overlay_6.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -359,7 +359,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_7.jpg",
+			expected: "./_testdata/overlay/overlay_7.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -370,7 +370,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_8.jpg",
+			expected: "./_testdata/overlay/overlay_8.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -381,7 +381,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_9.jpg",
+			expected: "./_testdata/overlay/overlay_9.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,
@@ -392,7 +392,7 @@ func (s *BildProcessorSuite) TestBildProcessor_Overlay() {
 			},
 		},
 		{
-			expected: "./_testdata/overlay/overlay_19.jpg",
+			expected: "./_testdata/overlay/overlay_19.png",
 			overlays: []*processor.OverlayAttrs{
 				{
 					Img:              overlay,

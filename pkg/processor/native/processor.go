@@ -236,7 +236,7 @@ func (bp *BildProcessor) Overlay(base []byte, overlays []*processor.OverlayAttrs
 		}
 	}
 
-	return bp.Encode(baseImg, f)
+	return bp.Encode(baseImg, processor.ExtensionPNG)
 }
 
 // WithEncoders is a builder function to set custom Encoders for BildProcessor
