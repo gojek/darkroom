@@ -19,19 +19,25 @@ type Storage struct {
 
 // Get takes in the Context and path as an argument and returns an IResponse interface implementation.
 // This method figures out how to get the data from the cloudfront storage backend.
-func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
-	res, err := s.client.Get(s.getURL(path), nil)
+func (s *Storage) Get(ctx context.Context, path string, opt *storage.GetRequestOptions) storage.IResponse {
+	var h http.Header
+	if opt != nil && opt.Range != "" {
+		h = http.Header{}
+		h.Add(storage.HeaderRange, opt.Range)
+	}
+
+	res, err := s.client.Get(s.getURL(path), h)
 	if err != nil {
 		if res != nil {
-			return storage.NewResponse([]byte(nil), res.StatusCode, err)
+			return storage.NewResponse([]byte(nil), res.StatusCode, err, nil)
 		}
-		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err)
+		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err, nil)
 	}
 	if res.StatusCode == http.StatusForbidden {
-		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden"))
+		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden"), nil)
 	}
 	body, _ := ioutil.ReadAll(res.Body)
-	return storage.NewResponse([]byte(body), res.StatusCode, nil)
+	return storage.NewResponse(body, res.StatusCode, nil, s.newMetadata(&res.Header))
 }
 
 func (s *Storage) getURL(path string) string {
@@ -50,6 +56,17 @@ func (s *Storage) getProtocol() string {
 		return "https"
 	}
 	return "http"
+}
+
+func (s *Storage) newMetadata(header *http.Header) *storage.ResponseMetadata {
+	return &storage.ResponseMetadata{
+		AcceptRanges:  header.Get(storage.HeaderAcceptRanges),
+		ContentLength: header.Get(storage.HeaderContentLength),
+		ContentRange:  header.Get(storage.HeaderContentRange),
+		ContentType:   header.Get(storage.HeaderContentType),
+		ETag:          header.Get(storage.HeaderETag),
+		LastModified:  header.Get(storage.HeaderLastModified),
+	}
 }
 
 // NewStorage returns a new cloudfront.Storage instance
