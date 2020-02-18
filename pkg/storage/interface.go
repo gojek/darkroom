@@ -7,7 +7,7 @@ import "context"
 type Storage interface {
 	// Get takes in the Context and path as an argument and returns an IResponse interface implementation.
 	// This method figures out how to get the data from the storage backend.
-	Get(ctx context.Context, path string) IResponse
+	Get(ctx context.Context, path string, opt *GetRequestOptions) IResponse
 }
 
 // IResponse interface sets the contract that can be used to return the result from different Storage backends.

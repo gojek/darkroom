@@ -1,24 +1,31 @@
 package s3
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/gojek/darkroom/pkg/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"io"
-	"net/http"
-	"testing"
 )
 
 const (
-	validPath   = "path/to/valid-file"
-	invalidPath = "path/to/invalid-file"
+	validPath    = "path/to/valid-file"
+	invalidPath  = "path/to/invalid-file"
+	validRange   = "bytes: 0-100"
+	invalidRange = "none"
 )
 
 type StorageTestSuite struct {
@@ -44,6 +51,7 @@ func (s *StorageTestSuite) SetupSuite() {
 		}),
 	)
 	s.storage.downloader = &mockDownloader{}
+	s.storage.service = &mockGetObject{}
 }
 
 func TestStorageSuite(t *testing.T) {
@@ -51,7 +59,7 @@ func TestStorageSuite(t *testing.T) {
 }
 
 func (s *StorageTestSuite) TestStorage_Get() {
-	res := s.storage.Get(context.Background(), validPath)
+	res := s.storage.Get(context.Background(), validPath, nil)
 
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), []byte("someData"), res.Data())
@@ -59,7 +67,34 @@ func (s *StorageTestSuite) TestStorage_Get() {
 }
 
 func (s *StorageTestSuite) TestStorage_GetFailure() {
-	res := s.storage.Get(context.Background(), invalidPath)
+	res := s.storage.Get(context.Background(), invalidPath, nil)
+
+	assert.NotNil(s.T(), res.Error())
+	assert.Equal(s.T(), []byte(nil), res.Data())
+	assert.Equal(s.T(), http.StatusUnprocessableEntity, res.Status())
+}
+
+func (s *StorageTestSuite) TestStorage_GetRange() {
+	opt := &storage.GetRequestOptions{Range: validRange}
+	res := s.storage.Get(context.Background(), validPath, opt)
+	metadata := storage.ResponseMetadata{
+		AcceptRanges:  "bytes",
+		ContentLength: "101",
+		ContentRange:  "bytes 100-200/247103",
+		ContentType:   "image/png",
+		ETag:          "32705ce195789d7bf07f3d44783c2988",
+		LastModified:  "Wed, 21 Oct 2015 07:28:00 GMT",
+	}
+
+	assert.Nil(s.T(), res.Error())
+	assert.Equal(s.T(), []byte("someData"), res.Data())
+	assert.Equal(s.T(), http.StatusOK, res.Status())
+	assert.Equal(s.T(), &metadata, res.Metadata())
+}
+
+func (s *StorageTestSuite) TestStorage_GetRangeFailure() {
+	opt := &storage.GetRequestOptions{Range: invalidRange}
+	res := s.storage.Get(context.Background(), validPath, opt)
 
 	assert.NotNil(s.T(), res.Error())
 	assert.Equal(s.T(), []byte(nil), res.Data())
@@ -80,4 +115,25 @@ func (d *mockDownloader) DownloadWithContext(ctx aws.Context, w io.WriterAt, inp
 		return 0, nil
 	}
 	return 0, errors.New("error")
+}
+
+type mockGetObject struct {
+	mock.Mock
+	s3iface.S3API
+}
+
+func (d *mockGetObject) GetObject(input *s3.GetObjectInput) (*s3.GetObjectOutput, error) {
+	if *input.Range == validRange {
+		t, _ := time.Parse(http.TimeFormat, "Wed, 21 Oct 2015 07:28:00 GMT")
+		return &s3.GetObjectOutput{
+			AcceptRanges:  aws.String("bytes"),
+			ContentLength: aws.Int64(101),
+			ContentRange:  aws.String("bytes 100-200/247103"),
+			ContentType:   aws.String("image/png"),
+			ETag:          aws.String("32705ce195789d7bf07f3d44783c2988"),
+			LastModified:  aws.Time(t),
+			Body:          ioutil.NopCloser(bytes.NewReader([]byte("someData"))),
+		}, nil
+	}
+	return nil, errors.New("error")
 }

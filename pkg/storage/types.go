@@ -49,3 +49,7 @@ type HystrixCommand struct {
 	Name   string
 	Config hystrix.CommandConfig
 }
+
+type GetRequestOptions struct {
+	Range string
+}
