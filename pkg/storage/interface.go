@@ -18,4 +18,6 @@ type IResponse interface {
 	Error() error
 	// Status method returns the http StatusCode from the storage backend if there is any
 	Status() int
+	// Metadata method returns response metadata if the operation is successful and client support metadata
+	Metadata() *ResponseMetadata
 }
