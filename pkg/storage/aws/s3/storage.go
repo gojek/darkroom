@@ -56,31 +56,41 @@ func (s *Storage) get(ctx context.Context, input s3.GetObjectInput) storage.IRes
 	})
 	s3Err := <-responseChannel
 
-	return storage.NewResponse(buff.Bytes(), getStatusCodeFromError(s3Err), s3Err, nil)
+	return storage.NewResponse(buff.Bytes(), getStatusCodeFromError(s3Err, nil), s3Err, nil)
 }
 
 func (s *Storage) getRange(ctx context.Context, input s3.GetObjectInput) storage.IResponse {
-	responseChannel := make(chan *s3.GetObjectOutput, 1)
-	errorChannel := make(chan error, 1)
+	type getObjectResponse struct {
+		output s3.GetObjectOutput
+		err    error
+	}
+	responseChannel := make(chan getObjectResponse, 1)
 	makeNetworkCall(s.hystrixCmd.Name, s.hystrixCmd.Config, func() error {
 		resp, err := s.service.GetObject(&input)
-		errorChannel <- err
-		responseChannel <- resp
+		responseChannel <- getObjectResponse{
+			output: *resp,
+			err:    err,
+		}
 		return err
 	}, func(e error) error {
-		errorChannel <- e
+		responseChannel <- getObjectResponse{
+			err: e,
+		}
 		return e
 	})
 
-	s3Resp, s3Err := <-responseChannel, <-errorChannel
+	s3Resp := <-responseChannel
 
 	var metadata *storage.ResponseMetadata
 	var body []byte
-	if s3Err == nil {
-		metadata = s.newMetadata(*s3Resp)
-		body, _ = ioutil.ReadAll(s3Resp.Body)
+	var status int
+	if s3Resp.err == nil {
+		metadata = s.newMetadata(s3Resp.output)
+		body, _ = ioutil.ReadAll(s3Resp.output.Body)
+		status = http.StatusPartialContent
 	}
-	return storage.NewResponse(body, getStatusCodeFromError(s3Err), s3Err, metadata)
+
+	return storage.NewResponse(body, getStatusCodeFromError(s3Resp.err, &status), s3Resp.err, metadata)
 }
 
 func (s *Storage) newMetadata(output s3.GetObjectOutput) *storage.ResponseMetadata {
