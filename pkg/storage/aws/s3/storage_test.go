@@ -88,7 +88,7 @@ func (s *StorageTestSuite) TestStorage_GetRange() {
 
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), []byte("someData"), res.Data())
-	assert.Equal(s.T(), http.StatusOK, res.Status())
+	assert.Equal(s.T(), http.StatusPartialContent, res.Status())
 	assert.Equal(s.T(), &metadata, res.Metadata())
 }
 

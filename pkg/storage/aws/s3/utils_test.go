@@ -14,7 +14,7 @@ func Test_getStatusCodeFromError(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, getStatusCodeFromError(errors.New("status code: 401"), &statusCode))
 	assert.Equal(t, http.StatusUnprocessableEntity, getStatusCodeFromError(errors.New("status code: 4xx"), &statusCode))
 	assert.Equal(t, http.StatusUnprocessableEntity, getStatusCodeFromError(errors.New("status code: 422"), &statusCode))
-	assert.Equal(t, http.StatusOK, getStatusCodeFromError(nil, &statusCode))
+	assert.Equal(t, http.StatusOK, getStatusCodeFromError(nil, nil))
 
 	statusCode = http.StatusPartialContent
 	assert.Equal(t, http.StatusPartialContent, getStatusCodeFromError(nil, &statusCode))

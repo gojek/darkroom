@@ -61,14 +61,14 @@ func (s *Storage) get(ctx context.Context, input s3.GetObjectInput) storage.IRes
 
 func (s *Storage) getRange(ctx context.Context, input s3.GetObjectInput) storage.IResponse {
 	type getObjectResponse struct {
-		output s3.GetObjectOutput
+		output *s3.GetObjectOutput
 		err    error
 	}
 	responseChannel := make(chan getObjectResponse, 1)
 	makeNetworkCall(s.hystrixCmd.Name, s.hystrixCmd.Config, func() error {
 		resp, err := s.service.GetObject(&input)
 		responseChannel <- getObjectResponse{
-			output: *resp,
+			output: resp,
 			err:    err,
 		}
 		return err
@@ -85,7 +85,7 @@ func (s *Storage) getRange(ctx context.Context, input s3.GetObjectInput) storage
 	var body []byte
 	var status int
 	if s3Resp.err == nil {
-		metadata = s.newMetadata(s3Resp.output)
+		metadata = s.newMetadata(*s3Resp.output)
 		body, _ = ioutil.ReadAll(s3Resp.output.Body)
 		status = http.StatusPartialContent
 	}
