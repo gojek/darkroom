@@ -98,7 +98,7 @@ type mockStorage struct {
 	mock.Mock
 }
 
-func (m *mockStorage) Get(ctx context.Context, path string) storage.IResponse {
+func (m *mockStorage) Get(ctx context.Context, path string, opt *storage.GetRequestOptions) storage.IResponse {
 	args := m.Called(ctx, path)
-	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2))
+	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2), args[3].(*storage.ResponseMetadata))
 }

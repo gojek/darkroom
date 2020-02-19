@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"testing"
+
 	"github.com/gojek/darkroom/pkg/storage"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"testing"
 )
 
 const (

@@ -2,6 +2,7 @@ package storage
 
 import "github.com/afex/hystrix-go/hystrix"
 
+// ResponseMetadata contains metadata of the storage response
 type ResponseMetadata struct {
 	AcceptRanges  string
 	ContentLength string
@@ -50,6 +51,7 @@ type HystrixCommand struct {
 	Config hystrix.CommandConfig
 }
 
+// GetRequestOptions holds option to request data from storage
 type GetRequestOptions struct {
 	Range string
 }
