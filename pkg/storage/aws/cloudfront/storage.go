@@ -21,14 +21,8 @@ type Storage struct {
 // This method figures out how to get the data from the cloudfront storage backend.
 func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	res, err := s.client.Get(s.getURL(path), nil)
-	if err != nil {
-		if res != nil {
-			return storage.NewResponse([]byte(nil), res.StatusCode, err)
-		}
-		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err)
-	}
-	if res.StatusCode == http.StatusForbidden {
-		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden"))
+	if errRes, ok := s.hasError(res, err); ok {
+		return errRes
 	}
 	body, _ := ioutil.ReadAll(res.Body)
 	return storage.NewResponse(body, res.StatusCode, nil)
@@ -44,15 +38,10 @@ func (s *Storage) GetPartialObject(ctx context.Context, path string, opt *storag
 	}
 
 	res, err := s.client.Get(s.getURL(path), h)
-	if err != nil {
-		if res != nil {
-			return storage.NewResponse([]byte(nil), res.StatusCode, err)
-		}
-		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err)
+	if errRes, ok := s.hasError(res, err); ok {
+		return errRes
 	}
-	if res.StatusCode == http.StatusForbidden {
-		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden"))
-	}
+
 	body, _ := ioutil.ReadAll(res.Body)
 	return storage.
 		NewResponse(body, res.StatusCode, nil).
@@ -82,6 +71,19 @@ func (s *Storage) getProtocol() string {
 		return "https"
 	}
 	return "http"
+}
+
+func (s *Storage) hasError(res *http.Response, err error) (storage.IResponse, bool) {
+	if err != nil {
+		if res != nil {
+			return storage.NewResponse([]byte(nil), res.StatusCode, err), true
+		}
+		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err), true
+	}
+	if res.StatusCode == http.StatusForbidden {
+		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden")), true
+	}
+	return nil, false
 }
 
 // NewStorage returns a new cloudfront.Storage instance
