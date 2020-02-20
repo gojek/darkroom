@@ -28,7 +28,7 @@ const (
 func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		l := logger.SugaredWithRequest(r)
-		res := deps.Storage.Get(r.Context(), r.URL.Path, nil)
+		res := deps.Storage.Get(r.Context(), r.URL.Path)
 		if res.Error() != nil {
 			l.Errorf("error from Storage.Get: %s", res.Error())
 			metrics.Update(metrics.UpdateOption{Name: StorageGetErrorKey, Type: metrics.Count})

@@ -37,7 +37,7 @@ func (s *ImageHandlerTestSuite) TestImageHandler() {
 	r, _ := http.NewRequest(http.MethodGet, "/image-valid", nil)
 	rr := httptest.NewRecorder()
 
-	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil, nil)
+	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
@@ -49,7 +49,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithStorageGetError() {
 	r, _ := http.NewRequest(http.MethodGet, "/image-invalid", nil)
 	rr := httptest.NewRecorder()
 
-	s.storage.On("Get", mock.Anything, "/image-invalid").Return([]byte(nil), http.StatusUnprocessableEntity, errors.New("error"), nil)
+	s.storage.On("Get", mock.Anything, "/image-invalid").Return([]byte(nil), http.StatusUnprocessableEntity, errors.New("error"))
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
@@ -66,7 +66,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParameters() {
 	params := make(map[string]string)
 	params["w"] = "100"
 	params["h"] = "100"
-	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil, nil)
+	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
 	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return(processedData, nil)
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
@@ -85,7 +85,7 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessing
 	params := make(map[string]string)
 	params["w"] = "100"
 	params["h"] = "100"
-	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil, nil)
+	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
 	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return([]byte(nil), errors.New("error"))
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
@@ -98,7 +98,12 @@ type mockStorage struct {
 	mock.Mock
 }
 
-func (m *mockStorage) Get(ctx context.Context, path string, opt *storage.GetRequestOptions) storage.IResponse {
+func (m *mockStorage) Get(ctx context.Context, path string) storage.IResponse {
 	args := m.Called(ctx, path)
-	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2), nil)
+	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2))
+}
+
+func (m *mockStorage) GetPartialObject(ctx context.Context, path string, opt *storage.GetPartialObjectRequestOptions) storage.IResponse {
+	args := m.Called(ctx, path)
+	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2)).WithMetadata(args[3].(*storage.ResponseMetadata))
 }

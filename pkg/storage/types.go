@@ -40,9 +40,15 @@ func (r *Response) Metadata() *ResponseMetadata {
 	return r.metadata
 }
 
+// WithMetadata sets metadata field on the struct
+func (r *Response) WithMetadata(metadata *ResponseMetadata) *Response {
+	r.metadata = metadata
+	return r
+}
+
 // NewResponse takes data, statusCode and error as arguments and returns a new Response
-func NewResponse(data []byte, statusCode int, err error, metadata *ResponseMetadata) *Response {
-	return &Response{data: data, err: err, status: statusCode, metadata: metadata}
+func NewResponse(data []byte, statusCode int, err error) *Response {
+	return &Response{data: data, err: err, status: statusCode}
 }
 
 // HystrixCommand wraps the command name and the configuration to be used with hystrix
@@ -51,7 +57,7 @@ type HystrixCommand struct {
 	Config hystrix.CommandConfig
 }
 
-// GetRequestOptions holds option to request data from storage
-type GetRequestOptions struct {
+// GetPartialObjectRequestOptions holds option to request data from storage
+type GetPartialObjectRequestOptions struct {
 	Range string
 }

@@ -7,7 +7,10 @@ import "context"
 type Storage interface {
 	// Get takes in the Context and path as an argument and returns an IResponse interface implementation.
 	// This method figures out how to get the data from the storage backend.
-	Get(ctx context.Context, path string, opt *GetRequestOptions) IResponse
+	Get(ctx context.Context, path string) IResponse
+	// GetPartialObject takes in the Context, path, and opt as an argument and returns an IResponse interface implementation.
+	// This method figures out how to get partial data from the storage backend.
+	GetPartialObject(ctx context.Context, path string, opt *GetPartialObjectRequestOptions) IResponse
 }
 
 // IResponse interface sets the contract that can be used to return the result from different Storage backends.
@@ -18,6 +21,6 @@ type IResponse interface {
 	Error() error
 	// Status method returns the http StatusCode from the storage backend if there is any
 	Status() int
-	// ResponseMetadata method returns response metadata if the operation is successful and client support metadata
+	// Metadata method returns response metadata if the operation is successful and client support metadata
 	Metadata() *ResponseMetadata
 }

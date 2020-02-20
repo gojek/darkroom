@@ -29,21 +29,12 @@ type Storage struct {
 
 // Get takes in the Context and path as an argument and returns an IResponse interface implementation.
 // This method figures out how to get the data from the S3 storage backend.
-func (s *Storage) Get(ctx context.Context, path string, opt *storage.GetRequestOptions) storage.IResponse {
+func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	input := s3.GetObjectInput{
 		Bucket: aws.String(s.bucketName),
 		Key:    aws.String(path),
 	}
 
-	if opt != nil && len(opt.Range) > 0 {
-		input.Range = &opt.Range
-		return s.getRange(ctx, input)
-	}
-
-	return s.get(ctx, input)
-}
-
-func (s *Storage) get(ctx context.Context, input s3.GetObjectInput) storage.IResponse {
 	buff := &aws.WriteAtBuffer{}
 	responseChannel := make(chan error, 1)
 	makeNetworkCall(s.hystrixCmd.Name, s.hystrixCmd.Config, func() error {
@@ -56,10 +47,21 @@ func (s *Storage) get(ctx context.Context, input s3.GetObjectInput) storage.IRes
 	})
 	s3Err := <-responseChannel
 
-	return storage.NewResponse(buff.Bytes(), getStatusCodeFromError(s3Err, nil), s3Err, nil)
+	return storage.NewResponse(buff.Bytes(), getStatusCodeFromError(s3Err, nil), s3Err)
 }
 
-func (s *Storage) getRange(ctx context.Context, input s3.GetObjectInput) storage.IResponse {
+// Get takes in the Context and path as an argument and returns an IResponse interface implementation.
+// This method figures out how to get partial data from the S3 storage backend.
+func (s *Storage) GetPartialObject(ctx context.Context, path string, opt *storage.GetPartialObjectRequestOptions) storage.IResponse {
+	if opt == nil || len(opt.Range) == 0 {
+		return s.Get(ctx, path)
+	}
+
+	input := s3.GetObjectInput{
+		Bucket: aws.String(s.bucketName),
+		Key:    aws.String(path),
+		Range:  &opt.Range,
+	}
 	type getObjectResponse struct {
 		output *s3.GetObjectOutput
 		err    error
@@ -90,7 +92,9 @@ func (s *Storage) getRange(ctx context.Context, input s3.GetObjectInput) storage
 		status = http.StatusPartialContent
 	}
 
-	return storage.NewResponse(body, getStatusCodeFromError(s3Resp.err, &status), s3Resp.err, metadata)
+	return storage.
+		NewResponse(body, getStatusCodeFromError(s3Resp.err, &status), s3Resp.err).
+		WithMetadata(metadata)
 }
 
 func (s *Storage) newMetadata(output s3.GetObjectOutput) *storage.ResponseMetadata {

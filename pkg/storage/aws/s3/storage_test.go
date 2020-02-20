@@ -59,7 +59,7 @@ func TestStorageSuite(t *testing.T) {
 }
 
 func (s *StorageTestSuite) TestStorage_Get() {
-	res := s.storage.Get(context.Background(), validPath, nil)
+	res := s.storage.Get(context.Background(), validPath)
 
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), []byte("someData"), res.Data())
@@ -67,7 +67,7 @@ func (s *StorageTestSuite) TestStorage_Get() {
 }
 
 func (s *StorageTestSuite) TestStorage_GetFailure() {
-	res := s.storage.Get(context.Background(), invalidPath, nil)
+	res := s.storage.Get(context.Background(), invalidPath)
 
 	assert.NotNil(s.T(), res.Error())
 	assert.Equal(s.T(), []byte(nil), res.Data())
@@ -75,8 +75,8 @@ func (s *StorageTestSuite) TestStorage_GetFailure() {
 }
 
 func (s *StorageTestSuite) TestStorage_GetRange() {
-	opt := &storage.GetRequestOptions{Range: validRange}
-	res := s.storage.Get(context.Background(), validPath, opt)
+	opt := &storage.GetPartialObjectRequestOptions{Range: validRange}
+	res := s.storage.GetPartialObject(context.Background(), validPath, opt)
 	metadata := storage.ResponseMetadata{
 		AcceptRanges:  "bytes",
 		ContentLength: "101",
@@ -93,8 +93,8 @@ func (s *StorageTestSuite) TestStorage_GetRange() {
 }
 
 func (s *StorageTestSuite) TestStorage_GetRangeFailure() {
-	opt := &storage.GetRequestOptions{Range: invalidRange}
-	res := s.storage.Get(context.Background(), validPath, opt)
+	opt := &storage.GetPartialObjectRequestOptions{Range: invalidRange}
+	res := s.storage.GetPartialObject(context.Background(), validPath, opt)
 
 	assert.NotNil(s.T(), res.Error())
 	assert.Equal(s.T(), []byte(nil), res.Data())

@@ -19,7 +19,24 @@ type Storage struct {
 
 // Get takes in the Context and path as an argument and returns an IResponse interface implementation.
 // This method figures out how to get the data from the cloudfront storage backend.
-func (s *Storage) Get(ctx context.Context, path string, opt *storage.GetRequestOptions) storage.IResponse {
+func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
+	res, err := s.client.Get(s.getURL(path), nil)
+	if err != nil {
+		if res != nil {
+			return storage.NewResponse([]byte(nil), res.StatusCode, err)
+		}
+		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err)
+	}
+	if res.StatusCode == http.StatusForbidden {
+		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden"))
+	}
+	body, _ := ioutil.ReadAll(res.Body)
+	return storage.NewResponse(body, res.StatusCode, nil)
+}
+
+// GetPartialObject takes in the Context, path and opt as an argument and returns an IResponse interface implementation.
+// This method figures out how to get partial data from the cloudfront storage backend.
+func (s *Storage) GetPartialObject(ctx context.Context, path string, opt *storage.GetPartialObjectRequestOptions) storage.IResponse {
 	var h http.Header
 	if opt != nil && opt.Range != "" {
 		h = http.Header{}
@@ -29,15 +46,24 @@ func (s *Storage) Get(ctx context.Context, path string, opt *storage.GetRequestO
 	res, err := s.client.Get(s.getURL(path), h)
 	if err != nil {
 		if res != nil {
-			return storage.NewResponse([]byte(nil), res.StatusCode, err, nil)
+			return storage.NewResponse([]byte(nil), res.StatusCode, err)
 		}
-		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err, nil)
+		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err)
 	}
 	if res.StatusCode == http.StatusForbidden {
-		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden"), nil)
+		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden"))
 	}
 	body, _ := ioutil.ReadAll(res.Body)
-	return storage.NewResponse(body, res.StatusCode, nil, s.newMetadata(&res.Header))
+	return storage.
+		NewResponse(body, res.StatusCode, nil).
+		WithMetadata(&storage.ResponseMetadata{
+			AcceptRanges:  res.Header.Get(storage.HeaderAcceptRanges),
+			ContentLength: res.Header.Get(storage.HeaderContentLength),
+			ContentRange:  res.Header.Get(storage.HeaderContentRange),
+			ContentType:   res.Header.Get(storage.HeaderContentType),
+			ETag:          res.Header.Get(storage.HeaderETag),
+			LastModified:  res.Header.Get(storage.HeaderLastModified),
+		})
 }
 
 func (s *Storage) getURL(path string) string {
@@ -56,17 +82,6 @@ func (s *Storage) getProtocol() string {
 		return "https"
 	}
 	return "http"
-}
-
-func (s *Storage) newMetadata(header *http.Header) *storage.ResponseMetadata {
-	return &storage.ResponseMetadata{
-		AcceptRanges:  header.Get(storage.HeaderAcceptRanges),
-		ContentLength: header.Get(storage.HeaderContentLength),
-		ContentRange:  header.Get(storage.HeaderContentRange),
-		ContentType:   header.Get(storage.HeaderContentType),
-		ETag:          header.Get(storage.HeaderETag),
-		LastModified:  header.Get(storage.HeaderLastModified),
-	}
 }
 
 // NewStorage returns a new cloudfront.Storage instance

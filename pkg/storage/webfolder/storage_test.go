@@ -49,7 +49,7 @@ func (s *StorageTestSuite) TestStorage_GetNotFound() {
 	s.client.On("Get", fmt.Sprintf("%s%s", validBaseURL, invalidPath), http.Header(nil)).
 		Return(&http.Response{StatusCode: http.StatusNotFound}, errors.New("not found"))
 
-	res := s.storage.Get(context.TODO(), invalidPath, nil)
+	res := s.storage.Get(context.TODO(), invalidPath)
 
 	assert.NotNil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusNotFound, res.Status())
@@ -60,7 +60,7 @@ func (s *StorageTestSuite) TestStorage_GetNoResponse() {
 	s.client.On("Get", fmt.Sprintf("%s%s", validBaseURL, invalidPath), http.Header(nil)).
 		Return(nil, errors.New("response body read failure"))
 
-	res := s.storage.Get(context.TODO(), invalidPath, nil)
+	res := s.storage.Get(context.TODO(), invalidPath)
 
 	assert.NotNil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, res.Status())
@@ -74,7 +74,7 @@ func (s *StorageTestSuite) TestStorage_GetSuccessResponse() {
 			Body:       ioutil.NopCloser(bytes.NewReader([]byte("response body"))),
 		}, nil)
 
-	res := s.storage.Get(context.TODO(), validPath, nil)
+	res := s.storage.Get(context.TODO(), validPath)
 
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusOK, res.Status())
@@ -109,8 +109,8 @@ func (s *StorageTestSuite) TestStorage_GetRangeSuccessResponse() {
 			Header:     respHeader,
 		}, nil)
 
-	opt := storage.GetRequestOptions{Range: validRange}
-	res := s.storage.Get(context.TODO(), validPath, &opt)
+	opt := storage.GetPartialObjectRequestOptions{Range: validRange}
+	res := s.storage.GetPartialObject(context.TODO(), validPath, &opt)
 
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusOK, res.Status())
