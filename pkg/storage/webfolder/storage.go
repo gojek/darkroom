@@ -22,7 +22,7 @@ func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	if resErr, ok := s.hasError(res, err); ok {
 		return resErr
 	}
-	
+
 	body, _ := ioutil.ReadAll(res.Body)
 	return storage.NewResponse(body, res.StatusCode, nil)
 }
