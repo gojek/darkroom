@@ -24,7 +24,7 @@ import (
 const (
 	validPath    = "path/to/valid-file"
 	invalidPath  = "path/to/invalid-file"
-	validRange   = "bytes: 0-100"
+	validRange   = "bytes=0-100"
 	invalidRange = "none"
 )
 

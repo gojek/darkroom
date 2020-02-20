@@ -20,7 +20,7 @@ const (
 	validHost   = "cloudfront.net"
 	validPath   = "/path/to/valid-file"
 	invalidPath = "/path/to/invalid-file"
-	validRange  = "bytes: 100-200"
+	validRange  = "bytes=100-200"
 )
 
 type StorageTestSuite struct {
