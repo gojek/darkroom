@@ -97,7 +97,7 @@ func (s *StorageTestSuite) TestStorage_GetSuccessResponse() {
 	assert.Equal(s.T(), []byte("response body"), res.Data())
 }
 
-func (s *StorageTestSuite) TestStorage_GetRangeSuccessResponse() {
+func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse() {
 	metadata := storage.ResponseMetadata{
 		AcceptRanges:  "bytes",
 		ContentLength: "1024",

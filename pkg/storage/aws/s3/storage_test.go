@@ -74,7 +74,7 @@ func (s *StorageTestSuite) TestStorage_GetFailure() {
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, res.Status())
 }
 
-func (s *StorageTestSuite) TestStorage_GetRange() {
+func (s *StorageTestSuite) TestStorage_GetPartialObject() {
 	opt := &storage.GetPartialObjectRequestOptions{Range: validRange}
 	res := s.storage.GetPartialObject(context.Background(), validPath, opt)
 	metadata := storage.ResponseMetadata{
@@ -92,7 +92,7 @@ func (s *StorageTestSuite) TestStorage_GetRange() {
 	assert.Equal(s.T(), &metadata, res.Metadata())
 }
 
-func (s *StorageTestSuite) TestStorage_GetRangeFailure() {
+func (s *StorageTestSuite) TestStorage_GetPartialObjectFailure() {
 	opt := &storage.GetPartialObjectRequestOptions{Range: invalidRange}
 	res := s.storage.GetPartialObject(context.Background(), validPath, opt)
 
