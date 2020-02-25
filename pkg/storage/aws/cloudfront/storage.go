@@ -35,6 +35,8 @@ func (s *Storage) GetPartialObject(ctx context.Context, path string, opt *storag
 	if opt != nil && opt.Range != "" {
 		h = http.Header{}
 		h.Add(storage.HeaderRange, opt.Range)
+	} else {
+		return s.Get(ctx, path)
 	}
 
 	res, err := s.client.Get(s.getURL(path), h)

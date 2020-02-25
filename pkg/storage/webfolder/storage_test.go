@@ -82,31 +82,10 @@ func (s *StorageTestSuite) TestStorage_GetSuccessResponse() {
 }
 
 func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse() {
-	metadata := storage.ResponseMetadata{
-		AcceptRanges:  "bytes",
-		ContentLength: "1024",
-		ContentType:   "image/png",
-		ContentRange:  "bytes 100-200/1024",
-		ETag:          "32705ce195789d7bf07f3d44783c2988",
-		LastModified:  "Wed, 21 Oct 2015 07:28:00 GMT",
-	}
-
-	reqHeader := http.Header{}
-	reqHeader.Add(storage.HeaderRange, validRange)
-
-	respHeader := http.Header{}
-	respHeader.Add(storage.HeaderAcceptRanges, metadata.AcceptRanges)
-	respHeader.Add(storage.HeaderContentLength, metadata.ContentLength)
-	respHeader.Add(storage.HeaderContentType, metadata.ContentType)
-	respHeader.Add(storage.HeaderContentRange, metadata.ContentRange)
-	respHeader.Add(storage.HeaderETag, metadata.ETag)
-	respHeader.Add(storage.HeaderLastModified, metadata.LastModified)
-
-	s.client.On("Get", fmt.Sprintf("%s%s", validBaseURL, validPath), reqHeader).
+	s.client.On("Get", fmt.Sprintf("%s%s", validBaseURL, validPath), http.Header(nil)).
 		Return(&http.Response{
 			StatusCode: http.StatusOK,
 			Body:       ioutil.NopCloser(bytes.NewReader([]byte("response body"))),
-			Header:     respHeader,
 		}, nil)
 
 	opt := storage.GetPartialObjectRequestOptions{Range: validRange}
@@ -115,7 +94,7 @@ func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse() {
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusOK, res.Status())
 	assert.Equal(s.T(), []byte("response body"), res.Data())
-	assert.Equal(s.T(), &metadata, res.Metadata())
+	assert.Nil(s.T(), res.Metadata())
 }
 
 // Mocks

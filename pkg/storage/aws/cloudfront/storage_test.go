@@ -134,6 +134,20 @@ func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse() {
 	assert.Equal(s.T(), &metadata, res.Metadata())
 }
 
+func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse_WhenRangeNotProvided() {
+	s.client.On("Get", fmt.Sprintf("%s://%s%s", s.storage.getProtocol(), validHost, validPath), http.Header(nil)).
+		Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte("response body"))),
+		}, nil)
+	res := s.storage.GetPartialObject(context.TODO(), validPath, nil)
+
+	assert.Nil(s.T(), res.Error())
+	assert.Equal(s.T(), http.StatusOK, res.Status())
+	assert.Equal(s.T(), []byte("response body"), res.Data())
+	assert.Nil(s.T(), res.Metadata())
+}
+
 func (s *StorageTestSuite) TestStorage_getURL() {
 	cases := []struct {
 		secureProtocol bool
