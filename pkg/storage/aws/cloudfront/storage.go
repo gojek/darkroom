@@ -21,17 +21,40 @@ type Storage struct {
 // This method figures out how to get the data from the cloudfront storage backend.
 func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	res, err := s.client.Get(s.getURL(path), nil)
-	if err != nil {
-		if res != nil {
-			return storage.NewResponse([]byte(nil), res.StatusCode, err)
-		}
-		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err)
-	}
-	if res.StatusCode == http.StatusForbidden {
-		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden"))
+	if errRes, ok := s.hasError(res, err); ok {
+		return errRes
 	}
 	body, _ := ioutil.ReadAll(res.Body)
-	return storage.NewResponse([]byte(body), res.StatusCode, nil)
+	return storage.NewResponse(body, res.StatusCode, nil)
+}
+
+// GetPartially takes in the Context, path and opt as an argument and returns an IResponse interface implementation.
+// This method figures out how to get partial data from the cloudfront storage backend.
+func (s *Storage) GetPartially(ctx context.Context, path string, opt *storage.GetPartiallyRequestOptions) storage.IResponse {
+	var h http.Header
+	if opt != nil && opt.Range != "" {
+		h = http.Header{}
+		h.Add(storage.HeaderRange, opt.Range)
+	} else {
+		return s.Get(ctx, path)
+	}
+
+	res, err := s.client.Get(s.getURL(path), h)
+	if errRes, ok := s.hasError(res, err); ok {
+		return errRes
+	}
+
+	body, _ := ioutil.ReadAll(res.Body)
+	return storage.
+		NewResponse(body, res.StatusCode, nil).
+		WithMetadata(&storage.ResponseMetadata{
+			AcceptRanges:  res.Header.Get(storage.HeaderAcceptRanges),
+			ContentLength: res.Header.Get(storage.HeaderContentLength),
+			ContentRange:  res.Header.Get(storage.HeaderContentRange),
+			ContentType:   res.Header.Get(storage.HeaderContentType),
+			ETag:          res.Header.Get(storage.HeaderETag),
+			LastModified:  res.Header.Get(storage.HeaderLastModified),
+		})
 }
 
 func (s *Storage) getURL(path string) string {
@@ -50,6 +73,19 @@ func (s *Storage) getProtocol() string {
 		return "https"
 	}
 	return "http"
+}
+
+func (s *Storage) hasError(res *http.Response, err error) (storage.IResponse, bool) {
+	if err != nil {
+		if res != nil {
+			return storage.NewResponse([]byte(nil), res.StatusCode, err), true
+		}
+		return storage.NewResponse([]byte(nil), http.StatusUnprocessableEntity, err), true
+	}
+	if res.StatusCode == http.StatusForbidden {
+		return storage.NewResponse([]byte(nil), res.StatusCode, errors.New("forbidden")), true
+	}
+	return nil, false
 }
 
 // NewStorage returns a new cloudfront.Storage instance

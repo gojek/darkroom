@@ -4,20 +4,23 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/gojek/darkroom/pkg/storage"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 )
 
 const (
 	validBaseURL = "https://example.com/path/to/images"
 	validPath    = "/path/to/valid-file"
 	invalidPath  = "/path/to/invalid-file"
+	validRange   = "bytes=100-200"
 )
 
 type StorageTestSuite struct {
@@ -76,6 +79,22 @@ func (s *StorageTestSuite) TestStorage_GetSuccessResponse() {
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusOK, res.Status())
 	assert.Equal(s.T(), []byte("response body"), res.Data())
+}
+
+func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse() {
+	s.client.On("Get", fmt.Sprintf("%s%s", validBaseURL, validPath), http.Header(nil)).
+		Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte("response body"))),
+		}, nil)
+
+	opt := storage.GetPartiallyRequestOptions{Range: validRange}
+	res := s.storage.GetPartially(context.TODO(), validPath, &opt)
+
+	assert.Nil(s.T(), res.Error())
+	assert.Equal(s.T(), http.StatusOK, res.Status())
+	assert.Equal(s.T(), []byte("response body"), res.Data())
+	assert.Nil(s.T(), res.Metadata())
 }
 
 // Mocks

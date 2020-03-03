@@ -102,3 +102,8 @@ func (m *mockStorage) Get(ctx context.Context, path string) storage.IResponse {
 	args := m.Called(ctx, path)
 	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2))
 }
+
+func (m *mockStorage) GetPartially(ctx context.Context, path string, opt *storage.GetPartiallyRequestOptions) storage.IResponse {
+	args := m.Called(ctx, path, opt)
+	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2)).WithMetadata(args[3].(*storage.ResponseMetadata))
+}

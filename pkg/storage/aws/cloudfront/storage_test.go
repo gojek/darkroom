@@ -4,20 +4,23 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/gojek/darkroom/pkg/storage"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 )
 
 const (
 	validHost   = "cloudfront.net"
 	validPath   = "/path/to/valid-file"
 	invalidPath = "/path/to/invalid-file"
+	validRange  = "bytes=100-200"
 )
 
 type StorageTestSuite struct {
@@ -92,6 +95,57 @@ func (s *StorageTestSuite) TestStorage_GetSuccessResponse() {
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusOK, res.Status())
 	assert.Equal(s.T(), []byte("response body"), res.Data())
+}
+
+func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse() {
+	metadata := storage.ResponseMetadata{
+		AcceptRanges:  "bytes",
+		ContentLength: "1024",
+		ContentType:   "image/png",
+		ContentRange:  "bytes 100-200/1024",
+		ETag:          "32705ce195789d7bf07f3d44783c2988",
+		LastModified:  "Wed, 21 Oct 2015 07:28:00 GMT",
+	}
+
+	reqHeader := http.Header{}
+	reqHeader.Add(storage.HeaderRange, validRange)
+
+	respHeader := http.Header{}
+	respHeader.Add(storage.HeaderAcceptRanges, metadata.AcceptRanges)
+	respHeader.Add(storage.HeaderContentLength, metadata.ContentLength)
+	respHeader.Add(storage.HeaderContentType, metadata.ContentType)
+	respHeader.Add(storage.HeaderContentRange, metadata.ContentRange)
+	respHeader.Add(storage.HeaderETag, metadata.ETag)
+	respHeader.Add(storage.HeaderLastModified, metadata.LastModified)
+
+	s.client.On("Get", fmt.Sprintf("%s://%s%s", s.storage.getProtocol(), validHost, validPath), reqHeader).
+		Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte("response body"))),
+			Header:     respHeader,
+		}, nil)
+
+	opt := storage.GetPartiallyRequestOptions{Range: validRange}
+	res := s.storage.GetPartially(context.TODO(), validPath, &opt)
+
+	assert.Nil(s.T(), res.Error())
+	assert.Equal(s.T(), http.StatusOK, res.Status())
+	assert.Equal(s.T(), []byte("response body"), res.Data())
+	assert.Equal(s.T(), &metadata, res.Metadata())
+}
+
+func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse_WhenRangeNotProvided() {
+	s.client.On("Get", fmt.Sprintf("%s://%s%s", s.storage.getProtocol(), validHost, validPath), http.Header(nil)).
+		Return(&http.Response{
+			StatusCode: http.StatusOK,
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte("response body"))),
+		}, nil)
+	res := s.storage.GetPartially(context.TODO(), validPath, nil)
+
+	assert.Nil(s.T(), res.Error())
+	assert.Equal(s.T(), http.StatusOK, res.Status())
+	assert.Equal(s.T(), []byte("response body"), res.Data())
+	assert.Nil(s.T(), res.Metadata())
 }
 
 func (s *StorageTestSuite) TestStorage_getURL() {

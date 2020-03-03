@@ -41,3 +41,7 @@ type mockStorage struct {
 func (m *mockStorage) Get(ctx context.Context, path string) storage.IResponse {
 	return storage.NewResponse([]byte(nil), http.StatusOK, nil)
 }
+
+func (m *mockStorage) GetPartially(ctx context.Context, path string, metadata *storage.GetPartiallyRequestOptions) storage.IResponse {
+	return storage.NewResponse([]byte(nil), http.StatusOK, nil).WithMetadata(nil)
+}
