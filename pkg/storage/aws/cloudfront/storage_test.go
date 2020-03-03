@@ -125,8 +125,8 @@ func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse() {
 			Header:     respHeader,
 		}, nil)
 
-	opt := storage.GetPartialObjectRequestOptions{Range: validRange}
-	res := s.storage.GetPartialObject(context.TODO(), validPath, &opt)
+	opt := storage.GetPartiallyRequestOptions{Range: validRange}
+	res := s.storage.GetPartially(context.TODO(), validPath, &opt)
 
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusOK, res.Status())
@@ -140,7 +140,7 @@ func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse_WhenRange
 			StatusCode: http.StatusOK,
 			Body:       ioutil.NopCloser(bytes.NewReader([]byte("response body"))),
 		}, nil)
-	res := s.storage.GetPartialObject(context.TODO(), validPath, nil)
+	res := s.storage.GetPartially(context.TODO(), validPath, nil)
 
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusOK, res.Status())

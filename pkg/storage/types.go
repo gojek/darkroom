@@ -57,7 +57,7 @@ type HystrixCommand struct {
 	Config hystrix.CommandConfig
 }
 
-// GetPartialObjectRequestOptions holds option to request data from storage
-type GetPartialObjectRequestOptions struct {
+// GetPartiallyRequestOptions holds option to request data from storage
+type GetPartiallyRequestOptions struct {
 	Range string
 }

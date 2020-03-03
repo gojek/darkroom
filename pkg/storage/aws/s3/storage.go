@@ -50,9 +50,9 @@ func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	return storage.NewResponse(buff.Bytes(), getStatusCodeFromError(s3Err, nil), s3Err)
 }
 
-// GetPartialObject takes in the Context, path and opt as an argument and returns an IResponse interface implementation.
+// GetPartially takes in the Context, path and opt as an argument and returns an IResponse interface implementation.
 // This method figures out how to get partial data from the S3 storage backend.
-func (s *Storage) GetPartialObject(ctx context.Context, path string, opt *storage.GetPartialObjectRequestOptions) storage.IResponse {
+func (s *Storage) GetPartially(ctx context.Context, path string, opt *storage.GetPartiallyRequestOptions) storage.IResponse {
 	if opt == nil || len(opt.Range) == 0 {
 		return s.Get(ctx, path)
 	}

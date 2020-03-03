@@ -27,9 +27,9 @@ func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	return storage.NewResponse(body, res.StatusCode, nil)
 }
 
-// GetPartialObject takes in the Context, path and opt (which ignored) as an argument and returns an IResponse interface implementation.
+// GetPartially takes in the Context, path and opt (which ignored) as an argument and returns an IResponse interface implementation.
 // This method is an alias of `Get` method
-func (s *Storage) GetPartialObject(ctx context.Context, path string, _ *storage.GetPartialObjectRequestOptions) storage.IResponse {
+func (s *Storage) GetPartially(ctx context.Context, path string, _ *storage.GetPartiallyRequestOptions) storage.IResponse {
 	return s.Get(ctx, path)
 }
 

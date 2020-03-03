@@ -88,8 +88,8 @@ func (s *StorageTestSuite) TestStorage_GetPartialObjectSuccessResponse() {
 			Body:       ioutil.NopCloser(bytes.NewReader([]byte("response body"))),
 		}, nil)
 
-	opt := storage.GetPartialObjectRequestOptions{Range: validRange}
-	res := s.storage.GetPartialObject(context.TODO(), validPath, &opt)
+	opt := storage.GetPartiallyRequestOptions{Range: validRange}
+	res := s.storage.GetPartially(context.TODO(), validPath, &opt)
 
 	assert.Nil(s.T(), res.Error())
 	assert.Equal(s.T(), http.StatusOK, res.Status())
