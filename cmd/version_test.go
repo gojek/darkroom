@@ -32,6 +32,7 @@ func (s *VersionCmdSuite) SetupTest() {
 	s.rootCmd = &cobra.Command{
 		Use: "app",
 	}
+	s.rootCmd.AddCommand(newVersionCmd())
 	s.buf = &bytes.Buffer{}
 	s.rootCmd.SetOut(s.buf)
 }
