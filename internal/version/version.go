@@ -1,5 +1,12 @@
 package version
 
+var (
+	version   = "unknown"
+	gitTag    = "unknown"
+	gitCommit = "unknown"
+	buildDate = "unknown"
+)
+
 type BuildInfo struct {
 	Version   string
 	GitTag    string
@@ -10,3 +17,12 @@ type BuildInfo struct {
 var (
 	Build BuildInfo
 )
+
+func init() {
+	Build = BuildInfo{
+		Version:   version,
+		GitTag:    gitTag,
+		GitCommit: gitCommit,
+		BuildDate: buildDate,
+	}
+}
