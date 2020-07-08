@@ -13,12 +13,22 @@ builds:
       - CGO_ENABLED=1
     ldflags:
       - -w -s -extldflags "-static"
+      - -X github.com/gojek/darkroom/internal/version.version={{ .Version }}
+      - -X github.com/gojek/darkroom/internal/version.gitTag={{ .Tag }}
+      - -X github.com/gojek/darkroom/internal/version.gitCommit={{ .FullCommit }}
+      - -X github.com/gojek/darkroom/internal/version.buildDate={{ .Date }}
   - id: darkroom_windows_32bit
     main: .
     goos:
       - windows
     goarch:
       - 386
+    ldflags:
+      - -w -s
+      - -X github.com/gojek/darkroom/internal/version.version={{ .Version }}
+      - -X github.com/gojek/darkroom/internal/version.gitTag={{ .Tag }}
+      - -X github.com/gojek/darkroom/internal/version.gitCommit={{ .FullCommit }}
+      - -X github.com/gojek/darkroom/internal/version.buildDate={{ .Date }}
     env:
       - CGO_ENABLED=1
       - CC=i686-w64-mingw32-gcc
@@ -29,6 +39,12 @@ builds:
       - windows
     goarch:
       - amd64
+    ldflags:
+      - -w -s
+      - -X github.com/gojek/darkroom/internal/version.version={{ .Version }}
+      - -X github.com/gojek/darkroom/internal/version.gitTag={{ .Tag }}
+      - -X github.com/gojek/darkroom/internal/version.gitCommit={{ .FullCommit }}
+      - -X github.com/gojek/darkroom/internal/version.buildDate={{ .Date }}
     env:
       - CGO_ENABLED=1
       - CC=x86_64-w64-mingw32-gcc
@@ -40,6 +56,12 @@ builds:
     goarch:
       - amd64
       - 386
+    ldflags:
+      - -w -s
+      - -X github.com/gojek/darkroom/internal/version.version={{ .Version }}
+      - -X github.com/gojek/darkroom/internal/version.gitTag={{ .Tag }}
+      - -X github.com/gojek/darkroom/internal/version.gitCommit={{ .FullCommit }}
+      - -X github.com/gojek/darkroom/internal/version.buildDate={{ .Date }}
     env:
       - CGO_ENABLED=1
       - CC=o64-clang
