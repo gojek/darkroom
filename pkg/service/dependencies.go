@@ -37,9 +37,8 @@ func NewDependencies() (*Dependencies, error) {
 	}
 	if deps.Storage == nil || deps.Manipulator == nil {
 		return nil, errors.New("handler dependencies are not valid")
-	} else {
-		return deps, nil
 	}
+	return deps, nil
 }
 
 func getDefaultParams() map[string]string {
