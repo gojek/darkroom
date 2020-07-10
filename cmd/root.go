@@ -9,10 +9,7 @@ var rootCmd = &cobra.Command{
 	Short: "Darkroom is an Image Proxy on your image source",
 }
 
-func init() {
-	rootCmd.AddCommand(serverCmd)
-	rootCmd.AddCommand(newVersionCmd())
-}
+func init() {}
 
 // Run function lets you run the commands
 func Run(args []string) error {

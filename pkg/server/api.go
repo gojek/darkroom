@@ -3,70 +3,63 @@ package server
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-
-	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"
+	"net/http"
 )
+
+// Options represents the Server options
+type Options struct {
+	Handler       http.Handler
+	Port          int
+	LifeCycleHook *LifeCycleHook
+}
 
 // Server struct wraps a http.Handler and the LifeCycleHook
 type Server struct {
-	handler http.Handler
-	hook    *LifeCycleHook
+	server *http.Server
+	hook   *LifeCycleHook
 }
 
 // NewServer returns a new Server configurable with Options
-func NewServer(opts ...Option) *Server {
-	s := Server{}
-	for _, opt := range opts {
-		opt(&s)
+func NewServer(options Options) *Server {
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", options.Port),
+		Handler: options.Handler,
+	}
+	s := Server{
+		server: srv,
+		hook:   options.LifeCycleHook,
 	}
 	return &s
 }
 
-// AddLifeCycleHook sets the passed LifeCycleHook to the Server struct
-func (s *Server) AddLifeCycleHook(hook *LifeCycleHook) {
-	s.hook = hook
-}
-
 // Start is used to start a http.Server and wait for a kill signal to gracefully shutdown the server
-func (s *Server) Start() {
-	logger.Info("Starting darkroom server")
-
+func (s *Server) Start(stop <-chan struct{}) error {
 	if s.hook != nil {
 		s.hook.initFunc()
 		defer s.hook.deferFunc()
 	}
 
-	portInfo := fmt.Sprintf(":%d", config.Port())
-	server := &http.Server{Addr: portInfo, Handler: s.handler}
+	errChan := make(chan error)
+	go func() {
+		err := s.server.ListenAndServe()
+		if err != nil {
+			switch err {
+			case http.ErrServerClosed:
+				return
+			default:
+				logger.Errorf("could not start server: %s", err)
+				errChan <- err
+			}
+		}
+	}()
+	logger.Infof("Starting darkroom server at 0.0.0.0%s", s.server.Addr)
 
-	go listenServer(server)
-	waitForShutdown(server)
-}
-
-func listenServer(s *http.Server) {
-	err := s.ListenAndServe()
-	if err != http.ErrServerClosed && err != nil {
-		logger.Errorf("error while starting darkroom server: %s", err)
+	select {
+	case <-stop:
+		logger.Info("Shutting down server")
+		return s.server.Shutdown(context.Background())
+	case err := <-errChan:
+		return err
 	}
-}
-
-func waitForShutdown(s *http.Server) {
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig,
-		syscall.SIGINT,
-		syscall.SIGTERM)
-	<-sig
-	logger.Info("darkroom server shutting down")
-
-	err := s.Shutdown(context.Background())
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	close(sig)
-	logger.Info("darkroom server shutdown complete")
 }

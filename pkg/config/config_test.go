@@ -49,10 +49,6 @@ func TestConfigCasesWithIntValues(t *testing.T) {
 		callFunc func() int
 	}{
 		{
-			key:      "port",
-			callFunc: Port,
-		},
-		{
 			key:      "cache.time",
 			callFunc: CacheTime,
 		},

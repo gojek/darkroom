@@ -11,7 +11,6 @@ import (
 type config struct {
 	logLevel                        string
 	debugMode                       bool
-	port                            int
 	cacheTime                       int
 	dataSource                      Source
 	enableConcurrentOpacityChecking bool
@@ -30,11 +29,6 @@ func getConfig() *config {
 
 func newConfig() *config {
 	v := Viper()
-	port := v.GetInt("port")
-	if port == 0 {
-		port = 3000 // Fallback to default port
-	}
-
 	s := Source{
 		Kind: v.GetString("source.kind"),
 		HystrixCommand: storage.HystrixCommand{
@@ -53,7 +47,6 @@ func newConfig() *config {
 	return &config{
 		logLevel:                        v.GetString("log.level"),
 		debugMode:                       v.GetBool("debug"),
-		port:                            port,
 		cacheTime:                       v.GetInt("cache.time"),
 		dataSource:                      s,
 		enableConcurrentOpacityChecking: v.GetBool("enableConcurrentOpacityChecking"),
@@ -74,11 +67,6 @@ func LogLevel() string {
 // DebugModeEnabled returns the debug mode bool from the environment
 func DebugModeEnabled() bool {
 	return getConfig().debugMode
-}
-
-// Port returns the application port to be used from the environment
-func Port() int {
-	return getConfig().port
 }
 
 // CacheTime returns the time to set the cache-time in image handler from the environment

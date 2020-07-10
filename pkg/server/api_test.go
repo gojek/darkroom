@@ -7,7 +7,10 @@ import (
 )
 
 func TestNewServer(t *testing.T) {
-	s := NewServer(WithHandler(mux.NewRouter()))
-	s.AddLifeCycleHook(NewLifeCycleHook(func() {}, func() {}))
+	s := NewServer(Options{
+		Handler:       mux.NewRouter(),
+		Port:          3000,
+		LifeCycleHook: nil,
+	})
 	assert.NotNil(t, s)
 }
