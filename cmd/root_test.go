@@ -6,10 +6,8 @@ import (
 )
 
 func TestRootCmd(t *testing.T) {
-	cmd := newRootCmd()
-	cmd.SetArgs([]string{})
 	// when
-	err := cmd.Execute()
+	err := Execute()
 	// then
 	assert.NoError(t, err)
 }

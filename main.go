@@ -6,12 +6,11 @@ package main
 
 import (
 	"github.com/gojek/darkroom/cmd"
-	"log"
 	"os"
 )
 
 func main() {
-	if err := cmd.Run(os.Args[1:]); err != nil {
-		log.Fatalf("unable to run the command %s ", err)
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
 	}
 }
