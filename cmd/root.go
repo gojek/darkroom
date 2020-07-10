@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/gojek/darkroom/cmd/signals"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 )
 
 // newRootCmd represents the base command when called without any subcommands.
