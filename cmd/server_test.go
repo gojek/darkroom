@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/gojek/darkroom/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -13,6 +14,11 @@ func TestRunServer(t *testing.T) {
 	errCh := make(chan error)
 	stopCh := make(chan struct{})
 	diagnosticsPort := 9999
+	v := config.Viper()
+	v.Set("port", diagnosticsPort)
+	v.Set("source.kind", "WebFolder")
+	v.Set("source.baseURL", "https://example.com/path/to/folder")
+	config.Update()
 
 	// given
 	cmd := newRunCmdWithOpts(runCmdOpts{

@@ -23,8 +23,30 @@ func serverCmdF(cmd *cobra.Command, args []string) {
 	startServer()
 }
 
+type runCmdOpts struct {
+	SetupSignalHandler func() (stopCh <-chan struct{})
+}
+
+func newRunCmdWithOpts(opts runCmdOpts) *cobra.Command {
+	return &cobra.Command{
+		Use:   "server",
+		Short: "Start the app server",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			deps, err := service.NewDependencies()
+			if err != nil {
+				return err
+			}
+			handler := router.NewRouter(deps)
+			s := server.NewServer(server.WithHandler(handler))
+			s.Start()
+			return nil
+		},
+	}
+}
+
 func startServer() {
-	handler := router.NewRouter(service.NewDependencies())
+	deps, _ := service.NewDependencies()
+	handler := router.NewRouter(deps)
 	s := server.NewServer(server.WithHandler(handler))
 	s.Start()
 }
