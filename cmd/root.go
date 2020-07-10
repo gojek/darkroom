@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/gojek/darkroom/cmd/signals"
 	"github.com/spf13/cobra"
 )
 
@@ -10,6 +11,9 @@ func newRootCmd() *cobra.Command {
 		Use:   "darkroom",
 		Short: "Darkroom is an Image Proxy on your image source",
 	}
+	cmd.AddCommand(newRunCmdWithOpts(runCmdOpts{
+		SetupSignalHandler: signals.SetupSignalHandler,
+	}))
 	return cmd
 }
 
