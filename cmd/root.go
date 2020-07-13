@@ -11,6 +11,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
+	rootCmd.AddCommand(newVersionCmd())
 }
 
 // Run function lets you run the commands
