@@ -6,8 +6,6 @@ import (
 )
 
 func TestRootCmd(t *testing.T) {
-	// when
 	err := Execute()
-	// then
 	assert.NoError(t, err)
 }
