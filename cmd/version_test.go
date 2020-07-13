@@ -38,24 +38,16 @@ func (s *VersionCmdSuite) SetupTest() {
 }
 
 func (s *VersionCmdSuite) TestVersionOutput() {
-	// given
 	s.rootCmd.SetArgs([]string{"version"})
-	// when
 	err := s.rootCmd.Execute()
-	// then
 	s.NoError(err)
-	// and
 	s.Equal(strings.TrimSpace(`0.1.0`), strings.TrimSpace(s.buf.String()))
 }
 
 func (s *VersionCmdSuite) TestVersionDetailedOutput() {
-	// given
 	s.rootCmd.SetArgs([]string{"version", "--detailed"})
-	// when
 	err := s.rootCmd.Execute()
-	// then
 	s.NoError(err)
-	// and
 	s.Equal(strings.TrimSpace(`
 Version:    0.1.0
 Git Tag:    v0.1.0
