@@ -19,7 +19,7 @@ before_deploy:
 
 deploy:
   - provider: script
-    script: docker run --rm --privileged -v $(pwd):/darkroom -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) -w /darkroom -e GITHUB_TOKEN -e DOCKER_USER -e DOCKER_PASSWORD bepsays/ci-goreleaser /bin/bash -c "echo $DOCKER_USER && docker login docker.io -u $DOCKER_USER -p $DOCKER_PASSWORD && goreleaser release --skip-validate --rm-dist"
+    script: docker run --rm --privileged -v $(pwd):/darkroom -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) -w /darkroom -e GITHUB_TOKEN -e DOCKER_USER -e DOCKER_PASSWORD ajatprabha/ci-goreleaser /bin/bash -c "echo $DOCKER_USER && docker login docker.io -u $DOCKER_USER -p $DOCKER_PASSWORD && goreleaser release --skip-validate --rm-dist"
     skip_cleanup: true
     on:
       tags: true

@@ -12,7 +12,7 @@ builds:
     env:
       - CGO_ENABLED=1
     ldflags:
-      - -w -s -extldflags "-static"
+      - -w -s
       - -X github.com/gojek/darkroom/internal/version.version={{ .Version }}
       - -X github.com/gojek/darkroom/internal/version.gitTag={{ .Tag }}
       - -X github.com/gojek/darkroom/internal/version.gitCommit={{ .FullCommit }}
@@ -55,7 +55,6 @@ builds:
       - darwin
     goarch:
       - amd64
-      - 386
     ldflags:
       - -w -s
       - -X github.com/gojek/darkroom/internal/version.version={{ .Version }}
