@@ -11,9 +11,9 @@ import (
 )
 
 func TestNewDependencies(t *testing.T) {
-	deps := NewDependencies()
-	assert.NotNil(t, deps)
-	assert.Nil(t, deps.Storage)
+	deps, err := NewDependencies()
+	assert.Error(t, err)
+	assert.Nil(t, deps)
 }
 
 func TestGetDefaultParams(t *testing.T) {
@@ -49,7 +49,8 @@ func TestNewDependenciesWithWebFolderStorage(t *testing.T) {
 	v.Set("source.baseURL", "https://example.com/path/to/folder")
 	config.Update()
 
-	deps := NewDependencies()
+	deps, err := NewDependencies()
+	assert.NoError(t, err)
 	assert.NotNil(t, deps)
 	assert.IsType(t, &webfolder.Storage{}, deps.Storage)
 }
@@ -59,7 +60,8 @@ func TestNewDependenciesWithS3Storage(t *testing.T) {
 	v.Set("source.kind", "S3")
 	config.Update()
 
-	deps := NewDependencies()
+	deps, err := NewDependencies()
+	assert.NoError(t, err)
 	assert.NotNil(t, deps)
 	assert.IsType(t, &s3.Storage{}, deps.Storage)
 }
@@ -70,7 +72,8 @@ func TestNewDependenciesWithCloudfrontStorage(t *testing.T) {
 	v.Set("source.secureProtocol", "true")
 	config.Update()
 
-	deps := NewDependencies()
+	deps, err := NewDependencies()
+	assert.NoError(t, err)
 	assert.NotNil(t, deps)
 	assert.IsType(t, &cloudfront.Storage{}, deps.Storage)
 }

@@ -2,6 +2,7 @@
 package service
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -24,7 +25,7 @@ type Dependencies struct {
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
-func NewDependencies() *Dependencies {
+func NewDependencies() (*Dependencies, error) {
 	s := config.DataSource()
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams())}
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
@@ -34,7 +35,10 @@ func NewDependencies() *Dependencies {
 	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
 		deps.Storage = NewCloudfrontStorage(s.Value.(config.Cloudfront), s.HystrixCommand)
 	}
-	return deps
+	if deps.Storage == nil || deps.Manipulator == nil {
+		return nil, errors.New("handler dependencies are not valid")
+	}
+	return deps, nil
 }
 
 func getDefaultParams() map[string]string {
