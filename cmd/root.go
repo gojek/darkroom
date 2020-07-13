@@ -14,6 +14,7 @@ func newRootCmd() *cobra.Command {
 	cmd.AddCommand(newRunCmdWithOpts(runCmdOpts{
 		SetupSignalHandler: signals.SetupSignalHandler,
 	}))
+	cmd.AddCommand(newVersionCmd())
 	return cmd
 }
 
