@@ -24,31 +24,49 @@ func newTestClient(fn RoundTripFunc) *http.Client {
 	}
 }
 
+func bucketResponseMocker(req *http.Request) *http.Response {
+	if strings.Contains(req.URL.String(), "failed-bucket") {
+		return &http.Response{
+			StatusCode: 422,
+			Body:       ioutil.NopCloser(strings.NewReader("")),
+			Header:     make(http.Header),
+		}
+	}
+	if strings.Contains(req.URL.String(), "www.googleapis.com/storage/v1/b/") {
+		return &http.Response{
+			StatusCode: 200,
+			Body: ioutil.NopCloser(strings.NewReader(`
+{
+  "kind": "storage#bucket",
+  "selfLink": "https://www.googleapis.com/storage/v1/b/bucket-name",
+  "name": "bucket-name"
+}`)),
+			Header: make(http.Header),
+		}
+	}
+	return &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(strings.NewReader("contents")),
+		Header:     make(http.Header),
+	}
+}
+
 func TestInterfaces(t *testing.T) {
 	c, _ := storage.NewClient(
 		context.TODO(),
 		option.WithHTTPClient(
-			newTestClient(func(req *http.Request) *http.Response {
-				if strings.Contains(req.URL.String(), "failed-bucket") {
-					return &http.Response{
-						StatusCode: 422,
-						Body:       ioutil.NopCloser(strings.NewReader("")),
-						Header:     make(http.Header),
-					}
-				}
-				return &http.Response{
-					StatusCode: 200,
-					Body:       ioutil.NopCloser(strings.NewReader("contents")),
-					Header:     make(http.Header),
-				}
-			}),
+			newTestClient(bucketResponseMocker),
 		),
 	)
-	basicTests(t, bucketHandle{c.Bucket("bucket")})
+	basicTests(t, bucketHandle{c.Bucket("bucket-name")})
 	basicFailedTests(t, bucketHandle{c.Bucket("failed-bucket")})
 }
 
 func basicTests(t *testing.T, bkt BucketHandle) {
+	attrs, _ := bkt.Attrs(context.TODO())
+	if got, want := attrs.Name, "bucket-name"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
 	b := readObject(t, bkt.Object("stiface-test"))
 	if got, want := string(b), "contents"; got != want {
 		t.Errorf("got %q, want %q", got, want)

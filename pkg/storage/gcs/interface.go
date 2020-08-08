@@ -16,6 +16,7 @@ type ObjectHandle interface {
 
 type BucketHandle interface {
 	Object(string) ObjectHandle
+	Attrs(context.Context) (*storage.BucketAttrs, error)
 }
 
 type Reader interface {

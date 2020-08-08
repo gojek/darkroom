@@ -16,11 +16,10 @@ type Storage struct {
 }
 
 // NewStorage returns a new gcs.Storage instance
-func NewStorage() *Storage {
+func NewStorage(opts Options) *Storage {
 	// TODO: Handle error
 	c, _ := gs.NewClient(context.TODO())
-	// TODO: Update bucket name
-	return &Storage{bucketHandle{c.Bucket("")}}
+	return &Storage{bucketHandle{c.Bucket(opts.BucketName)}}
 }
 
 // Get takes in the Context and path as an argument and returns an IResponse interface implementation.
