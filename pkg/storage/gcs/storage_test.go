@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/option"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -13,9 +14,10 @@ import (
 )
 
 const (
-	validPath   = "path/to/valid-file"
-	invalidPath = "path/to/invalid-file"
-	bucketName  = "bucket-name"
+	validPath      = "path/to/valid-file"
+	invalidPath    = "path/to/invalid-file"
+	unreadablePath = "path/to/unreadable-file"
+	bucketName     = "bucket-name"
 )
 
 type StorageTestSuite struct {
@@ -26,8 +28,8 @@ type StorageTestSuite struct {
 func (s *StorageTestSuite) SetupTest() {
 	ns, err := NewStorage(Options{BucketName: bucketName})
 	s.NoError(err)
+	ns.bucketHandle = &mockBucketHandle{}
 	s.storage = *ns
-	s.storage.bucketHandle = &mockBucketHandle{}
 }
 
 func TestStorageSuite(t *testing.T) {
@@ -82,17 +84,25 @@ func (s *StorageTestSuite) TestNewStorageHasCorrectBucketName() {
 func (s *StorageTestSuite) TestStorage_Get() {
 	res := s.storage.Get(context.Background(), validPath)
 
-	s.Nil(res.Error())
+	s.NoError(res.Error())
 	s.Equal([]byte("someData"), res.Data())
 	s.Equal(http.StatusOK, res.Status())
 }
 
-func (s *StorageTestSuite) TestStorage_GetFailure() {
+func (s *StorageTestSuite) TestStorage_GetFailureWithInvalidPath() {
 	res := s.storage.Get(context.Background(), invalidPath)
 
-	s.NotNil(res.Error())
+	s.Error(res.Error())
 	s.Equal([]byte(nil), res.Data())
 	s.Equal(http.StatusNotFound, res.Status())
+}
+
+func (s *StorageTestSuite) TestStorage_GetFailureWithUnreadablePath() {
+	res := s.storage.Get(context.Background(), unreadablePath)
+
+	s.Error(res.Error())
+	s.Equal([]byte(nil), res.Data())
+	s.Equal(http.StatusUnprocessableEntity, res.Status())
 }
 
 type mockBucketHandle struct{}
@@ -119,6 +129,9 @@ func (m mockObjectHandle) NewReader(ctx context.Context) (Reader, error) {
 			Message: "Not Found",
 		}
 	}
+	if m.objectKey == unreadablePath {
+		return &badReader{}, nil
+	}
 	return nil, &googleapi.Error{
 		Code:    400,
 		Message: "Bad Request",
@@ -128,4 +141,14 @@ func (m mockObjectHandle) NewReader(ctx context.Context) (Reader, error) {
 func (m mockObjectHandle) NewRangeReader(ctx context.Context, i int64, i2 int64) (Reader, error) {
 	// TODO
 	panic("implement me")
+}
+
+type badReader struct{}
+
+func (b badReader) Read(p []byte) (n int, err error) {
+	return 0, io.ErrUnexpectedEOF
+}
+
+func (b badReader) Close() error {
+	return nil
 }

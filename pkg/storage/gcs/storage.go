@@ -33,8 +33,10 @@ func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	if errors.As(err, &apiErr) {
 		return storage.NewResponse(nil, apiErr.Code, apiErr)
 	}
-	d, _ := ioutil.ReadAll(r)
-	// TODO: Handle error
+	d, err := ioutil.ReadAll(r)
+	if err != nil {
+		return storage.NewResponse(nil, http.StatusUnprocessableEntity, err)
+	}
 	return storage.NewResponse(d, http.StatusOK, nil)
 }
 
