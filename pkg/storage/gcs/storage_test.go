@@ -24,7 +24,9 @@ type StorageTestSuite struct {
 }
 
 func (s *StorageTestSuite) SetupTest() {
-	s.storage = *NewStorage(Options{BucketName: bucketName})
+	ns, err := NewStorage(Options{BucketName: bucketName})
+	s.NoError(err)
+	s.storage = *ns
 	s.storage.bucketHandle = &mockBucketHandle{}
 }
 
@@ -36,14 +38,36 @@ func (s *StorageTestSuite) TestNewStorage() {
 	s.NotNil(s.storage)
 }
 
+func (s *StorageTestSuite) TestNewStorageWithValidCredentialsJSON() {
+	ns, err := NewStorage(Options{BucketName: bucketName, CredentialsJSON: []byte(`
+{
+  "type": "service_account",
+  "project_id": "",
+  "private_key_id": "",
+  "private_key": "",
+  "client_email": "",
+  "client_id": ""
+}`)})
+	s.NoError(err)
+	s.NotNil(ns)
+}
+
+func (s *StorageTestSuite) TestNewStorageWithInvalidCredentialsJSON() {
+	ns, err := NewStorage(Options{BucketName: bucketName, CredentialsJSON: []byte("randomJson")})
+	s.Error(err)
+	s.Nil(ns)
+}
+
 func (s *StorageTestSuite) TestNewStorageHasBucketHandle() {
-	ns := *NewStorage(Options{BucketName: bucketName})
+	ns, err := NewStorage(Options{BucketName: bucketName})
+	s.NoError(err)
 	s.NotNil(ns)
 	s.NotNil(ns.bucketHandle)
 }
 
 func (s *StorageTestSuite) TestNewStorageHasCorrectBucketName() {
-	ns := *NewStorage(Options{BucketName: bucketName})
+	ns, err := NewStorage(Options{BucketName: bucketName})
+	s.NoError(err)
 	s.NotNil(ns)
 	c, _ := storage.NewClient(
 		context.TODO(),

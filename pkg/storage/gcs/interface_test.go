@@ -58,13 +58,13 @@ func TestInterfaces(t *testing.T) {
 			newTestClient(bucketResponseMocker),
 		),
 	)
-	basicTests(t, bucketHandle{c.Bucket("bucket-name")})
+	basicTests(t, bucketHandle{c.Bucket(bucketName)})
 	basicFailedTests(t, bucketHandle{c.Bucket("failed-bucket")})
 }
 
 func basicTests(t *testing.T, bkt BucketHandle) {
 	attrs, _ := bkt.Attrs(context.TODO())
-	if got, want := attrs.Name, "bucket-name"; got != want {
+	if got, want := attrs.Name, bucketName; got != want {
 		t.Errorf("got %q, want %q", got, want)
 	}
 	b := readObject(t, bkt.Object("stiface-test"))

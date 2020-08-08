@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/gojek/darkroom/pkg/storage"
 	"google.golang.org/api/googleapi"
+	"google.golang.org/api/option"
 	"io/ioutil"
 	"net/http"
 )
@@ -16,21 +17,30 @@ type Storage struct {
 }
 
 // NewStorage returns a new gcs.Storage instance
-func NewStorage(opts Options) *Storage {
-	// TODO: Handle error
-	c, _ := gs.NewClient(context.TODO())
-	return &Storage{bucketHandle{c.Bucket(opts.BucketName)}}
+func NewStorage(opts Options) (*Storage, error) {
+	c, err := gs.NewClient(context.TODO(), clientOptions(opts.CredentialsJSON)...)
+	if err != nil {
+		return nil, err
+	}
+	return &Storage{bucketHandle{c.Bucket(opts.BucketName)}}, nil
 }
 
 // Get takes in the Context and path as an argument and returns an IResponse interface implementation.
 // This method figures out how to get the data from the S3 storage backend.
 func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	r, err := s.bucketHandle.Object(path).NewReader(ctx)
-	apiErr := &googleapi.Error{}
+	var apiErr *googleapi.Error
 	if errors.As(err, &apiErr) {
 		return storage.NewResponse(nil, apiErr.Code, apiErr)
 	}
 	d, _ := ioutil.ReadAll(r)
 	// TODO: Handle error
 	return storage.NewResponse(d, http.StatusOK, nil)
+}
+
+func clientOptions(credentialsJSON []byte) []option.ClientOption {
+	if len(credentialsJSON) != 0 {
+		return []option.ClientOption{option.WithCredentialsJSON(credentialsJSON)}
+	}
+	return []option.ClientOption{option.WithoutAuthentication()}
 }
