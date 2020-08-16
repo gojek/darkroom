@@ -10,8 +10,9 @@ import (
 // See https://github.com/googleapis/google-cloud-go-testing/blob/master/storage/stiface/interfaces.go
 
 type ObjectHandle interface {
-	NewReader(context.Context) (Reader, error)
-	NewRangeReader(context.Context, int64, int64) (Reader, error)
+	NewReader(ctx context.Context) (Reader, error)
+	NewRangeReader(ctx context.Context, offset, length int64) (Reader, error)
+	Attrs(ctx context.Context) (attrs *storage.ObjectAttrs, err error)
 }
 
 type BucketHandle interface {
