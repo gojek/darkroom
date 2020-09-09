@@ -80,12 +80,12 @@ func NewPrometheus(reg *prometheus.Registry) MetricService {
 			}, []string{"image_type"}),
 		storageGetErrors: prometheus.NewCounter(
 			prometheus.CounterOpts{
-				Name: "storage_errors_with_deps",
+				Name: "storage_get_errors_total",
 				Help: "The total number of storage get errors",
 			}),
 		processorErrors: prometheus.NewCounter(
 			prometheus.CounterOpts{
-				Name: "processor_errors_with_deps",
+				Name: "processor_errors_total",
 				Help: "The total number of storage get errors",
 			}),
 
@@ -96,7 +96,7 @@ func NewPrometheus(reg *prometheus.Registry) MetricService {
 	return p
 }
 
-func (p *prometheusService) registerMetrics() {
+func (p prometheusService) registerMetrics() {
 	p.reg.MustRegister(
 		p.decodeDuration,
 		p.encodeDuration,
@@ -177,7 +177,7 @@ func (p prometheusService) getLabelValue(ImageData []byte) string {
 	return labelValue
 }
 
-func (p *prometheusService) AddMetricsEndPoint(metricsPath string, router *mux.Router) {
+func (p prometheusService) AddMetricsEndPoint(metricsPath string, router *mux.Router) {
 	router.Handle(metricsPath, promhttp.HandlerFor(p.reg, promhttp.HandlerOpts{}))
 }
 

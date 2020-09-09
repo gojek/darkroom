@@ -2,17 +2,15 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gojek/darkroom/pkg/metrics"
+	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/gojek/darkroom/pkg/processor/native"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"image"
 	"io/ioutil"
 	"testing"
-	"time"
-
-	"github.com/gojek/darkroom/pkg/processor"
-	"github.com/gojek/darkroom/pkg/processor/native"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestNewManipulator(t *testing.T) {
@@ -24,7 +22,7 @@ func TestNewManipulator(t *testing.T) {
 func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *testing.T) {
 	// Use real processor to ensure that right encoder is being used
 	p := native.NewBildProcessor()
-	m := NewManipulator(p, nil, metrics.NewPrometheus())
+	m := NewManipulator(p, nil, metrics.NewPrometheus(prometheus.NewRegistry()))
 
 	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.webp")
 	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_webp_to_png.png")
@@ -42,7 +40,7 @@ func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *test
 func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T) {
 	// Use real processor to ensure that right encoder is being used
 	p := native.NewBildProcessor()
-	m := NewManipulator(p, nil, metrics.NewPrometheus())
+	m := NewManipulator(p, nil, metrics.NewPrometheus(prometheus.NewRegistry()))
 
 	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.png")
 	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_png_to_webp.webp")
@@ -59,7 +57,7 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 
 func TestManipulator_Process(t *testing.T) {
 	mp := &mockProcessor{}
-	m := NewManipulator(mp, nil, metrics.NewPrometheus())
+	m := NewManipulator(mp, nil, &metrics.MockMetricService{})
 	params := make(map[string]string)
 
 	input := []byte("inputData")
@@ -72,7 +70,7 @@ func TestManipulator_Process(t *testing.T) {
 
 	// Create new struct for asserting expectations
 	mp = &mockProcessor{}
-	m = NewManipulator(mp, nil, metrics.NewPrometheus())
+	m = NewManipulator(mp, nil, &metrics.MockMetricService{})
 	mp.On("Decode", input).Return(decoded, "png", nil)
 	mp.On("Encode", decoded, "png").Return(input, nil)
 	mp.On("Crop", decoded, 100, 100, processor.PointCenter).Return(decoded, nil)
@@ -178,19 +176,6 @@ func TestCleanInt(t *testing.T) {
 	assert.Equal(t, 0, CleanInt("0"))
 	assert.Equal(t, 0, CleanInt("garbage"))
 	assert.Equal(t, 0, CleanInt("-234"))
-}
-
-func Test_trackDuration(t *testing.T) {
-	imageData, err := ioutil.ReadFile("../processor/native/_testdata/test.png")
-	if err != nil {
-		panic(err)
-	}
-
-	updateOption := trackDuration(cropDurationKey, time.Now(), NewSpecBuilder().WithImageData(imageData).Build())
-	assert.Equal(t, fmt.Sprintf("%s.%s.%s", cropDurationKey, "<=128KB", "png"), updateOption.Name)
-
-	updateOption = trackDuration(cropDurationKey, time.Now(), NewSpecBuilder().WithImageData(make([]byte, 10)).Build())
-	assert.Equal(t, fmt.Sprintf("%s.%s.%s", cropDurationKey, "<=128KB", "octet-stream"), updateOption.Name)
 }
 
 type mockProcessor struct {

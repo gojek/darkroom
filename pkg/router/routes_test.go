@@ -2,6 +2,8 @@ package router
 
 import (
 	"context"
+	"github.com/gojek/darkroom/pkg/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"testing"
 
@@ -12,7 +14,8 @@ import (
 )
 
 func TestNewRouter(t *testing.T) {
-	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{}})
+	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{},
+		MetricService: metrics.NewPrometheus(prometheus.NewRegistry())})
 	assert.NotNil(t, router)
 }
 
@@ -21,7 +24,8 @@ func TestNewRouterInDebugMode(t *testing.T) {
 	v.Set("debug", "true")
 	config.Update()
 
-	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{}})
+	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{},
+		MetricService: metrics.NewPrometheus(prometheus.NewRegistry())})
 	assert.NotNil(t, router)
 }
 
@@ -31,7 +35,8 @@ func TestNewRouterWithPathPrefix(t *testing.T) {
 	v.Set("source.pathPrefix", "/path/to/folder")
 	config.Update()
 
-	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{}})
+	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{},
+		MetricService: metrics.NewPrometheus(prometheus.NewRegistry())})
 	assert.NotNil(t, router)
 }
 

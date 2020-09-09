@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"math"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -28,17 +27,6 @@ const (
 	compress     = "compress"
 	format       = "format"
 	scale        = "scale"
-
-	cropDurationKey      = "cropDuration"
-	decodeDurationKey    = "decodeDuration"
-	encodeDurationKey    = "encodeDuration"
-	grayScaleDurationKey = "grayScaleDuration"
-	blurDurationKey      = "blurDuration"
-	resizeDurationKey    = "resizeDuration"
-	flipDurationKey      = "flipDuration"
-	rotateDurationKey    = "rotateDuration"
-	fixOrientationKey    = "fixOrientation"
-	scaleDurationKey     = "scaleDuration"
 )
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
@@ -182,18 +170,6 @@ func GetCropPoint(input string) processor.Point {
 	default:
 		return processor.PointCenter
 	}
-}
-
-func trackDuration(name string, start time.Time, spec processSpec) *metrics.UpdateOption {
-	ext := strings.Split(http.DetectContentType(spec.ImageData), "/")[1]
-	updateOption := metrics.UpdateOption{
-		Name:     fmt.Sprintf("%s.%s.%s", name, metrics.GetImageSizeCluster(spec.ImageData), ext),
-		Type:     metrics.Duration,
-		Duration: time.Since(start),
-		Scope:    spec.Scope,
-	}
-	metrics.Update(updateOption)
-	return &updateOption
 }
 
 // NewManipulator takes in a Processor interface and returns a new Manipulator

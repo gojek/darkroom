@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gojek/darkroom/pkg/metrics"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,7 +31,8 @@ func TestImageHandlerSuite(t *testing.T) {
 func (s *ImageHandlerTestSuite) SetupTest() {
 	s.storage = &mockStorage{}
 	s.manipulator = &service.MockManipulator{}
-	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator}
+	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator,
+		MetricService: &metrics.MockMetricService{}}
 }
 
 func (s *ImageHandlerTestSuite) TestImageHandler() {

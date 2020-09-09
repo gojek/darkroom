@@ -2,8 +2,9 @@
 package service
 
 import (
+	"errors"
 	"github.com/gojek/darkroom/pkg/metrics"
-	"github.com/gojek/darkroom/pkg/storage/local"
+	"github.com/gojek/darkroom/pkg/regex"
 	"github.com/prometheus/client_golang/prometheus"
 	"strings"
 	"time"
@@ -28,11 +29,19 @@ type Dependencies struct {
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
 func NewDependencies() (*Dependencies, error) {
+	s := config.DataSource()
 	metricService := metrics.NewPrometheus(prometheus.NewRegistry())
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService)}
-	deps.Storage = local.NewStorage(
-		local.WithVolume("/home"),
-	)
+	if regex.WebFolderMatcher.MatchString(s.Kind) {
+		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
+	} else if regex.S3Matcher.MatchString(s.Kind) {
+		deps.Storage = NewS3Storage(s.Value.(config.S3Bucket), s.HystrixCommand)
+	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
+		deps.Storage = NewCloudfrontStorage(s.Value.(config.Cloudfront), s.HystrixCommand)
+	}
+	if deps.Storage == nil || deps.Manipulator == nil {
+		return nil, errors.New("handler dependencies are not valid")
+	}
 	deps.MetricService = metricService
 	return deps, nil
 }
