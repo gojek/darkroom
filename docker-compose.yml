@@ -18,15 +18,14 @@ docusaurus:
     - ./website/sidebars.json:/app/website/sidebars.json
     - ./website/siteConfig.js:/app/website/siteConfig.js
   working_dir: /app/website
-  darkroom-service:
+  darkroom:
     image: ${USER}/darkroom:latest
     ports:
       - 80:3000
-    volumes:
-      - /Users/chaitanya/Downloads/sample-image.jpg:/home/sample-image.jpg
   prometheus:
     image: quay.io/prometheus/prometheus:latest
     ports:
       - 9090:9090
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
