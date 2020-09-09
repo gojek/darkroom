@@ -2,6 +2,7 @@
 package service
 
 import (
+	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/storage/local"
 	"strings"
 	"time"
@@ -20,15 +21,18 @@ import (
 type Dependencies struct {
 	Storage     base.Storage
 	Manipulator Manipulator
+	MetricService metrics.MetricService
 }
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
 func NewDependencies() (*Dependencies, error) {
-	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams())}
+	metricService := metrics.NewPrometheus()
+	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService)}
 	deps.Storage = local.NewStorage(
 		local.WithVolume("/home"),
 	)
+	deps.MetricService = metricService
 	return deps, nil
 }
 

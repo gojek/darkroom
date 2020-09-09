@@ -6,7 +6,6 @@ import (
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"
-	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/service"
 )
 
@@ -31,7 +30,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		res := deps.Storage.Get(r.Context(), r.URL.Path)
 		if res.Error() != nil {
 			l.Errorf("error from Storage.Get: %s", res.Error())
-			metrics.Update(metrics.UpdateOption{Name: StorageGetErrorKey, Type: metrics.Count})
+			deps.MetricService.CountStorageGetErrors()
 			w.WriteHeader(res.Status())
 			return
 		}
@@ -50,7 +49,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 			data, err = deps.Manipulator.Process(service.NewSpecBuilder().WithImageData(data).WithParams(params).Build())
 			if err != nil {
 				l.Errorf("error from Manipulator.Process: %s", err)
-				metrics.Update(metrics.UpdateOption{Name: ProcessorErrorKey, Type: metrics.Count})
+				deps.MetricService.CountProcessorErrors()
 				w.WriteHeader(http.StatusUnprocessableEntity)
 				return
 			}

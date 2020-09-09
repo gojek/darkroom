@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/gojek/darkroom/pkg/metrics"
 	"image"
 	"io/ioutil"
 	"testing"
@@ -15,7 +16,7 @@ import (
 )
 
 func TestNewManipulator(t *testing.T) {
-	m := NewManipulator(native.NewBildProcessor(), nil)
+	m := NewManipulator(native.NewBildProcessor(), nil, nil)
 	assert.NotNil(t, m)
 }
 
@@ -23,7 +24,7 @@ func TestNewManipulator(t *testing.T) {
 func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *testing.T) {
 	// Use real processor to ensure that right encoder is being used
 	p := native.NewBildProcessor()
-	m := NewManipulator(p, nil)
+	m := NewManipulator(p, nil, metrics.NewPrometheus())
 
 	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.webp")
 	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_webp_to_png.png")
@@ -41,7 +42,7 @@ func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *test
 func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T) {
 	// Use real processor to ensure that right encoder is being used
 	p := native.NewBildProcessor()
-	m := NewManipulator(p, nil)
+	m := NewManipulator(p, nil, metrics.NewPrometheus())
 
 	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.png")
 	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_png_to_webp.webp")
@@ -58,7 +59,7 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 
 func TestManipulator_Process(t *testing.T) {
 	mp := &mockProcessor{}
-	m := NewManipulator(mp, nil)
+	m := NewManipulator(mp, nil, metrics.NewPrometheus())
 	params := make(map[string]string)
 
 	input := []byte("inputData")
@@ -71,7 +72,7 @@ func TestManipulator_Process(t *testing.T) {
 
 	// Create new struct for asserting expectations
 	mp = &mockProcessor{}
-	m = NewManipulator(mp, nil)
+	m = NewManipulator(mp, nil, metrics.NewPrometheus())
 	mp.On("Decode", input).Return(decoded, "png", nil)
 	mp.On("Encode", decoded, "png").Return(input, nil)
 	mp.On("Crop", decoded, 100, 100, processor.PointCenter).Return(decoded, nil)
