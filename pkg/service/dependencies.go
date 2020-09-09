@@ -2,13 +2,12 @@
 package service
 
 import (
-	"errors"
+	"github.com/gojek/darkroom/pkg/storage/local"
 	"strings"
 	"time"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/processor/native"
-	"github.com/gojek/darkroom/pkg/regex"
 	base "github.com/gojek/darkroom/pkg/storage"
 	"github.com/gojek/darkroom/pkg/storage/aws/cloudfront"
 	"github.com/gojek/darkroom/pkg/storage/aws/s3"
@@ -26,18 +25,10 @@ type Dependencies struct {
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
 func NewDependencies() (*Dependencies, error) {
-	s := config.DataSource()
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams())}
-	if regex.WebFolderMatcher.MatchString(s.Kind) {
-		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
-	} else if regex.S3Matcher.MatchString(s.Kind) {
-		deps.Storage = NewS3Storage(s.Value.(config.S3Bucket), s.HystrixCommand)
-	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
-		deps.Storage = NewCloudfrontStorage(s.Value.(config.Cloudfront), s.HystrixCommand)
-	}
-	if deps.Storage == nil || deps.Manipulator == nil {
-		return nil, errors.New("handler dependencies are not valid")
-	}
+	deps.Storage = local.NewStorage(
+		local.WithVolume("/home"),
+	)
 	return deps, nil
 }
 

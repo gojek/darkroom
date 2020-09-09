@@ -2,6 +2,7 @@
 package router
 
 import (
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"net/http/pprof"
 
@@ -24,7 +25,7 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 	if config.DebugModeEnabled() {
 		setDebugRoutes(r)
 	}
-
+	r.Handle("/metrics", promhttp.Handler())
 	// Catch all handler
 	s := config.DataSource()
 	if (regex.S3Matcher.MatchString(s.Kind) ||

@@ -1,20 +1,32 @@
 version: "3"
 
 services:
-  docusaurus:
-    build:
-      dockerfile: Dockerfile.docs
-      context: .
+docusaurus:
+  build:
+    dockerfile: Dockerfile.docs
+    context: .
+  ports:
+    - 3000:3000
+    - 35729:35729
+  volumes:
+    - ./docs:/app/docs
+    - ./website/blog:/app/website/blog
+    - ./website/core:/app/website/core
+    - ./website/i18n:/app/website/i18n
+    - ./website/pages:/app/website/pages
+    - ./website/static:/app/website/static
+    - ./website/sidebars.json:/app/website/sidebars.json
+    - ./website/siteConfig.js:/app/website/siteConfig.js
+  working_dir: /app/website
+  darkroom-service:
+    image: ${USER}/darkroom:latest
     ports:
-      - 3000:3000
-      - 35729:35729
+      - 80:3000
     volumes:
-      - ./docs:/app/docs
-      - ./website/blog:/app/website/blog
-      - ./website/core:/app/website/core
-      - ./website/i18n:/app/website/i18n
-      - ./website/pages:/app/website/pages
-      - ./website/static:/app/website/static
-      - ./website/sidebars.json:/app/website/sidebars.json
-      - ./website/siteConfig.js:/app/website/siteConfig.js
-    working_dir: /app/website
+      - /Users/chaitanya/Downloads/sample-image.jpg:/home/sample-image.jpg
+  prometheus:
+    image: quay.io/prometheus/prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
