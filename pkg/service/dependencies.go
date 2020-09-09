@@ -4,6 +4,7 @@ package service
 import (
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/storage/local"
+	"github.com/prometheus/client_golang/prometheus"
 	"strings"
 	"time"
 
@@ -27,7 +28,7 @@ type Dependencies struct {
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
 func NewDependencies() (*Dependencies, error) {
-	metricService := metrics.NewPrometheus()
+	metricService := metrics.NewPrometheus(prometheus.NewRegistry())
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService)}
 	deps.Storage = local.NewStorage(
 		local.WithVolume("/home"),

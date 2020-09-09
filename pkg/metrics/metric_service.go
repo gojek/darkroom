@@ -1,6 +1,9 @@
 package metrics
 
-import "time"
+import (
+	"github.com/gorilla/mux"
+	"time"
+)
 
 type MetricService interface {
 	TrackDecodeDuration(start time.Time, ImageData []byte)
@@ -22,6 +25,8 @@ type MetricService interface {
 	TrackFlipDuration(start time.Time, ImageData []byte)
 
 	TrackRotateDuration(start time.Time, ImageData []byte)
+
+	AddMetricsEndPoint(metricsPath string, router *mux.Router)
 
 	CountStorageGetErrors()
 

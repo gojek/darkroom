@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"strings"
@@ -24,73 +23,94 @@ type prometheusService struct {
 	rotateDuration *prometheus.HistogramVec
 	storageGetErrors prometheus.Counter
 	processorErrors prometheus.Counter
+	reg *prometheus.Registry
 }
 
-func NewPrometheus() MetricService {
+func NewPrometheus(reg *prometheus.Registry) MetricService {
 	p := &prometheusService{
-		decodeDuration:   promauto.NewHistogramVec(
+		decodeDuration:   prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_decode_duration",
 				Help: "Time taken to decode requested image",
 			}, []string{"image_type"}),
-		encodeDuration:   promauto.NewHistogramVec(
+		encodeDuration:   prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_encode_duration",
 				Help: "Time taken to encode data back to image",
 			}, []string{"image_type"}),
-		cropDuration: promauto.NewHistogramVec(
+		cropDuration: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_crop_duration",
 				Help: "Time taken to apply cropping to image data",
 			}, []string{"image_type"}),
-		scaleDuration: promauto.NewHistogramVec(
+		scaleDuration: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_scale_duration",
 				Help: "Time taken to apply scaling to image data",
 			}, []string{"image_type"}),
-		resizeDuration: promauto.NewHistogramVec(
+		resizeDuration: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_resize_duration",
 				Help: "Time taken to apply resizing to image data",
 			}, []string{"image_type"}),
-		grayscaleDuration: promauto.NewHistogramVec(
+		grayscaleDuration: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_grayscale_duration",
 				Help: "Time taken to apply grayscale filter to image data",
 			}, []string{"image_type"}),
-		blurDuration: promauto.NewHistogramVec(
+		blurDuration: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_blur_duration",
 				Help: "Time taken to apply blur to image data",
 			}, []string{"image_type"}),
-		fixOrientationDuration: promauto.NewHistogramVec(
+		fixOrientationDuration: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_orientation_duration",
 				Help: "Time to taken to apply orientation to image data",
 			}, []string{"image_type"}),
-		flipDuration: promauto.NewHistogramVec(
+		flipDuration: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_flip_duration",
 				Help: "Time taken to apply flipping to image data",
 			}, []string{"image_type"}),
-		rotateDuration: promauto.NewHistogramVec(
+		rotateDuration: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name: "image_rotate_duration",
 				Help: "Time taken to apply rotation to image data",
 			}, []string{"image_type"}),
-		storageGetErrors: promauto.NewCounter(
+		storageGetErrors: prometheus.NewCounter(
 			prometheus.CounterOpts{
 				Name: "storage_errors_with_deps",
 				Help: "The total number of storage get errors",
 			}),
-		processorErrors: promauto.NewCounter(
+		processorErrors: prometheus.NewCounter(
 			prometheus.CounterOpts{
 				Name: "processor_errors_with_deps",
 				Help: "The total number of storage get errors",
 			}),
+
+		reg: reg,
 	}
+	p.registerMetrics()
 
 	return p
+}
+
+func (p *prometheusService) registerMetrics() {
+	p.reg.MustRegister(
+		p.decodeDuration,
+		p.encodeDuration,
+		p.cropDuration,
+		p.scaleDuration,
+		p.resizeDuration,
+		p.grayscaleDuration,
+		p.blurDuration,
+		p.fixOrientationDuration,
+		p.flipDuration,
+		p.rotateDuration,
+		p.storageGetErrors,
+		p.processorErrors,
+	)
 }
 
 func (p prometheusService) TrackDecodeDuration(start time.Time, ImageData []byte) {
@@ -157,7 +177,7 @@ func (p prometheusService) getLabelValue(ImageData []byte) string {
 	return labelValue
 }
 
-func AddMetricsEndPoint(metricsPath string, router *mux.Router) {
-	router.Handle(metricsPath, promhttp.Handler())
+func (p *prometheusService) AddMetricsEndPoint(metricsPath string, router *mux.Router) {
+	router.Handle(metricsPath, promhttp.HandlerFor(p.reg, promhttp.HandlerOpts{}))
 }
 

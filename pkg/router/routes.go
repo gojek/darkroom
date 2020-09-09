@@ -2,7 +2,6 @@
 package router
 
 import (
-	"github.com/gojek/darkroom/pkg/metrics"
 	"net/http"
 	"net/http/pprof"
 
@@ -25,7 +24,7 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 	if config.DebugModeEnabled() {
 		setDebugRoutes(r)
 	}
-	metrics.AddMetricsEndPoint("/metrics", r)
+	deps.MetricService.AddMetricsEndPoint("/metrics", r)
 	// Catch all handler
 	s := config.DataSource()
 	if (regex.S3Matcher.MatchString(s.Kind) ||
