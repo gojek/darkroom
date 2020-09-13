@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/gojek/darkroom/internal/runtime"
 	"github.com/gojek/darkroom/pkg/router"
 	"github.com/gojek/darkroom/pkg/server"
 	"github.com/gojek/darkroom/pkg/service"
@@ -19,11 +20,12 @@ func newRunCmdWithOpts(opts runCmdOpts) *cobra.Command {
 		Use:   "server",
 		Short: "Start the app server",
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			deps, err := service.NewDependencies()
+			registry := runtime.PrometheusRegistry()
+			deps, err := service.NewDependencies(registry)
 			if err != nil {
 				return err
 			}
-			handler := router.NewRouter(deps)
+			handler := router.NewRouter(deps, registry)
 			s := server.NewServer(server.Options{
 				Handler: handler,
 				Port:    args.port,

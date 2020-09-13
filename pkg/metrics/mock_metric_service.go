@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/mock"
 	"time"
 )
@@ -44,8 +43,5 @@ func (m *MockMetricService) CountStorageGetErrors() {
 }
 
 func (m *MockMetricService) CountProcessorErrors() {
-}
-
-func (m *MockMetricService) AddMetricsEndPoint(metricsPath string, router *mux.Router) {
 }
 

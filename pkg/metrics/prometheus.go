@@ -2,9 +2,7 @@ package metrics
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"strings"
 	"time"
@@ -177,7 +175,4 @@ func (p prometheusService) getLabelValue(ImageData []byte) string {
 	return labelValue
 }
 
-func (p prometheusService) AddMetricsEndPoint(metricsPath string, router *mux.Router) {
-	router.Handle(metricsPath, promhttp.HandlerFor(p.reg, promhttp.HandlerOpts{}))
-}
 

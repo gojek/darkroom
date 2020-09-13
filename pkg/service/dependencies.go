@@ -28,10 +28,11 @@ type Dependencies struct {
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
-func NewDependencies() (*Dependencies, error) {
+func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 	s := config.DataSource()
-	metricService := metrics.NewPrometheus(prometheus.NewRegistry())
-	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService)}
+	metricService := metrics.NewPrometheus(registry)
+	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
+		MetricService: metricService}
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
 	} else if regex.S3Matcher.MatchString(s.Kind) {
@@ -42,7 +43,6 @@ func NewDependencies() (*Dependencies, error) {
 	if deps.Storage == nil || deps.Manipulator == nil {
 		return nil, errors.New("handler dependencies are not valid")
 	}
-	deps.MetricService = metricService
 	return deps, nil
 }
 
