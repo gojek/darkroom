@@ -14,8 +14,9 @@ import (
 )
 
 func TestNewRouter(t *testing.T) {
+	registry := prometheus.NewRegistry()
 	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{},
-		MetricService: metrics.NewPrometheus(prometheus.NewRegistry())})
+		MetricService: metrics.NewPrometheus(registry), Registry: registry})
 	assert.NotNil(t, router)
 }
 
@@ -24,8 +25,9 @@ func TestNewRouterInDebugMode(t *testing.T) {
 	v.Set("debug", "true")
 	config.Update()
 
+	registry := prometheus.NewRegistry()
 	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{},
-		MetricService: metrics.NewPrometheus(prometheus.NewRegistry())})
+		MetricService: metrics.NewPrometheus(registry), Registry: registry})
 	assert.NotNil(t, router)
 }
 
@@ -35,8 +37,9 @@ func TestNewRouterWithPathPrefix(t *testing.T) {
 	v.Set("source.pathPrefix", "/path/to/folder")
 	config.Update()
 
+	registry := prometheus.NewRegistry()
 	router := NewRouter(&service.Dependencies{Storage: &mockStorage{}, Manipulator: &service.MockManipulator{},
-		MetricService: metrics.NewPrometheus(prometheus.NewRegistry())})
+		MetricService: metrics.NewPrometheus(registry), Registry: registry})
 	assert.NotNil(t, router)
 }
 
