@@ -22,6 +22,7 @@ type ImageHandlerTestSuite struct {
 	deps        *service.Dependencies
 	storage     *mockStorage
 	manipulator *service.MockManipulator
+	mockMetricService *metrics.MockMetricService
 }
 
 func TestImageHandlerSuite(t *testing.T) {
@@ -31,8 +32,9 @@ func TestImageHandlerSuite(t *testing.T) {
 func (s *ImageHandlerTestSuite) SetupTest() {
 	s.storage = &mockStorage{}
 	s.manipulator = &service.MockManipulator{}
+	s.mockMetricService = &metrics.MockMetricService{}
 	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator,
-		MetricService: &metrics.MockMetricService{}}
+		MetricService: s.mockMetricService}
 }
 
 func (s *ImageHandlerTestSuite) TestImageHandler() {
@@ -52,9 +54,11 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithStorageGetError() {
 	rr := httptest.NewRecorder()
 
 	s.storage.On("Get", mock.Anything, "/image-invalid").Return([]byte(nil), http.StatusUnprocessableEntity, errors.New("error"))
+	s.mockMetricService.On("CountStorageGetErrors")
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
+	s.mockMetricService.AssertCalled(s.T(), "CountStorageGetErrors")
 	assert.Equal(s.T(), "", rr.Body.String())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, rr.Code)
 }
@@ -89,9 +93,11 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessing
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
 	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return([]byte(nil), errors.New("error"))
+	s.mockMetricService.On("CountProcessorErrors")
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
+	s.mockMetricService.AssertCalled(s.T(), "CountProcessorErrors")
 	assert.Equal(s.T(), "", rr.Body.String())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, rr.Code)
 }
@@ -109,3 +115,4 @@ func (m *mockStorage) GetPartially(ctx context.Context, path string, opt *storag
 	args := m.Called(ctx, path, opt)
 	return storage.NewResponse(args[0].([]byte), args.Int(1), args.Error(2)).WithMetadata(args[3].(*storage.ResponseMetadata))
 }
+

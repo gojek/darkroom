@@ -40,8 +40,10 @@ func (m *MockMetricService) TrackRotateDuration(start time.Time, ImageData []byt
 }
 
 func (m *MockMetricService) CountStorageGetErrors() {
+	m.Called()
 }
 
 func (m *MockMetricService) CountProcessorErrors() {
+	m.Called()
 }
 
