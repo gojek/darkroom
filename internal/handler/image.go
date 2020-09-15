@@ -30,7 +30,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		res := deps.Storage.Get(r.Context(), r.URL.Path)
 		if res.Error() != nil {
 			l.Errorf("error from Storage.Get: %s", res.Error())
-			deps.MetricService.CountStorageGetErrors()
+			deps.MetricService.CountImageHandlerErrors(StorageGetErrorKey)
 			w.WriteHeader(res.Status())
 			return
 		}
@@ -49,7 +49,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 			data, err = deps.Manipulator.Process(service.NewSpecBuilder().WithImageData(data).WithParams(params).Build())
 			if err != nil {
 				l.Errorf("error from Manipulator.Process: %s", err)
-				deps.MetricService.CountProcessorErrors()
+				deps.MetricService.CountImageHandlerErrors(ProcessorErrorKey)
 				w.WriteHeader(http.StatusUnprocessableEntity)
 				return
 			}

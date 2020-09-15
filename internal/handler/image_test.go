@@ -54,11 +54,11 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithStorageGetError() {
 	rr := httptest.NewRecorder()
 
 	s.storage.On("Get", mock.Anything, "/image-invalid").Return([]byte(nil), http.StatusUnprocessableEntity, errors.New("error"))
-	s.mockMetricService.On("CountStorageGetErrors")
+	s.mockMetricService.On("CountImageHandlerErrors")
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
-	s.mockMetricService.AssertCalled(s.T(), "CountStorageGetErrors")
+	s.mockMetricService.AssertCalled(s.T(), "CountImageHandlerErrors")
 	assert.Equal(s.T(), "", rr.Body.String())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, rr.Code)
 }
@@ -93,11 +93,11 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessing
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
 	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return([]byte(nil), errors.New("error"))
-	s.mockMetricService.On("CountProcessorErrors")
+	s.mockMetricService.On("CountImageHandlerErrors")
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
-	s.mockMetricService.AssertCalled(s.T(), "CountProcessorErrors")
+	s.mockMetricService.AssertCalled(s.T(), "CountImageHandlerErrors")
 	assert.Equal(s.T(), "", rr.Body.String())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, rr.Code)
 }

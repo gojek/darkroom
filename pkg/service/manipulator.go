@@ -27,6 +27,17 @@ const (
 	compress     = "compress"
 	format       = "format"
 	scale        = "scale"
+
+	cropDurationKey      = "cropDuration"
+	decodeDurationKey    = "decodeDuration"
+	encodeDurationKey    = "encodeDuration"
+	grayScaleDurationKey = "grayScaleDuration"
+	blurDurationKey      = "blurDuration"
+	resizeDurationKey    = "resizeDuration"
+	flipDurationKey      = "flipDuration"
+	rotateDurationKey    = "rotateDuration"
+	fixOrientationKey    = "fixOrientation"
+	scaleDurationKey     = "scaleDuration"
 )
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
@@ -52,30 +63,30 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	m.metricService.TrackDecodeDuration(t, spec.ImageData)
+	m.metricService.TrackDuration(decodeDurationKey, t, spec.ImageData)
 	if params[fit] == crop {
 		t = time.Now()
 		data = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
-		m.metricService.TrackCropDuration(t, spec.ImageData)
+		m.metricService.TrackDuration(cropDurationKey, t, spec.ImageData)
 	} else if params[fit] == scale {
 		t = time.Now()
 		data = m.processor.Scale(data, CleanInt(params[width]), CleanInt(params[height]))
-		m.metricService.TrackScaleDuration(t, spec.ImageData)
+		m.metricService.TrackDuration(scaleDurationKey, t, spec.ImageData)
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		t = time.Now()
 		data = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
-		m.metricService.TrackResizeDuration(t, spec.ImageData)
+		m.metricService.TrackDuration(resizeDurationKey, t, spec.ImageData)
 	}
 
 	if params[mono] == blackHexCode {
 		t = time.Now()
 		data = m.processor.GrayScale(data)
-		m.metricService.TrackGrayScaleDuration(t, spec.ImageData)
+		m.metricService.TrackDuration(grayScaleDurationKey, t, spec.ImageData)
 	}
 	if radius := CleanFloat(params[blur], 1000); radius > 0 {
 		t = time.Now()
 		data = m.processor.Blur(data, radius)
-		m.metricService.TrackBlurDuration(t, spec.ImageData)
+		m.metricService.TrackDuration(blurDurationKey, t, spec.ImageData)
 	}
 
 	autos := strings.Split(params[auto], ",")
@@ -84,7 +95,7 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 			orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
 			t = time.Now()
 			data = m.processor.FixOrientation(data, orientation)
-			m.metricService.TrackFixOrientationDuration(t, spec.ImageData)
+			m.metricService.TrackDuration(fixOrientationKey, t, spec.ImageData)
 		} else if a == format {
 			w := spec.IsWebPSupported()
 			if w {
@@ -98,19 +109,19 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	if len(params[flip]) != 0 {
 		t = time.Now()
 		data = m.processor.Flip(data, params[flip])
-		m.metricService.TrackFlipDuration(t, spec.ImageData)
+		m.metricService.TrackDuration(flipDurationKey, t, spec.ImageData)
 	}
 
 	if angle := CleanFloat(params[rotate], 360); angle > 0 {
 		t = time.Now()
 		data = m.processor.Rotate(data, angle)
-		m.metricService.TrackRotateDuration(t, spec.ImageData)
+		m.metricService.TrackDuration(rotateDurationKey, t, spec.ImageData)
 	}
 
 	t = time.Now()
 	src, err := m.processor.Encode(data, f)
 	if err == nil {
-		m.metricService.TrackEncodeDuration(t, spec.ImageData)
+		m.metricService.TrackDuration(encodeDurationKey, t, spec.ImageData)
 	}
 	return src, err
 }

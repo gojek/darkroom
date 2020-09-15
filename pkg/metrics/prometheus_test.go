@@ -25,35 +25,34 @@ func TestPrometheusMetrics(t *testing.T) {
 				if err != nil {
 					panic(err)
 				}
-				s.TrackCropDuration(now.Add(-6*time.Second), imageData)
+				s.TrackDuration("cropDuration", now.Add(-6*time.Second), imageData)
 			},
 			expMetrics: []string{
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="0.005"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="0.01"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="0.025"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="0.05"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="0.1"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="0.25"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="0.5"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="1"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="2.5"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="5"} 0`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="10"} 1`,
-				`image_crop_duration_bucket{image_type="<=128KB.png",le="+Inf"} 1`,
-				`image_crop_duration_count{image_type="<=128KB.png"} 1`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="0.005"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="0.01"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="0.025"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="0.05"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="0.1"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="0.25"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="0.5"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="1"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="2.5"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="5"} 0`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="10"} 1`,
+				`image_process_duration_bucket{image_type="<=128KB.png",process="cropDuration",le="+Inf"} 1`,
+				`image_process_duration_count{image_type="<=128KB.png",process="cropDuration"} 1`,
 			},
 			expCode: 200,
 		},
 		{
 			name: "Measuring storage and processor errors should expose metrics on prometheus endpoint.",
 			addMetrics: func(s MetricService) {
-				s.CountProcessorErrors()
-				s.CountStorageGetErrors()
-				s.CountStorageGetErrors()
+				s.CountImageHandlerErrors("handler.storage.get.error")
+				s.CountImageHandlerErrors("handler.processor.error")
 			},
 			expMetrics: []string{
-				`processor_errors_total 1`,
-				`storage_get_errors_total 2`,
+				`image_handler_errors{error_type="handler.storage.get.error"} 1`,
+				`image_handler_errors{error_type="handler.processor.error"} 1`,
 			},
 			expCode: 200,
 		},
