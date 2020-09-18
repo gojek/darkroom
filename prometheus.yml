@@ -26,5 +26,5 @@ scrape_configs:
     # scheme defaults to 'http'.
 
     static_configs:
-    - targets: ['docker.for.mac.localhost:80']
+    - targets: ['darkroom:3000']
 

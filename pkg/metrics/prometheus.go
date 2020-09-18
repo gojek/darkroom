@@ -43,7 +43,7 @@ func (p prometheusService) registerMetrics() {
 
 func (p prometheusService) TrackDuration(imageProcess string, start time.Time, ImageData []byte) {
 	imageType := p.getImageType(ImageData)
-	p.imageProcessDuration.WithLabelValues(imageProcess, imageType).Observe(time.Since(start).Seconds())
+	p.imageProcessDuration.WithLabelValues(imageProcess, imageType).Observe(float64(time.Since(start).Milliseconds()))
 }
 
 func (p prometheusService) CountImageHandlerErrors(kind string) {

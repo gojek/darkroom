@@ -3,10 +3,10 @@ version: "3"
 services:
   docusaurus:
     build:
-      dockerfile: Dockerfile.docs
+      dockerfile: build/Dockerfile.docs
       context: .
     ports:
-      - 3000:3000
+      - 8000:3000
       - 35729:35729
     volumes:
       - ./docs:/app/docs
@@ -17,17 +17,28 @@ services:
       - ./website/static:/app/website/static
       - ./website/sidebars.json:/app/website/sidebars.json
       - ./website/siteConfig.js:/app/website/siteConfig.js
+    networks:
+      - app-network
     working_dir: /app/website
   darkroom:
-    image: ${USER}/darkroom:latest
+    build:
+      dockerfile: build/Dockerfile
+      context: .
     ports:
-      - 80:3000
+      - 3000:3000
+    environment:
+      - SOURCE_KIND=webfolder
+      - SOURCE_BASEURL=https://raw.githubusercontent.com/gojek/darkroom/master/website/static/img
+    networks:
+      - app-network
   prometheus:
     image: quay.io/prometheus/prometheus:latest
     ports:
       - 9090:9090
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - app-network
   grafana:
     image: grafana/grafana:5.1.0
     ports:
@@ -38,5 +49,10 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
 
 

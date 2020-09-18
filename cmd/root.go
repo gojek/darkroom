@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/gojek/darkroom/internal/runtime"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 )
@@ -13,6 +14,7 @@ func newRootCmd() *cobra.Command {
 	}
 	cmd.AddCommand(newRunCmdWithOpts(runCmdOpts{
 		SetupSignalHandler: signals.SetupSignalHandler,
+		registry: runtime.PrometheusRegistry(),
 	}))
 	cmd.AddCommand(newVersionCmd())
 	return cmd

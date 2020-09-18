@@ -23,18 +23,16 @@ import (
 type Dependencies struct {
 	Storage     base.Storage
 	Manipulator Manipulator
-	Registry *prometheus.Registry
 	MetricService metrics.MetricService
 }
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
-func NewDependencies() (*Dependencies, error) {
+func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 	s := config.DataSource()
-	registry := prometheus.NewRegistry()
 	metricService := metrics.NewPrometheus(registry)
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
-		MetricService: metricService, Registry: registry}
+		MetricService: metricService}
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
 	} else if regex.S3Matcher.MatchString(s.Kind) {
