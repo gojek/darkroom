@@ -10,7 +10,7 @@ var once sync.Once
 
 func PrometheusRegistry() *prometheus.Registry {
 	once.Do(func() {
-		instance = prometheus.NewPedanticRegistry()
+		instance = prometheus.NewRegistry()
 	})
 	return instance
 }
