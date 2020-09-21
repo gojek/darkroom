@@ -47,12 +47,12 @@ func TestPrometheusMetrics(t *testing.T) {
 		{
 			name: "Measuring storage and processor errors should expose metrics on prometheus endpoint.",
 			addMetrics: func(s MetricService) {
-				s.CountImageHandlerErrors("handler.storage.get.error")
-				s.CountImageHandlerErrors("handler.processor.error")
+				s.CountImageHandlerErrors("storage_get_error")
+				s.CountImageHandlerErrors("processor_error")
 			},
 			expMetrics: []string{
-				`image_handler_errors{error_type="handler.storage.get.error"} 1`,
-				`image_handler_errors{error_type="handler.processor.error"} 1`,
+				`image_handler_errors{error_type="storage_get_error"} 1`,
+				`image_handler_errors{error_type="processor_error"} 1`,
 			},
 			expCode: 200,
 		},

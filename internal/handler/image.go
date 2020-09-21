@@ -18,9 +18,9 @@ const (
 	// Ref: https://tools.ietf.org/html/rfc7231#section-7.1.4
 	VaryHeader = "Vary"
 	// StorageGetErrorKey is the key used while pushing metrics update to statsd
-	StorageGetErrorKey = "handler.storage.get.error"
+	StorageGetErrorKey = "storage_get_error"
 	// ProcessorErrorKey is the key used while pushing metrics update to statsd
-	ProcessorErrorKey = "handler.processor.error"
+	ProcessorErrorKey = "processor_error"
 )
 
 // ImageHandler is responsible for fetching the path from the storage backend and processing it if required

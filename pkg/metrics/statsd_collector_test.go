@@ -1,8 +1,6 @@
 package metrics
 
 import (
-	"errors"
-	"fmt"
 	"testing"
 	"time"
 
@@ -13,17 +11,17 @@ import (
 
 func TestInitializeStatsdCollector(t *testing.T) {
 	// Test Statter client
-	err := InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0})
+	_, err := InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0})
 	assert.Nil(t, err)
 	assert.NotNil(t, instance)
 	assert.NotNil(t, instance.client)
 
 	// Test sampleRate
-	err = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5})
+	_, err = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5})
 	assert.Nil(t, err)
 	assert.Equal(t, float32(5), instance.sampleRate)
 
-	err = InitializeStatsdCollector(&StatsdCollectorConfig{})
+	_, err = InitializeStatsdCollector(&StatsdCollectorConfig{})
 	assert.Nil(t, err)
 	assert.Equal(t, float32(1), instance.sampleRate)
 }
@@ -38,12 +36,8 @@ func TestRegisterHystrixMetrics(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestUpdate(t *testing.T) {
-	// Test when instance is nil
-	instance = nil
-	Update(UpdateOption{})
-
-	_ = InitializeStatsdCollector(&StatsdCollectorConfig{})
+func TestStatsDMetricsUpdate(t *testing.T) {
+	_,_ = InitializeStatsdCollector(&StatsdCollectorConfig{})
 
 	mc := &mockStatsdClient{}
 	instance.client = mc
@@ -53,81 +47,17 @@ func TestUpdate(t *testing.T) {
 		mock.AnythingOfType("string"),
 		mock.AnythingOfType("time.Duration"),
 		mock.AnythingOfType("float32")).Return(nil)
-	Update(UpdateOption{Type: Duration, Duration: time.Since(now)})
+	instance.TrackDuration("cropDuration", now, nil)
 
 	mc.On("Inc",
 		mock.AnythingOfType("string"),
 		mock.AnythingOfType("int64"),
 		mock.AnythingOfType("float32")).Return(nil)
-	Update(UpdateOption{Type: Count})
-
-	// error case
-	mc.On("Gauge",
-		mock.AnythingOfType("string"),
-		mock.AnythingOfType("int64"),
-		mock.AnythingOfType("float32")).Return(errors.New("error"))
-	Update(UpdateOption{Type: Gauge, NumValue: -500})
+	instance.CountImageHandlerErrors("")
 
 	mc.AssertExpectations(t)
 }
 
-func TestFormatter(t *testing.T) {
-	cases := []struct {
-		updateOption   UpdateOption
-		expectedOutput string
-	}{
-		{
-			updateOption: UpdateOption{
-				Scope: "process_image",
-				Name:  "duration",
-				Type:  Duration,
-			},
-			expectedOutput: "process_image.duration",
-		},
-		{
-			updateOption: UpdateOption{
-				Name: "duration",
-				Type: Duration,
-			},
-			expectedOutput: fmt.Sprintf("%s.%s", DefaultScope, "duration"),
-		},
-		{
-			updateOption: UpdateOption{
-				Scope: ".scope",
-				Name:  "duration",
-				Type:  Duration,
-			},
-			expectedOutput: "scope.duration",
-		},
-		{
-			updateOption: UpdateOption{
-				Scope: ".scope.",
-				Name:  "duration",
-				Type:  Duration,
-			},
-			expectedOutput: "scope.duration",
-		},
-		{
-			updateOption: UpdateOption{
-				Scope: "scope.name",
-				Name:  "duration",
-				Type:  Duration,
-			},
-			expectedOutput: "scope.name.duration",
-		},
-		{
-			updateOption: UpdateOption{
-				Scope: ".scope.name.",
-				Name:  ".duration.time.",
-				Type:  Duration,
-			},
-			expectedOutput: "scope.name.duration.time",
-		},
-	}
-	for _, c := range cases {
-		assert.Equal(t, c.expectedOutput, formatter(c.updateOption))
-	}
-}
 
 type mockStatsdClient struct {
 	mock.Mock

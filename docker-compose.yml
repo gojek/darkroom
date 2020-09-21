@@ -40,7 +40,7 @@ services:
     networks:
       - app-network
   grafana:
-    image: grafana/grafana:5.1.0
+    image: grafana/grafana
     ports:
       - 8080:3000
     environment:
@@ -48,7 +48,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./deployments/grafana/provisioning:/etc/grafana/provisioning
     networks:
       - app-network
 networks:

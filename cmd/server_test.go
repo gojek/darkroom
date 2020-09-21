@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/gojek/darkroom/pkg/config"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -22,6 +23,7 @@ func TestRunServer(t *testing.T) {
 		SetupSignalHandler: func() <-chan struct{} {
 			return stopCh
 		},
+		registry: prometheus.NewRegistry(),
 	})
 	cmd.SetArgs([]string{"-p", fmt.Sprintf("%d", diagnosticsPort)})
 
@@ -58,6 +60,7 @@ func TestRunServerWithInvalidPort(t *testing.T) {
 		SetupSignalHandler: func() <-chan struct{} {
 			return stopCh
 		},
+		registry: prometheus.NewRegistry(),
 	})
 	cmd.SetArgs([]string{"-p", fmt.Sprintf("%d", -9000)})
 
@@ -81,6 +84,7 @@ func TestRunServerWithInvalidDependencies(t *testing.T) {
 		SetupSignalHandler: func() <-chan struct{} {
 			return stopCh
 		},
+		registry: prometheus.NewRegistry(),
 	})
 
 	go func() {
