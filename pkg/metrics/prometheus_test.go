@@ -12,10 +12,10 @@ import (
 
 func TestPrometheusMetrics(t *testing.T) {
 	tests := []struct {
-		name string
+		name       string
 		addMetrics func(MetricService)
 		expMetrics []string
-		expCode int
+		expCode    int
 	}{
 		{
 			name: "Measuring duration metrics should expose metrics on prometheus endpoint.",

@@ -9,9 +9,9 @@ import (
 )
 
 type prometheusService struct {
-	imageProcessDuration *prometheus.HistogramVec
+	imageProcessDuration     *prometheus.HistogramVec
 	imageHandlerErrorCounter *prometheus.CounterVec
-	reg *prometheus.Registry
+	reg                      *prometheus.Registry
 }
 
 func NewPrometheus(reg *prometheus.Registry) MetricService {
@@ -55,5 +55,3 @@ func (p prometheusService) getImageType(ImageData []byte) string {
 	labelValue := fmt.Sprintf("%s.%s", GetImageSizeCluster(ImageData), ext)
 	return labelValue
 }
-
-

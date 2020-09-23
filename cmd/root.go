@@ -14,7 +14,7 @@ func newRootCmd() *cobra.Command {
 	}
 	cmd.AddCommand(newRunCmdWithOpts(runCmdOpts{
 		SetupSignalHandler: signals.SetupSignalHandler,
-		registry: runtime.PrometheusRegistry(),
+		registry:           runtime.PrometheusRegistry(),
 	}))
 	cmd.AddCommand(newVersionCmd())
 	return cmd

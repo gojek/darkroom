@@ -57,7 +57,8 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 
 func TestManipulator_Process(t *testing.T) {
 	mp := &mockProcessor{}
-	m := NewManipulator(mp, nil, &metrics.MockMetricService{})
+	ms := &metrics.MockMetricService{}
+	m := NewManipulator(mp, nil, ms)
 	params := make(map[string]string)
 
 	input := []byte("inputData")
@@ -70,10 +71,12 @@ func TestManipulator_Process(t *testing.T) {
 
 	// Create new struct for asserting expectations
 	mp = &mockProcessor{}
-	m = NewManipulator(mp, nil, &metrics.MockMetricService{})
+	ms = &metrics.MockMetricService{}
+	m = NewManipulator(mp, nil, ms)
 	mp.On("Decode", input).Return(decoded, "png", nil)
 	mp.On("Encode", decoded, "png").Return(input, nil)
 	mp.On("Crop", decoded, 100, 100, processor.PointCenter).Return(decoded, nil)
+	ms.On("TrackDuration", mock.Anything, mock.Anything, mock.Anything)
 	params[fit] = crop
 	params[width] = "100"
 	params[height] = "100"

@@ -10,7 +10,7 @@ import (
 
 type runCmdOpts struct {
 	SetupSignalHandler func() (stopCh <-chan struct{})
-	registry *prometheus.Registry
+	registry           *prometheus.Registry
 }
 
 func newRunCmdWithOpts(opts runCmdOpts) *cobra.Command {

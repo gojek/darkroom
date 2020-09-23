@@ -21,18 +21,23 @@ import (
 
 // Dependencies struct holds the reference to the Storage and the Manipulator interface implementations
 type Dependencies struct {
-	Storage     base.Storage
-	Manipulator Manipulator
+	Storage       base.Storage
+	Manipulator   Manipulator
 	MetricService metrics.MetricService
 }
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
 func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
-	s := config.DataSource()
-	metricService := metrics.NewPrometheus(registry)
+	var metricService metrics.MetricService
+	if regex.PrometheusMatcher.MatchString(config.MetricsSystem()) {
+		metricService = metrics.NewPrometheus(registry)
+	} else if regex.StatsdMatcher.MatchString(config.MetricsSystem()) {
+		metricService, _ = metrics.InitializeStatsdCollector(config.StatsdConfig())
+	}
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
 		MetricService: metricService}
+	s := config.DataSource()
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
 	} else if regex.S3Matcher.MatchString(s.Kind) {
@@ -40,7 +45,7 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
 		deps.Storage = NewCloudfrontStorage(s.Value.(config.Cloudfront), s.HystrixCommand)
 	}
-	if deps.Storage == nil || deps.Manipulator == nil {
+	if deps.Storage == nil || deps.Manipulator == nil || deps.MetricService == nil {
 		return nil, errors.New("handler dependencies are not valid")
 	}
 	return deps, nil

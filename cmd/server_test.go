@@ -17,6 +17,7 @@ func TestRunServer(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "WebFolder")
 	v.Set("source.baseURL", "https://example.com/path/to/folder")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
 	cmd := newRunCmdWithOpts(runCmdOpts{
@@ -54,6 +55,7 @@ func TestRunServerWithInvalidPort(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "WebFolder")
 	v.Set("source.baseURL", "https://example.com/path/to/folder")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
 	cmd := newRunCmdWithOpts(runCmdOpts{
@@ -78,6 +80,7 @@ func TestRunServerWithInvalidDependencies(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "")
 	v.Set("source.baseURL", "")
+	v.Set("metrics.system", "")
 	config.Update()
 
 	cmd := newRunCmdWithOpts(runCmdOpts{

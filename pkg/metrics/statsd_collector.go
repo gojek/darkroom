@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"fmt"
+	"github.com/gojek/darkroom/pkg/config"
 	"net/http"
 	"strings"
 	"time"
@@ -27,20 +28,8 @@ type statsdClient struct {
 	sampleRate float32
 }
 
-// StatsdCollectorConfig provides configuration that the Statsd client will need.
-type StatsdCollectorConfig struct {
-	// StatsdAddr is the tcp address of the Statsd server
-	StatsdAddr string
-	// Prefix is the prefix that will be prepended to all metrics sent from this collector.
-	Prefix string
-	// StatsdSampleRate sets statsd sampling. If 0, defaults to 1.0. (no sampling)
-	SampleRate float32
-	// FlushBytes sets message size for statsd packets. If 0, defaults to LANFlushSize.
-	FlushBytes int
-}
-
 // InitializeStatsdCollector will start publishing metrics in the form {config.Prefix}.{updateOption.Scope|default}.{updateOption.Name}
-func InitializeStatsdCollector(config *StatsdCollectorConfig) (MetricService, error) {
+func InitializeStatsdCollector(config *config.StatsdCollectorConfig) (MetricService, error) {
 	flushBytes := config.FlushBytes
 	if flushBytes == 0 {
 		flushBytes = LANStatsdFlushBytes
@@ -53,7 +42,6 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) (MetricService, er
 
 	c, err := statsd.NewBufferedClient(config.StatsdAddr, config.Prefix, 1*time.Second, flushBytes)
 	if err != nil {
-		// TODO Add logger for error
 		logger.Errorf("failed to initialize statsd collector with error: %s", err.Error())
 		return nil, err
 	}
@@ -61,7 +49,7 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) (MetricService, er
 	return instance, nil
 }
 
-func RegisterHystrixMetrics(config *StatsdCollectorConfig, prefix string) error {
+func RegisterHystrixMetrics(config *config.StatsdCollectorConfig, prefix string) error {
 	c, err := plugins.InitializeStatsdCollector(&plugins.StatsdCollectorConfig{
 		StatsdAddr: config.StatsdAddr,
 		Prefix:     prefix,
@@ -94,4 +82,3 @@ func (s statsdClient) getMetricTag(imageProcess string, ImageData []byte) string
 	tag := fmt.Sprintf("%s.%s.%s", imageProcess, GetImageSizeCluster(ImageData), ext)
 	return tag
 }
-

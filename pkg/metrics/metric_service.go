@@ -5,9 +5,7 @@ import (
 )
 
 type MetricService interface {
-
 	TrackDuration(imageProcess string, start time.Time, ImageData []byte)
 
-    CountImageHandlerErrors(kind string)
-
+	CountImageHandlerErrors(kind string)
 }

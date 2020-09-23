@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"github.com/gojek/darkroom/pkg/config"
 	"testing"
 	"time"
 
@@ -11,33 +12,33 @@ import (
 
 func TestInitializeStatsdCollector(t *testing.T) {
 	// Test Statter client
-	_, err := InitializeStatsdCollector(&StatsdCollectorConfig{FlushBytes: 0})
+	_, err := InitializeStatsdCollector(&config.StatsdCollectorConfig{FlushBytes: 0})
 	assert.Nil(t, err)
 	assert.NotNil(t, instance)
 	assert.NotNil(t, instance.client)
 
 	// Test sampleRate
-	_, err = InitializeStatsdCollector(&StatsdCollectorConfig{SampleRate: 5})
+	_, err = InitializeStatsdCollector(&config.StatsdCollectorConfig{SampleRate: 5})
 	assert.Nil(t, err)
 	assert.Equal(t, float32(5), instance.sampleRate)
 
-	_, err = InitializeStatsdCollector(&StatsdCollectorConfig{})
+	_, err = InitializeStatsdCollector(&config.StatsdCollectorConfig{})
 	assert.Nil(t, err)
 	assert.Equal(t, float32(1), instance.sampleRate)
 }
 
 func TestRegisterHystrixMetrics(t *testing.T) {
-	err := RegisterHystrixMetrics(&StatsdCollectorConfig{}, "prefix")
+	err := RegisterHystrixMetrics(&config.StatsdCollectorConfig{}, "prefix")
 	assert.Nil(t, err)
 
-	err = RegisterHystrixMetrics(&StatsdCollectorConfig{
+	err = RegisterHystrixMetrics(&config.StatsdCollectorConfig{
 		StatsdAddr: "foo:bar:foo",
 	}, "prefix")
 	assert.NotNil(t, err)
 }
 
 func TestStatsDMetricsUpdate(t *testing.T) {
-	_,_ = InitializeStatsdCollector(&StatsdCollectorConfig{})
+	_, _ = InitializeStatsdCollector(&config.StatsdCollectorConfig{})
 
 	mc := &mockStatsdClient{}
 	instance.client = mc
@@ -57,7 +58,6 @@ func TestStatsDMetricsUpdate(t *testing.T) {
 
 	mc.AssertExpectations(t)
 }
-
 
 type mockStatsdClient struct {
 	mock.Mock

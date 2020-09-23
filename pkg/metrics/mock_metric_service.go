@@ -10,9 +10,9 @@ type MockMetricService struct {
 }
 
 func (m *MockMetricService) TrackDuration(imageProcess string, start time.Time, ImageData []byte) {
+	m.Called(imageProcess, start, ImageData)
 }
 
 func (m *MockMetricService) CountImageHandlerErrors(kind string) {
-	m.Called()
+	m.Called(kind)
 }
-

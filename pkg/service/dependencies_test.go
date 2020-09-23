@@ -48,6 +48,7 @@ func TestNewDependenciesWithWebFolderStorage(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "WebFolder")
 	v.Set("source.baseURL", "https://example.com/path/to/folder")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
 	deps, err := NewDependencies(prometheus.NewRegistry())
@@ -59,6 +60,7 @@ func TestNewDependenciesWithWebFolderStorage(t *testing.T) {
 func TestNewDependenciesWithS3Storage(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "S3")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
 	deps, err := NewDependencies(prometheus.NewRegistry())
@@ -71,10 +73,23 @@ func TestNewDependenciesWithCloudfrontStorage(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "Cloudfront")
 	v.Set("source.secureProtocol", "true")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
 	deps, err := NewDependencies(prometheus.NewRegistry())
 	assert.NoError(t, err)
 	assert.NotNil(t, deps)
 	assert.IsType(t, &cloudfront.Storage{}, deps.Storage)
+}
+
+func TestNewDependenciesWithStatsdCollector(t *testing.T) {
+	v := config.Viper()
+	v.Set("source.kind", "WebFolder")
+	v.Set("source.baseURL", "https://example.com/path/to/folder")
+	v.Set("metrics.system", "statsd")
+	config.Update()
+
+	deps, err := NewDependencies(nil)
+	assert.NoError(t, err)
+	assert.NotNil(t, deps)
 }

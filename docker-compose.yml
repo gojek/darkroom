@@ -29,6 +29,7 @@ services:
     environment:
       - SOURCE_KIND=webfolder
       - SOURCE_BASEURL=https://raw.githubusercontent.com/gojek/darkroom/master/website/static/img
+      - METRICS_SYSTEM=prometheus
     networks:
       - app-network
   prometheus:
