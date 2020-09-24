@@ -3,6 +3,7 @@ package service
 
 import (
 	"errors"
+	"github.com/gojek/darkroom/pkg/logger"
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/regex"
 	"github.com/prometheus/client_golang/prometheus"
@@ -35,6 +36,10 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 	} else if regex.StatsdMatcher.MatchString(config.MetricsSystem()) {
 		metricService, _ = metrics.InitializeStatsdCollector(config.StatsdConfig())
 	}
+	if metricService == nil {
+		metricService = metrics.NoOpMetricService{}
+		logger.Warn("NoOpMetricService is being used since metric system is not specified")
+	}
 	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
 		MetricService: metricService}
 	s := config.DataSource()
@@ -45,7 +50,7 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
 		deps.Storage = NewCloudfrontStorage(s.Value.(config.Cloudfront), s.HystrixCommand)
 	}
-	if deps.Storage == nil || deps.Manipulator == nil || deps.MetricService == nil {
+	if deps.Storage == nil || deps.Manipulator == nil {
 		return nil, errors.New("handler dependencies are not valid")
 	}
 	return deps, nil

@@ -81,15 +81,3 @@ func TestNewDependenciesWithCloudfrontStorage(t *testing.T) {
 	assert.NotNil(t, deps)
 	assert.IsType(t, &cloudfront.Storage{}, deps.Storage)
 }
-
-func TestNewDependenciesWithStatsdCollector(t *testing.T) {
-	v := config.Viper()
-	v.Set("source.kind", "WebFolder")
-	v.Set("source.baseURL", "https://example.com/path/to/folder")
-	v.Set("metrics.system", "statsd")
-	config.Update()
-
-	deps, err := NewDependencies(nil)
-	assert.NoError(t, err)
-	assert.NotNil(t, deps)
-}
