@@ -6,7 +6,6 @@ import (
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/logger"
-	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/service"
 )
 
@@ -19,9 +18,9 @@ const (
 	// Ref: https://tools.ietf.org/html/rfc7231#section-7.1.4
 	VaryHeader = "Vary"
 	// StorageGetErrorKey is the key used while pushing metrics update to statsd
-	StorageGetErrorKey = "handler.storage.get.error"
+	StorageGetErrorKey = "storage_get_error"
 	// ProcessorErrorKey is the key used while pushing metrics update to statsd
-	ProcessorErrorKey = "handler.processor.error"
+	ProcessorErrorKey = "processor_error"
 )
 
 // ImageHandler is responsible for fetching the path from the storage backend and processing it if required
@@ -31,7 +30,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		res := deps.Storage.Get(r.Context(), r.URL.Path)
 		if res.Error() != nil {
 			l.Errorf("error from Storage.Get: %s", res.Error())
-			metrics.Update(metrics.UpdateOption{Name: StorageGetErrorKey, Type: metrics.Count})
+			deps.MetricService.CountImageHandlerErrors(StorageGetErrorKey)
 			w.WriteHeader(res.Status())
 			return
 		}
@@ -50,7 +49,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 			data, err = deps.Manipulator.Process(service.NewSpecBuilder().WithImageData(data).WithParams(params).Build())
 			if err != nil {
 				l.Errorf("error from Manipulator.Process: %s", err)
-				metrics.Update(metrics.UpdateOption{Name: ProcessorErrorKey, Type: metrics.Count})
+				deps.MetricService.CountImageHandlerErrors(ProcessorErrorKey)
 				w.WriteHeader(http.StatusUnprocessableEntity)
 				return
 			}

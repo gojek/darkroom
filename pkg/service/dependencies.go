@@ -3,12 +3,15 @@ package service
 
 import (
 	"errors"
+	"github.com/gojek/darkroom/pkg/logger"
+	"github.com/gojek/darkroom/pkg/metrics"
+	"github.com/gojek/darkroom/pkg/regex"
+	"github.com/prometheus/client_golang/prometheus"
 	"strings"
 	"time"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/processor/native"
-	"github.com/gojek/darkroom/pkg/regex"
 	base "github.com/gojek/darkroom/pkg/storage"
 	"github.com/gojek/darkroom/pkg/storage/aws/cloudfront"
 	"github.com/gojek/darkroom/pkg/storage/aws/s3"
@@ -19,15 +22,27 @@ import (
 
 // Dependencies struct holds the reference to the Storage and the Manipulator interface implementations
 type Dependencies struct {
-	Storage     base.Storage
-	Manipulator Manipulator
+	Storage       base.Storage
+	Manipulator   Manipulator
+	MetricService metrics.MetricService
 }
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
-func NewDependencies() (*Dependencies, error) {
+func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
+	var metricService metrics.MetricService
+	if regex.PrometheusMatcher.MatchString(config.MetricsSystem()) {
+		metricService = metrics.NewPrometheus(registry)
+	} else if regex.StatsdMatcher.MatchString(config.MetricsSystem()) {
+		metricService, _ = metrics.InitializeStatsdCollector(config.StatsdConfig())
+	}
+	if metricService == nil {
+		metricService = metrics.NoOpMetricService{}
+		logger.Warn("NoOpMetricService is being used since metric system is not specified")
+	}
+	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
+		MetricService: metricService}
 	s := config.DataSource()
-	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams())}
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
 	} else if regex.S3Matcher.MatchString(s.Kind) {

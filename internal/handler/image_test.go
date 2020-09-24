@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gojek/darkroom/pkg/metrics"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,9 +19,10 @@ import (
 
 type ImageHandlerTestSuite struct {
 	suite.Suite
-	deps        *service.Dependencies
-	storage     *mockStorage
-	manipulator *service.MockManipulator
+	deps              *service.Dependencies
+	storage           *mockStorage
+	manipulator       *service.MockManipulator
+	mockMetricService *metrics.MockMetricService
 }
 
 func TestImageHandlerSuite(t *testing.T) {
@@ -30,7 +32,9 @@ func TestImageHandlerSuite(t *testing.T) {
 func (s *ImageHandlerTestSuite) SetupTest() {
 	s.storage = &mockStorage{}
 	s.manipulator = &service.MockManipulator{}
-	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator}
+	s.mockMetricService = &metrics.MockMetricService{}
+	s.deps = &service.Dependencies{Storage: s.storage, Manipulator: s.manipulator,
+		MetricService: s.mockMetricService}
 }
 
 func (s *ImageHandlerTestSuite) TestImageHandler() {
@@ -50,9 +54,11 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithStorageGetError() {
 	rr := httptest.NewRecorder()
 
 	s.storage.On("Get", mock.Anything, "/image-invalid").Return([]byte(nil), http.StatusUnprocessableEntity, errors.New("error"))
+	s.mockMetricService.On("CountImageHandlerErrors", "storage_get_error")
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
+	s.mockMetricService.AssertCalled(s.T(), "CountImageHandlerErrors", "storage_get_error")
 	assert.Equal(s.T(), "", rr.Body.String())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, rr.Code)
 }
@@ -87,9 +93,11 @@ func (s *ImageHandlerTestSuite) TestImageHandlerWithQueryParametersAndProcessing
 	params["h"] = "100"
 	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
 	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return([]byte(nil), errors.New("error"))
+	s.mockMetricService.On("CountImageHandlerErrors", "processor_error")
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 
+	s.mockMetricService.AssertCalled(s.T(), "CountImageHandlerErrors", "processor_error")
 	assert.Equal(s.T(), "", rr.Body.String())
 	assert.Equal(s.T(), http.StatusUnprocessableEntity, rr.Code)
 }

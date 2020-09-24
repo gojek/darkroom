@@ -2,6 +2,8 @@
 package router
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"net/http/pprof"
 
@@ -16,7 +18,7 @@ import (
 // NewRouter takes in handler Dependencies and returns mux.Router with default routes
 // and if debug mode is enabled then it also adds pprof routes.
 // It also, adds a PathPrefix to catch all route if config.DataSource().PathPrefix is set
-func NewRouter(deps *service.Dependencies) *mux.Router {
+func NewRouter(deps *service.Dependencies, registry *prometheus.Registry) *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.Methods(http.MethodGet).Path("/ping").Handler(handler.Ping())
@@ -24,7 +26,7 @@ func NewRouter(deps *service.Dependencies) *mux.Router {
 	if config.DebugModeEnabled() {
 		setDebugRoutes(r)
 	}
-
+	r.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 	// Catch all handler
 	s := config.DataSource()
 	if (regex.S3Matcher.MatchString(s.Kind) ||

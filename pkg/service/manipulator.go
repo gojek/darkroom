@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"math"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -50,6 +49,7 @@ type Manipulator interface {
 type manipulator struct {
 	processor     processor.Processor
 	defaultParams map[string]string
+	metricService metrics.MetricService
 }
 
 // Process takes ProcessSpec as an argument and returns []byte, error
@@ -63,30 +63,30 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	trackDuration(decodeDurationKey, t, spec)
+	m.metricService.TrackDuration(decodeDurationKey, t, spec.ImageData)
 	if params[fit] == crop {
 		t = time.Now()
 		data = m.processor.Crop(data, CleanInt(params[width]), CleanInt(params[height]), GetCropPoint(params[crop]))
-		trackDuration(cropDurationKey, t, spec)
+		m.metricService.TrackDuration(cropDurationKey, t, spec.ImageData)
 	} else if params[fit] == scale {
 		t = time.Now()
 		data = m.processor.Scale(data, CleanInt(params[width]), CleanInt(params[height]))
-		trackDuration(scaleDurationKey, t, spec)
+		m.metricService.TrackDuration(scaleDurationKey, t, spec.ImageData)
 	} else if len(params[fit]) == 0 && (CleanInt(params[width]) != 0 || CleanInt(params[height]) != 0) {
 		t = time.Now()
 		data = m.processor.Resize(data, CleanInt(params[width]), CleanInt(params[height]))
-		trackDuration(resizeDurationKey, t, spec)
+		m.metricService.TrackDuration(resizeDurationKey, t, spec.ImageData)
 	}
 
 	if params[mono] == blackHexCode {
 		t = time.Now()
 		data = m.processor.GrayScale(data)
-		trackDuration(grayScaleDurationKey, t, spec)
+		m.metricService.TrackDuration(grayScaleDurationKey, t, spec.ImageData)
 	}
 	if radius := CleanFloat(params[blur], 1000); radius > 0 {
 		t = time.Now()
 		data = m.processor.Blur(data, radius)
-		trackDuration(blurDurationKey, t, spec)
+		m.metricService.TrackDuration(blurDurationKey, t, spec.ImageData)
 	}
 
 	autos := strings.Split(params[auto], ",")
@@ -95,7 +95,7 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 			orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
 			t = time.Now()
 			data = m.processor.FixOrientation(data, orientation)
-			trackDuration(fixOrientationKey, t, spec)
+			m.metricService.TrackDuration(fixOrientationKey, t, spec.ImageData)
 		} else if a == format {
 			w := spec.IsWebPSupported()
 			if w {
@@ -109,19 +109,19 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	if len(params[flip]) != 0 {
 		t = time.Now()
 		data = m.processor.Flip(data, params[flip])
-		trackDuration(flipDurationKey, t, spec)
+		m.metricService.TrackDuration(flipDurationKey, t, spec.ImageData)
 	}
 
 	if angle := CleanFloat(params[rotate], 360); angle > 0 {
 		t = time.Now()
 		data = m.processor.Rotate(data, angle)
-		trackDuration(rotateDurationKey, t, spec)
+		m.metricService.TrackDuration(rotateDurationKey, t, spec.ImageData)
 	}
 
 	t = time.Now()
 	src, err := m.processor.Encode(data, f)
 	if err == nil {
-		trackDuration(encodeDurationKey, t, spec)
+		m.metricService.TrackDuration(encodeDurationKey, t, spec.ImageData)
 	}
 	return src, err
 }
@@ -183,22 +183,12 @@ func GetCropPoint(input string) processor.Point {
 	}
 }
 
-func trackDuration(name string, start time.Time, spec processSpec) *metrics.UpdateOption {
-	ext := strings.Split(http.DetectContentType(spec.ImageData), "/")[1]
-	updateOption := metrics.UpdateOption{
-		Name:     fmt.Sprintf("%s.%s.%s", name, metrics.GetImageSizeCluster(spec.ImageData), ext),
-		Type:     metrics.Duration,
-		Duration: time.Since(start),
-		Scope:    spec.Scope,
-	}
-	metrics.Update(updateOption)
-	return &updateOption
-}
-
 // NewManipulator takes in a Processor interface and returns a new Manipulator
-func NewManipulator(processor processor.Processor, defaultParams map[string]string) Manipulator {
+func NewManipulator(processor processor.Processor, defaultParams map[string]string,
+	metricService metrics.MetricService) Manipulator {
 	return &manipulator{
 		processor:     processor,
 		defaultParams: defaultParams,
+		metricService: metricService,
 	}
 }

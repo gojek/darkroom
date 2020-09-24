@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
 	"testing"
 
 	"github.com/gojek/darkroom/pkg/config"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestNewDependencies(t *testing.T) {
-	deps, err := NewDependencies()
+	deps, err := NewDependencies(prometheus.NewRegistry())
 	assert.Error(t, err)
 	assert.Nil(t, deps)
 }
@@ -47,9 +48,10 @@ func TestNewDependenciesWithWebFolderStorage(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "WebFolder")
 	v.Set("source.baseURL", "https://example.com/path/to/folder")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
-	deps, err := NewDependencies()
+	deps, err := NewDependencies(prometheus.NewRegistry())
 	assert.NoError(t, err)
 	assert.NotNil(t, deps)
 	assert.IsType(t, &webfolder.Storage{}, deps.Storage)
@@ -58,9 +60,10 @@ func TestNewDependenciesWithWebFolderStorage(t *testing.T) {
 func TestNewDependenciesWithS3Storage(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "S3")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
-	deps, err := NewDependencies()
+	deps, err := NewDependencies(prometheus.NewRegistry())
 	assert.NoError(t, err)
 	assert.NotNil(t, deps)
 	assert.IsType(t, &s3.Storage{}, deps.Storage)
@@ -70,9 +73,10 @@ func TestNewDependenciesWithCloudfrontStorage(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "Cloudfront")
 	v.Set("source.secureProtocol", "true")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
-	deps, err := NewDependencies()
+	deps, err := NewDependencies(prometheus.NewRegistry())
 	assert.NoError(t, err)
 	assert.NotNil(t, deps)
 	assert.IsType(t, &cloudfront.Storage{}, deps.Storage)

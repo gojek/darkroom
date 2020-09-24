@@ -2,6 +2,8 @@ package metrics
 
 import (
 	"fmt"
+	"github.com/gojek/darkroom/pkg/config"
+	"net/http"
 	"strings"
 	"time"
 
@@ -26,20 +28,8 @@ type statsdClient struct {
 	sampleRate float32
 }
 
-// StatsdCollectorConfig provides configuration that the Statsd client will need.
-type StatsdCollectorConfig struct {
-	// StatsdAddr is the tcp address of the Statsd server
-	StatsdAddr string
-	// Prefix is the prefix that will be prepended to all metrics sent from this collector.
-	Prefix string
-	// StatsdSampleRate sets statsd sampling. If 0, defaults to 1.0. (no sampling)
-	SampleRate float32
-	// FlushBytes sets message size for statsd packets. If 0, defaults to LANFlushSize.
-	FlushBytes int
-}
-
 // InitializeStatsdCollector will start publishing metrics in the form {config.Prefix}.{updateOption.Scope|default}.{updateOption.Name}
-func InitializeStatsdCollector(config *StatsdCollectorConfig) error {
+func InitializeStatsdCollector(config *config.StatsdCollectorConfig) (MetricService, error) {
 	flushBytes := config.FlushBytes
 	if flushBytes == 0 {
 		flushBytes = LANStatsdFlushBytes
@@ -52,14 +42,14 @@ func InitializeStatsdCollector(config *StatsdCollectorConfig) error {
 
 	c, err := statsd.NewBufferedClient(config.StatsdAddr, config.Prefix, 1*time.Second, flushBytes)
 	if err != nil {
-		// TODO Add logger for error
-		c = &statsd.NoopClient{}
+		logger.Errorf("failed to initialize statsd collector with error: %s", err.Error())
+		return nil, err
 	}
 	instance = &statsdClient{client: c, sampleRate: sampleRate}
-	return nil
+	return instance, nil
 }
 
-func RegisterHystrixMetrics(config *StatsdCollectorConfig, prefix string) error {
+func RegisterHystrixMetrics(config *config.StatsdCollectorConfig, prefix string) error {
 	c, err := plugins.InitializeStatsdCollector(&plugins.StatsdCollectorConfig{
 		StatsdAddr: config.StatsdAddr,
 		Prefix:     prefix,
@@ -72,29 +62,23 @@ func RegisterHystrixMetrics(config *StatsdCollectorConfig, prefix string) error 
 	return nil
 }
 
-func formatter(updateOption UpdateOption) string {
-	scope := strings.Trim(updateOption.Scope, ".")
-	if updateOption.Scope == "" {
-		scope = DefaultScope
+func (s statsdClient) TrackDuration(imageProcess string, start time.Time, ImageData []byte) {
+	metricTag := s.getMetricTag(imageProcess, ImageData)
+	err := s.client.TimingDuration(metricTag, time.Since(start), s.sampleRate)
+	if err != nil {
+		logger.Errorf("MetricService.TrackDuration got an error: %s", err)
 	}
-	return fmt.Sprintf("%s.%s", scope, strings.Trim(updateOption.Name, "."))
 }
 
-// Update takes an UpdateOption and pushes the metrics to the statd client if initialised
-func Update(updateOption UpdateOption) {
-	if instance == nil {
-		return
-	}
-	var err error
-	switch updateOption.Type {
-	case Duration:
-		err = instance.client.TimingDuration(formatter(updateOption), updateOption.Duration, instance.sampleRate)
-	case Gauge:
-		err = instance.client.Gauge(formatter(updateOption), int64(updateOption.NumValue), instance.sampleRate)
-	case Count:
-		err = instance.client.Inc(formatter(updateOption), 1, instance.sampleRate)
-	}
+func (s statsdClient) CountImageHandlerErrors(kind string) {
+	err := s.client.Inc(kind, 1, s.sampleRate)
 	if err != nil {
-		logger.Errorf("metrics.Update got an error: %s", err)
+		logger.Errorf("MetricService.CountImageHandlerErrors got an error: %s", err)
 	}
+}
+
+func (s statsdClient) getMetricTag(imageProcess string, ImageData []byte) string {
+	ext := strings.Split(http.DetectContentType(ImageData), "/")[1]
+	tag := fmt.Sprintf("%s.%s.%s", imageProcess, GetImageSizeCluster(ImageData), ext)
+	return tag
 }

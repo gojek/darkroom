@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/gojek/darkroom/pkg/config"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -16,12 +17,14 @@ func TestRunServer(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "WebFolder")
 	v.Set("source.baseURL", "https://example.com/path/to/folder")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
 	cmd := newRunCmdWithOpts(runCmdOpts{
 		SetupSignalHandler: func() <-chan struct{} {
 			return stopCh
 		},
+		registry: prometheus.NewRegistry(),
 	})
 	cmd.SetArgs([]string{"-p", fmt.Sprintf("%d", diagnosticsPort)})
 
@@ -52,12 +55,14 @@ func TestRunServerWithInvalidPort(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "WebFolder")
 	v.Set("source.baseURL", "https://example.com/path/to/folder")
+	v.Set("metrics.system", "prometheus")
 	config.Update()
 
 	cmd := newRunCmdWithOpts(runCmdOpts{
 		SetupSignalHandler: func() <-chan struct{} {
 			return stopCh
 		},
+		registry: prometheus.NewRegistry(),
 	})
 	cmd.SetArgs([]string{"-p", fmt.Sprintf("%d", -9000)})
 
@@ -75,12 +80,14 @@ func TestRunServerWithInvalidDependencies(t *testing.T) {
 	v := config.Viper()
 	v.Set("source.kind", "")
 	v.Set("source.baseURL", "")
+	v.Set("metrics.system", "")
 	config.Update()
 
 	cmd := newRunCmdWithOpts(runCmdOpts{
 		SetupSignalHandler: func() <-chan struct{} {
 			return stopCh
 		},
+		registry: prometheus.NewRegistry(),
 	})
 
 	go func() {

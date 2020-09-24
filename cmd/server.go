@@ -4,11 +4,13 @@ import (
 	"github.com/gojek/darkroom/pkg/router"
 	"github.com/gojek/darkroom/pkg/server"
 	"github.com/gojek/darkroom/pkg/service"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cobra"
 )
 
 type runCmdOpts struct {
 	SetupSignalHandler func() (stopCh <-chan struct{})
+	registry           *prometheus.Registry
 }
 
 func newRunCmdWithOpts(opts runCmdOpts) *cobra.Command {
@@ -19,11 +21,11 @@ func newRunCmdWithOpts(opts runCmdOpts) *cobra.Command {
 		Use:   "server",
 		Short: "Start the app server",
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			deps, err := service.NewDependencies()
+			deps, err := service.NewDependencies(opts.registry)
 			if err != nil {
 				return err
 			}
-			handler := router.NewRouter(deps)
+			handler := router.NewRouter(deps, opts.registry)
 			s := server.NewServer(server.Options{
 				Handler: handler,
 				Port:    args.port,

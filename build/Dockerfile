@@ -2,7 +2,7 @@ FROM golang:alpine AS builder
 ENV GO111MODULE=on
 WORKDIR /app
 COPY . .
-RUN apk update && apk add --no-cache git
+RUN apk update && apk add build-base
 RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o darkroom main.go
 
 FROM alpine

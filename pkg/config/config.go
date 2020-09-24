@@ -15,6 +15,8 @@ type config struct {
 	dataSource                      Source
 	enableConcurrentOpacityChecking bool
 	defaultParams                   string
+	metricsSystem                   string
+	statsdConfig                    StatsdCollectorConfig
 }
 
 var instance *config
@@ -43,6 +45,12 @@ func newConfig() *config {
 		PathPrefix: v.GetString("source.pathPrefix"),
 	}
 	s.readValue()
+	c := StatsdCollectorConfig{
+		StatsdAddr: v.GetString("metrics.statsd.statsdAddr"),
+		Prefix:     v.GetString("metrics.statsd.prefix"),
+		SampleRate: float32(v.GetFloat64("metrics.statsd.sampleRate")),
+		FlushBytes: v.GetInt("metrics.statsd.flushBytes"),
+	}
 
 	return &config{
 		logLevel:                        v.GetString("log.level"),
@@ -51,6 +59,8 @@ func newConfig() *config {
 		dataSource:                      s,
 		enableConcurrentOpacityChecking: v.GetBool("enableConcurrentOpacityChecking"),
 		defaultParams:                   v.GetString("defaultParams"),
+		metricsSystem:                   v.GetString("metrics.system"),
+		statsdConfig:                    c,
 	}
 }
 
@@ -87,4 +97,14 @@ func ConcurrentOpacityCheckingEnabled() bool {
 // DefaultParams returns []string of default parameters (separated by semicolon) which will be applied to all image request, following the existing contract
 func DefaultParams() []string {
 	return strings.Split(getConfig().defaultParams, ";")
+}
+
+// MetricSystem returns the metrics system to be used for MetricService in dependencies from the environment
+func MetricsSystem() string {
+	return getConfig().metricsSystem
+}
+
+// StatsdConfig returns the config for statsd client initialization in dependencies from the environment
+func StatsdConfig() *StatsdCollectorConfig {
+	return &getConfig().statsdConfig
 }
