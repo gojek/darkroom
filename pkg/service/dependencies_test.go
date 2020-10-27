@@ -3,6 +3,8 @@ package service
 import (
 	"testing"
 
+	"github.com/gojek/darkroom/pkg/storage/gcs"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/gojek/darkroom/pkg/config"
@@ -81,4 +83,16 @@ func TestNewDependenciesWithCloudfrontStorage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, deps)
 	assert.IsType(t, &cloudfront.Storage{}, deps.Storage)
+}
+
+func TestNewDependenciesWithGCSStorage(t *testing.T) {
+	v := config.Viper()
+	v.Set("source.kind", "GoogleCloudStorage")
+	v.Set("metrics.system", "prometheus")
+	config.Update()
+
+	deps, err := NewDependencies(prometheus.NewRegistry())
+	assert.NoError(t, err)
+	assert.NotNil(t, deps)
+	assert.IsType(t, &gcs.Storage{}, deps.Storage)
 }
