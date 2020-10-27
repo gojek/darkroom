@@ -12,12 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gojektech/heimdall"
+	"google.golang.org/api/option"
 
 	gs "cloud.google.com/go/storage"
 	"github.com/gojek/darkroom/pkg/storage"
 	"google.golang.org/api/googleapi"
-	"google.golang.org/api/option"
 )
 
 var (
@@ -32,10 +31,12 @@ type Storage struct {
 
 // NewStorage returns a new gcs.Storage instance
 func NewStorage(opts Options) (*Storage, error) {
-	c, err := gs.NewClient(context.TODO(), clientOptions(opts.CredentialsJSON, opts.Client)...)
+	ctx := context.TODO()
+	client, err := newHeimdallHTTPClient(ctx, opts.Client, opts.CredentialsJSON)
 	if err != nil {
 		return nil, err
 	}
+	c, _ := gs.NewClient(ctx, option.WithHTTPClient(client))
 	return &Storage{bucketHandle{c.Bucket(opts.BucketName)}}, nil
 }
 
@@ -114,17 +115,4 @@ func (s *Storage) parseMetadata(attrs *gs.ObjectAttrs, offset, length int64) *st
 		ETag:          attrs.Etag,
 		LastModified:  attrs.Updated.Format(time.RFC1123),
 	}
-}
-
-func clientOptions(credentialsJSON []byte, client heimdall.Client) []option.ClientOption {
-	var options []option.ClientOption
-	if len(credentialsJSON) != 0 {
-		options = append(options, option.WithCredentialsJSON(credentialsJSON))
-	} else {
-		options = append(options, option.WithoutAuthentication())
-	}
-	if client != nil {
-		options = append(options, option.WithHTTPClient(newHeimdallHTTPClient(client)))
-	}
-	return options
 }
