@@ -89,7 +89,7 @@ func (s *StorageTestSuite) TestNewStorageHasCorrectBucketName() {
 }
 
 func (s *StorageTestSuite) TestBenchForStorage_Get() {
-	errNotFound := &googleapi.Error{Code: 404, Message: "Not Found"}
+	errForbidden := &googleapi.Error{Code: 403, Message: "Forbidden"}
 	testcases := []struct {
 		name            string
 		ctx             context.Context
@@ -111,9 +111,18 @@ func (s *StorageTestSuite) TestBenchForStorage_Get() {
 			ctx:  context.TODO(),
 			path: invalidPath,
 			newReaderReturn: func() (Reader, error) {
-				return nil, errNotFound
+				return nil, storage.ErrObjectNotExist
 			},
-			res: storageTypes.NewResponse([]byte(nil), http.StatusNotFound, errNotFound),
+			res: storageTypes.NewResponse([]byte(nil), http.StatusNotFound, storage.ErrObjectNotExist),
+		},
+		{
+			name: "FailureWithForbiddenPath",
+			ctx:  context.TODO(),
+			path: validPath,
+			newReaderReturn: func() (Reader, error) {
+				return nil, errForbidden
+			},
+			res: storageTypes.NewResponse([]byte(nil), http.StatusForbidden, errForbidden),
 		},
 		{
 			name: "FailureWithUnreadablePath",
@@ -127,6 +136,7 @@ func (s *StorageTestSuite) TestBenchForStorage_Get() {
 	}
 
 	for _, t := range testcases {
+		s.SetupTest()
 		s.Run(t.name, func() {
 			mo := &mockObjectHandle{objectKey: t.path}
 			s.bucketHandle.On("Object", t.path).Return(mo)
@@ -222,11 +232,9 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 			ctx:  context.TODO(),
 			path: invalidPath,
 			newReaderReturn: func() (Reader, error) {
-				return nil, &googleapi.Error{Code: 404, Message: "Not Found"}
+				return nil, storage.ErrObjectNotExist
 			},
-			res: storageTypes.NewResponse(nil, http.StatusNotFound,
-				&googleapi.Error{Code: 404, Message: "Not Found"},
-			),
+			res: storageTypes.NewResponse(nil, http.StatusNotFound, storage.ErrObjectNotExist),
 		},
 		{
 			name:   "OnInvalidRange",
@@ -250,6 +258,16 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 				Code:    400,
 				Message: "Bad Request"},
 			),
+		},
+		{
+			name: "NotFoundWithValidRangeAndInvalidPath",
+			ctx:  context.TODO(),
+			path:   invalidPath,
+			range_: &validRange,
+			newRangeReaderReturn: func() (Reader, error) {
+				return nil, storage.ErrObjectNotExist
+			},
+			res: storageTypes.NewResponse([]byte(nil), http.StatusNotFound, storage.ErrObjectNotExist),
 		},
 		{
 			name:   "OnBadReaderError",
@@ -277,16 +295,14 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 	}
 
 	for _, t := range testcases {
+		s.SetupTest()
 		s.Run(t.name, func() {
-			ns, _ := NewStorage(Options{BucketName: bucketName})
-			bh := &mockBucketHandle{}
 			mo := &mockObjectHandle{objectKey: t.path}
-			bh.On("Object", t.path).Return(mo)
-			ns.bucketHandle = bh
+			s.bucketHandle.On("Object", t.path).Return(mo)
 
 			var opts *storageTypes.GetPartiallyRequestOptions
 			if t.range_ != nil {
-				if o, l, err := ns.parseRange(*t.range_); err == nil {
+				if o, l, err := s.storage.parseRange(*t.range_); err == nil {
 					mo.On("NewRangeReader", t.ctx, o, l).
 						Return(t.newRangeReaderReturn())
 				}
@@ -299,7 +315,7 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 				mo.On("Attrs", t.ctx).Return(t.attrsReturn())
 			}
 
-			res := ns.GetPartially(t.ctx, t.path, opts)
+			res := s.storage.GetPartially(t.ctx, t.path, opts)
 
 			s.Equal(t.res.Error(), res.Error())
 			s.Equal(t.res.Data(), res.Data())

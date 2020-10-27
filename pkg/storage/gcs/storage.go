@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -38,7 +39,11 @@ func NewStorage(opts Options) (*Storage, error) {
 // Get takes in the Context and path as an argument and returns an IResponse interface implementation.
 // This method figures out how to get the data from the S3 storage backend.
 func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
+	path = strings.TrimPrefix(path, "/")
 	r, err := s.bucketHandle.Object(path).NewReader(ctx)
+	if errors.Is(err, gs.ErrObjectNotExist) {
+		return storage.NewResponse(nil, http.StatusNotFound, err)
+	}
 	var apiErr *googleapi.Error
 	if errors.As(err, &apiErr) {
 		return storage.NewResponse(nil, apiErr.Code, apiErr)
@@ -54,6 +59,7 @@ func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 // GetPartially takes in the Context, path and opt as an argument and returns an IResponse interface implementation.
 // This method figures out how to get partial data from the S3 storage backend.
 func (s *Storage) GetPartially(ctx context.Context, path string, opt *storage.GetPartiallyRequestOptions) storage.IResponse {
+	path = strings.TrimPrefix(path, "/")
 	if opt == nil || len(opt.Range) == 0 {
 		return s.Get(ctx, path)
 	}
@@ -63,6 +69,9 @@ func (s *Storage) GetPartially(ctx context.Context, path string, opt *storage.Ge
 	}
 	objHandle := s.bucketHandle.Object(path)
 	r, err := objHandle.NewRangeReader(ctx, offset, length)
+	if errors.Is(err, gs.ErrObjectNotExist) {
+		return storage.NewResponse(nil, http.StatusNotFound, err)
+	}
 	var apiErr *googleapi.Error
 	if errors.As(err, &apiErr) {
 		return storage.NewResponse(nil, apiErr.Code, apiErr)
