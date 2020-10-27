@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gojektech/heimdall/hystrix"
+
 	"cloud.google.com/go/storage"
 	storageTypes "github.com/gojek/darkroom/pkg/storage"
 	"github.com/stretchr/testify/mock"
@@ -46,6 +48,12 @@ func TestStorageSuite(t *testing.T) {
 
 func (s *StorageTestSuite) TestNewStorage() {
 	s.NotNil(s.storage)
+}
+
+func (s *StorageTestSuite) TestNewStorageWithHeimdallClient() {
+	ns, err := NewStorage(Options{BucketName: bucketName, Client: hystrix.NewClient()})
+	s.NoError(err)
+	s.NotNil(ns)
 }
 
 func (s *StorageTestSuite) TestNewStorageWithValidCredentialsJSON() {
