@@ -2,12 +2,13 @@ package metrics
 
 import (
 	"fmt"
-	"github.com/gojek/darkroom/pkg/config"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/afex/hystrix-go/hystrix/metric_collector"
+	"github.com/gojek/darkroom/pkg/config"
+
+	metricCollector "github.com/afex/hystrix-go/hystrix/metric_collector"
 	"github.com/afex/hystrix-go/plugins"
 	"github.com/cactus/go-statsd-client/statsd"
 	"github.com/gojek/darkroom/pkg/logger"

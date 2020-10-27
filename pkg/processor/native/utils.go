@@ -1,10 +1,11 @@
 package native
 
 import (
+	"image"
+
 	"github.com/anthonynsimon/bild/parallel"
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/processor"
-	"image"
 )
 
 func hasFastIsOpaque(im image.Image) bool {

@@ -1,13 +1,9 @@
 package gcs
 
 import (
-	gs "cloud.google.com/go/storage"
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gojek/darkroom/pkg/storage"
-	"google.golang.org/api/googleapi"
-	"google.golang.org/api/option"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -15,6 +11,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	gs "cloud.google.com/go/storage"
+	"github.com/gojek/darkroom/pkg/storage"
+	"google.golang.org/api/googleapi"
+	"google.golang.org/api/option"
 )
 
 var (

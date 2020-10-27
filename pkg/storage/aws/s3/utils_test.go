@@ -2,9 +2,10 @@ package s3
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_getStatusCodeFromError(t *testing.T) {

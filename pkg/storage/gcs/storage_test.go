@@ -1,19 +1,20 @@
 package gcs
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
-	storageTypes "github.com/gojek/darkroom/pkg/storage"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
-	"google.golang.org/api/googleapi"
-	"google.golang.org/api/option"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"cloud.google.com/go/storage"
+	storageTypes "github.com/gojek/darkroom/pkg/storage"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
+	"google.golang.org/api/googleapi"
+	"google.golang.org/api/option"
 )
 
 const (
@@ -260,8 +261,8 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 			),
 		},
 		{
-			name: "NotFoundWithValidRangeAndInvalidPath",
-			ctx:  context.TODO(),
+			name:   "NotFoundWithValidRangeAndInvalidPath",
+			ctx:    context.TODO(),
 			path:   invalidPath,
 			range_: &validRange,
 			newRangeReaderReturn: func() (Reader, error) {

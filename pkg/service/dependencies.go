@@ -3,13 +3,13 @@ package service
 
 import (
 	"errors"
+	"strings"
+	"time"
 
 	"github.com/gojek/darkroom/pkg/logger"
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/regex"
 	"github.com/prometheus/client_golang/prometheus"
-	"strings"
-	"time"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/processor/native"

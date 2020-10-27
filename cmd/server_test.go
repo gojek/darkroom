@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/gojek/darkroom/pkg/config"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/gojek/darkroom/pkg/config"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRunServer(t *testing.T) {

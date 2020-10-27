@@ -1,8 +1,9 @@
 package service
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"testing"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/storage/aws/cloudfront"

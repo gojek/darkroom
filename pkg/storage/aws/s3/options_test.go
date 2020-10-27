@@ -1,10 +1,11 @@
 package s3
 
 import (
+	"testing"
+
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/gojek/darkroom/pkg/storage"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestOptionsAreSet(t *testing.T) {

@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"bytes"
+	"strings"
+	"testing"
+
 	"github.com/gojek/darkroom/internal/version"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/suite"
-	"strings"
-	"testing"
 )
 
 type VersionCmdSuite struct {

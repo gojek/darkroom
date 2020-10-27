@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/gojek/darkroom/internal/version"
 	"github.com/spf13/cobra"
 )

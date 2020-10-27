@@ -2,13 +2,14 @@ package gcs
 
 import (
 	"bytes"
-	"cloud.google.com/go/storage"
 	"context"
-	"google.golang.org/api/option"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
+
+	"cloud.google.com/go/storage"
+	"google.golang.org/api/option"
 )
 
 type RoundTripFunc func(req *http.Request) *http.Response

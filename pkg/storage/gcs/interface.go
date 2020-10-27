@@ -1,9 +1,10 @@
 package gcs
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
 	"io"
+
+	"cloud.google.com/go/storage"
 )
 
 // These interfaces allow us to test the package properly.

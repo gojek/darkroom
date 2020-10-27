@@ -1,9 +1,10 @@
 package metrics
 
 import (
-	"github.com/gojek/darkroom/pkg/config"
 	"testing"
 	"time"
+
+	"github.com/gojek/darkroom/pkg/config"
 
 	"github.com/cactus/go-statsd-client/statsd"
 	"github.com/stretchr/testify/assert"
