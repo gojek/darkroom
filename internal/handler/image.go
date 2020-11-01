@@ -40,7 +40,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 
 		params := make(map[string]string)
 		values := r.URL.Query()
-		if len(values) > 0 {
+		if len(values) > 0 || len(deps.DefaultParams) > 0 {
 			for v := range values {
 				if len(values.Get(v)) != 0 {
 					params[v] = values.Get(v)
@@ -58,7 +58,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 		w.Header().Set(CacheControlHeader, fmt.Sprintf("public,max-age=%d", config.CacheTime()))
 		// Ref to Google CDN we support: https://cloud.google.com/cdn/docs/caching#cacheability
 		w.Header().Set(VaryHeader, "Accept")
-		
+
 		cl, _ := w.Write(data)
 		w.Header().Set(ContentLengthHeader, fmt.Sprintf("%d", cl))
 	}

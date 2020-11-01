@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gojek/darkroom/pkg/metrics"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gojek/darkroom/pkg/metrics"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/service"
@@ -37,11 +38,31 @@ func (s *ImageHandlerTestSuite) SetupTest() {
 		MetricService: s.mockMetricService}
 }
 
-func (s *ImageHandlerTestSuite) TestImageHandler() {
+func (s *ImageHandlerTestSuite) TestImageHandlerWithoutDefaultParams() {
+	s.deps.DefaultParams = make(map[string]string)
+
 	r, _ := http.NewRequest(http.MethodGet, "/image-valid", nil)
 	rr := httptest.NewRecorder()
+	data := []byte("validData")
 
-	s.storage.On("Get", mock.Anything, "/image-valid").Return([]byte("validData"), http.StatusOK, nil)
+	s.storage.On("Get", mock.Anything, "/image-valid").Return(data, http.StatusOK, nil)
+	ImageHandler(s.deps).ServeHTTP(rr, r)
+
+	assert.Equal(s.T(), "validData", rr.Body.String())
+	assert.Equal(s.T(), http.StatusOK, rr.Code)
+}
+
+func (s *ImageHandlerTestSuite) TestImageHandlerWithDefaultParams() {
+	s.deps.DefaultParams = map[string]string{
+		"auto": "compress",
+	}
+
+	r, _ := http.NewRequest(http.MethodGet, "/image-valid", nil)
+	rr := httptest.NewRecorder()
+	data := []byte("validData")
+
+	s.storage.On("Get", mock.Anything, "/image-valid").Return(data, http.StatusOK, nil)
+	s.manipulator.On("Process", mock.AnythingOfType("service.processSpec")).Return(data, nil)
 
 	ImageHandler(s.deps).ServeHTTP(rr, r)
 

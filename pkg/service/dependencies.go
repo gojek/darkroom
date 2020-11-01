@@ -3,12 +3,13 @@ package service
 
 import (
 	"errors"
+	"strings"
+	"time"
+
 	"github.com/gojek/darkroom/pkg/logger"
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/regex"
 	"github.com/prometheus/client_golang/prometheus"
-	"strings"
-	"time"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/processor/native"
@@ -25,6 +26,7 @@ type Dependencies struct {
 	Storage       base.Storage
 	Manipulator   Manipulator
 	MetricService metrics.MetricService
+	DefaultParams map[string]string
 }
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
@@ -40,8 +42,13 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 		metricService = metrics.NoOpMetricService{}
 		logger.Warn("NoOpMetricService is being used since metric system is not specified")
 	}
-	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
-		MetricService: metricService}
+	defaultParams := getDefaultParams()
+	deps := &Dependencies{
+		Manipulator:   NewManipulator(native.NewBildProcessor(), defaultParams, metricService),
+		MetricService: metricService,
+		DefaultParams: defaultParams,
+	}
+
 	s := config.DataSource()
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
