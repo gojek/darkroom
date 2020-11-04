@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gojek/darkroom/pkg/metrics"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gojek/darkroom/pkg/metrics"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/service"
