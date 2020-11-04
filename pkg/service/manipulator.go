@@ -44,6 +44,9 @@ const (
 type Manipulator interface {
 	// Process takes ProcessSpec as an argument and returns []byte, error
 	Process(spec processSpec) ([]byte, error)
+
+	// Whether or not default params are present
+	HasDefaultParams() bool
 }
 
 type manipulator struct {
@@ -124,6 +127,11 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		m.metricService.TrackDuration(encodeDurationKey, t, spec.ImageData)
 	}
 	return src, err
+}
+
+// This function returns true if defaultParams are present, returns false otherwise
+func (m *manipulator) HasDefaultParams() bool {
+	return len(m.defaultParams) > 0
 }
 
 func joinParams(params map[string]string, defaultParams map[string]string) map[string]string {

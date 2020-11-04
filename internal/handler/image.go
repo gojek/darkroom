@@ -40,7 +40,7 @@ func ImageHandler(deps *service.Dependencies) http.HandlerFunc {
 
 		params := make(map[string]string)
 		values := r.URL.Query()
-		if len(values) > 0 || len(deps.DefaultParams) > 0 {
+		if len(values) > 0 || deps.Manipulator.HasDefaultParams() {
 			for v := range values {
 				if len(values.Get(v)) != 0 {
 					params[v] = values.Get(v)

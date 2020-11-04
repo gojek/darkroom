@@ -26,7 +26,6 @@ type Dependencies struct {
 	Storage       base.Storage
 	Manipulator   Manipulator
 	MetricService metrics.MetricService
-	DefaultParams map[string]string
 }
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
@@ -46,7 +45,6 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 	deps := &Dependencies{
 		Manipulator:   NewManipulator(native.NewBildProcessor(), defaultParams, metricService),
 		MetricService: metricService,
-		DefaultParams: defaultParams,
 	}
 
 	s := config.DataSource()

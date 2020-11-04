@@ -2,15 +2,16 @@ package service
 
 import (
 	"errors"
+	"image"
+	"io/ioutil"
+	"testing"
+
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/gojek/darkroom/pkg/processor/native"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"image"
-	"io/ioutil"
-	"testing"
 )
 
 func TestNewManipulator(t *testing.T) {
@@ -179,6 +180,14 @@ func TestCleanInt(t *testing.T) {
 	assert.Equal(t, 0, CleanInt("0"))
 	assert.Equal(t, 0, CleanInt("garbage"))
 	assert.Equal(t, 0, CleanInt("-234"))
+}
+
+func TestManipulator_HasDefaultParams(t *testing.T) {
+	manipulatorWithDefaultParams := NewManipulator(nil, map[string]string{"auto": "compress"}, nil)
+	manipulatorWithoutDefaultParams := NewManipulator(nil, map[string]string{}, nil)
+
+	assert.Equal(t, true, manipulatorWithDefaultParams.HasDefaultParams())
+	assert.Equal(t, false, manipulatorWithoutDefaultParams.HasDefaultParams())
 }
 
 type mockProcessor struct {
