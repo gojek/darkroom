@@ -41,9 +41,8 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 		metricService = metrics.NoOpMetricService{}
 		logger.Warn("NoOpMetricService is being used since metric system is not specified")
 	}
-	defaultParams := getDefaultParams()
 	deps := &Dependencies{
-		Manipulator:   NewManipulator(native.NewBildProcessor(), defaultParams, metricService),
+		Manipulator:   NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
 		MetricService: metricService,
 	}
 

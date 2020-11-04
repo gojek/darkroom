@@ -45,7 +45,7 @@ type Manipulator interface {
 	// Process takes ProcessSpec as an argument and returns []byte, error
 	Process(spec processSpec) ([]byte, error)
 
-	// Whether or not default params are present
+	// HasDefaultParams returns true if defaultParams are present, returns false otherwise
 	HasDefaultParams() bool
 }
 
@@ -129,7 +129,7 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	return src, err
 }
 
-// This function returns true if defaultParams are present, returns false otherwise
+// HasDefaultParams returns true if defaultParams are present, returns false otherwise
 func (m *manipulator) HasDefaultParams() bool {
 	return len(m.defaultParams) > 0
 }
