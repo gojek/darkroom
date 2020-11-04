@@ -3,6 +3,7 @@ package service
 
 import (
 	"errors"
+
 	"github.com/gojek/darkroom/pkg/logger"
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/regex"
@@ -40,8 +41,11 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 		metricService = metrics.NoOpMetricService{}
 		logger.Warn("NoOpMetricService is being used since metric system is not specified")
 	}
-	deps := &Dependencies{Manipulator: NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
-		MetricService: metricService}
+	deps := &Dependencies{
+		Manipulator:   NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
+		MetricService: metricService,
+	}
+
 	s := config.DataSource()
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)

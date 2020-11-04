@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor"
 	"github.com/gojek/darkroom/pkg/processor/native"
@@ -179,6 +180,14 @@ func TestCleanInt(t *testing.T) {
 	assert.Equal(t, 0, CleanInt("0"))
 	assert.Equal(t, 0, CleanInt("garbage"))
 	assert.Equal(t, 0, CleanInt("-234"))
+}
+
+func TestManipulator_HasDefaultParams(t *testing.T) {
+	manipulatorWithDefaultParams := NewManipulator(nil, map[string]string{"auto": "compress"}, nil)
+	manipulatorWithoutDefaultParams := NewManipulator(nil, map[string]string{}, nil)
+
+	assert.Equal(t, true, manipulatorWithDefaultParams.HasDefaultParams())
+	assert.Equal(t, false, manipulatorWithoutDefaultParams.HasDefaultParams())
 }
 
 type mockProcessor struct {
