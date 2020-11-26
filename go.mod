@@ -3,6 +3,7 @@ module github.com/gojek/darkroom
 go 1.12
 
 require (
+	cloud.google.com/go v0.44.3
 	github.com/DataDog/datadog-go v2.2.0+incompatible // indirect
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/anthonynsimon/bild v0.10.1-0.20190710205720-eee9188e4370
@@ -24,5 +25,6 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.6.1
 	go.uber.org/zap v1.10.0
+	google.golang.org/api v0.9.0
 	sigs.k8s.io/controller-runtime v0.6.1
 )

@@ -3,22 +3,23 @@ package service
 
 import (
 	"errors"
-
-	"github.com/gojek/darkroom/pkg/logger"
-	"github.com/gojek/darkroom/pkg/metrics"
-	"github.com/gojek/darkroom/pkg/regex"
-	"github.com/prometheus/client_golang/prometheus"
 	"strings"
 	"time"
 
+	"github.com/gojektech/heimdall"
+	"github.com/gojektech/heimdall/hystrix"
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/gojek/darkroom/pkg/config"
+	"github.com/gojek/darkroom/pkg/logger"
+	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor/native"
+	"github.com/gojek/darkroom/pkg/regex"
 	base "github.com/gojek/darkroom/pkg/storage"
 	"github.com/gojek/darkroom/pkg/storage/aws/cloudfront"
 	"github.com/gojek/darkroom/pkg/storage/aws/s3"
+	"github.com/gojek/darkroom/pkg/storage/gcs"
 	"github.com/gojek/darkroom/pkg/storage/webfolder"
-	"github.com/gojektech/heimdall"
-	"github.com/gojektech/heimdall/hystrix"
 )
 
 // Dependencies struct holds the reference to the Storage and the Manipulator interface implementations
@@ -30,7 +31,7 @@ type Dependencies struct {
 
 // NewDependencies constructs new Dependencies based on the config.DataSource().Kind
 // Currently, it supports only one Manipulator
-func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
+func NewDependencies(registry *prometheus.Registry) (deps *Dependencies, err error) {
 	var metricService metrics.MetricService
 	if regex.PrometheusMatcher.MatchString(config.MetricsSystem()) {
 		metricService = metrics.NewPrometheus(registry)
@@ -41,11 +42,10 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 		metricService = metrics.NoOpMetricService{}
 		logger.Warn("NoOpMetricService is being used since metric system is not specified")
 	}
-	deps := &Dependencies{
+	deps = &Dependencies{
 		Manipulator:   NewManipulator(native.NewBildProcessor(), getDefaultParams(), metricService),
 		MetricService: metricService,
 	}
-
 	s := config.DataSource()
 	if regex.WebFolderMatcher.MatchString(s.Kind) {
 		deps.Storage = NewWebFolderStorage(s.Value.(config.WebFolder), s.HystrixCommand)
@@ -53,11 +53,13 @@ func NewDependencies(registry *prometheus.Registry) (*Dependencies, error) {
 		deps.Storage = NewS3Storage(s.Value.(config.S3Bucket), s.HystrixCommand)
 	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
 		deps.Storage = NewCloudfrontStorage(s.Value.(config.Cloudfront), s.HystrixCommand)
+	} else if regex.GoogleCloudStorageMatcher.MatchString(s.Kind) {
+		deps.Storage, err = NewGoogleCloudStorage(s.Value.(config.GoogleCloudStorage), s.HystrixCommand)
 	}
 	if deps.Storage == nil || deps.Manipulator == nil {
 		return nil, errors.New("handler dependencies are not valid")
 	}
-	return deps, nil
+	return deps, err
 }
 
 func getDefaultParams() map[string]string {
@@ -80,6 +82,15 @@ func NewS3Storage(b config.S3Bucket, hc base.HystrixCommand) *s3.Storage {
 		s3.WithSecretKey(b.SecretKey),
 		s3.WithHystrixCommand(hc),
 	)
+}
+
+// NewGoogleCloudStorage create a new gcs.Storage struct from the config.GoogleCloudStorage and the HystrixCommand
+func NewGoogleCloudStorage(b config.GoogleCloudStorage, hc base.HystrixCommand) (*gcs.Storage, error) {
+	return gcs.NewStorage(gcs.Options{
+		BucketName:      b.Name,
+		CredentialsJSON: []byte(b.CredentialsJSON),
+		Client:          newHystrixClient(hc),
+	})
 }
 
 // NewWebFolderStorage create a new webfolder.Storage struct from the config.WebFolder and the HystrixCommand

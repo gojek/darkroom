@@ -2,11 +2,12 @@ package logger
 
 import (
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"net/http"
-	"testing"
 )
 
 func makeLogsStorageHooks() (func(zapcore.Entry) error, **[]zapcore.Entry) {

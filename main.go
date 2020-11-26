@@ -5,8 +5,9 @@
 package main
 
 import (
-	"github.com/gojek/darkroom/cmd"
 	"os"
+
+	"github.com/gojek/darkroom/cmd"
 )
 
 func main() {

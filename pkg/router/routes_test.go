@@ -2,10 +2,11 @@ package router
 
 import (
 	"context"
-	"github.com/gojek/darkroom/pkg/metrics"
-	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"testing"
+
+	"github.com/gojek/darkroom/pkg/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/gojek/darkroom/pkg/config"
 	"github.com/gojek/darkroom/pkg/service"

@@ -3,11 +3,12 @@ package cloudfront
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/gojek/darkroom/pkg/storage"
 	"github.com/gojektech/heimdall"
 	"github.com/pkg/errors"
-	"io/ioutil"
-	"net/http"
 )
 
 // Storage holds the fields used by cloudfront storage implementation

@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewServer(t *testing.T) {

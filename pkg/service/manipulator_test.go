@@ -2,6 +2,9 @@ package service
 
 import (
 	"errors"
+	"image"
+	"io/ioutil"
+	"testing"
 
 	"github.com/gojek/darkroom/pkg/metrics"
 	"github.com/gojek/darkroom/pkg/processor"
@@ -9,9 +12,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"image"
-	"io/ioutil"
-	"testing"
 )
 
 func TestNewManipulator(t *testing.T) {

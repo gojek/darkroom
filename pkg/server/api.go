@@ -3,8 +3,9 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/gojek/darkroom/pkg/logger"
 	"net/http"
+
+	"github.com/gojek/darkroom/pkg/logger"
 )
 
 // Options represents the Server options

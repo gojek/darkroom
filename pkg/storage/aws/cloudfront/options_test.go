@@ -1,9 +1,10 @@
 package cloudfront
 
 import (
+	"testing"
+
 	"github.com/gojektech/heimdall/hystrix"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestWithCloudfrontHost(t *testing.T) {

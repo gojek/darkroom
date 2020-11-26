@@ -3,10 +3,11 @@ package webfolder
 import (
 	"context"
 	"fmt"
-	"github.com/gojek/darkroom/pkg/storage"
-	"github.com/gojektech/heimdall"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gojek/darkroom/pkg/storage"
+	"github.com/gojektech/heimdall"
 )
 
 // Storage holds the fields used by webfolder storage implementation

@@ -1,13 +1,14 @@
 package native
 
 import (
-	"github.com/gojek/darkroom/pkg/config"
-	"github.com/gojek/darkroom/pkg/processor"
-	"github.com/stretchr/testify/assert"
 	"image"
 	"image/color"
 	"image/draw"
 	"testing"
+
+	"github.com/gojek/darkroom/pkg/config"
+	"github.com/gojek/darkroom/pkg/processor"
+	"github.com/stretchr/testify/assert"
 )
 
 const (

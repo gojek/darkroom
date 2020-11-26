@@ -17,6 +17,14 @@ type S3Bucket struct {
 	SecretKey string
 }
 
+// GoogleCloudStorage contains the configuration values for GoogleCloudStorage source
+type GoogleCloudStorage struct {
+	// Name of the bucket
+	Name string
+	// CredentialsJSON of the service account associated with the bucket
+	CredentialsJSON string
+}
+
 // WebFolder contains the configuration for a directory available on the public internet
 type WebFolder struct {
 	// BaseURL that should be appended to the path
@@ -73,5 +81,10 @@ func (s *Source) readValue() {
 		}
 	} else if regex.WebFolderMatcher.MatchString(s.Kind) {
 		s.Value = WebFolder{BaseURL: v.GetString("source.baseURL")}
+	} else if regex.GoogleCloudStorageMatcher.MatchString(s.Kind) {
+		s.Value = GoogleCloudStorage{
+			Name:            v.GetString("source.bucket.name"),
+			CredentialsJSON: v.GetString("source.bucket.credentialsJson"),
+		}
 	}
 }
