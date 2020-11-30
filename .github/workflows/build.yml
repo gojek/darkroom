@@ -16,14 +16,12 @@ jobs:
         go-version: [ 1.13.x, 1.14.x, 1.15.x ]
 
     steps:
+      - uses: actions/checkout@v2
       - name: Set up Go ${{ matrix.go-version }}
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
         id: go
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
 
       - name: Build
         run: make compile
