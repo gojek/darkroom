@@ -80,6 +80,7 @@ func NewS3Storage(b config.S3Bucket, hc base.HystrixCommand) *s3.Storage {
 		s3.WithBucketRegion(b.Region),
 		s3.WithAccessKey(b.AccessKey),
 		s3.WithSecretKey(b.SecretKey),
+		s3.WithEndpoint(b.Endpoint),
 		s3.WithHystrixCommand(hc),
 	)
 }

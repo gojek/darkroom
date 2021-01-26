@@ -33,6 +33,13 @@ func WithSecretKey(secretKey string) Option {
 	}
 }
 
+// WithEndpoint sets the bucket endpoint
+func WithEndpoint(endpoint string) Option {
+	return func(s *Storage) {
+		s.endpoint = endpoint
+	}
+}
+
 // WithHystrixCommand sets the bucket hystrixCmd
 func WithHystrixCommand(hytrixCmd storage.HystrixCommand) Option {
 	return func(s *Storage) {
