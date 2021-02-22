@@ -1,5 +1,11 @@
-APP=darkroom
-APP_EXECUTABLE="./out/$(APP)"
+BUILD_DIR := ".out"
+APP_EXECUTABLE="$(BUILD_DIR)/darkroom"
+
+ifeq (,$(shell go env GOBIN))
+GOBIN=$(shell go env GOPATH)/bin
+else
+GOBIN=$(shell go env GOBIN)
+endif
 
 BUILD_INFO_GIT_TAG ?= $(shell git describe --tags 2>/dev/null || echo unknown)
 BUILD_INFO_GIT_COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
@@ -17,19 +23,18 @@ LD_FLAGS := -ldflags="-s -w $(build_info_ld_flags)"
 GOOS := $(shell go env GOOS)
 GOARCH := $(shell go env GOARCH)
 GO_BUILD := GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=1 go build $(LD_FLAGS)
-GO_RUN := CGO_ENABLED=1 go run $(LD_FLAGS)
+GO_RUN := GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=1 go run $(LD_FLAGS)
 
 all: test-ci
 
 setup:
 	go get golang.org/x/lint/golint
-	go get github.com/mattn/goveralls
 
 run: copy-config
 	@$(GO_RUN) main.go server
 
 compile:
-	@mkdir -p out
+	@mkdir -p $(BUILD_DIR)
 	@$(GO_BUILD) -o $(APP_EXECUTABLE) main.go
 
 lint:
@@ -44,8 +49,8 @@ vet:
 test:
 	go test ./... -covermode=count -coverprofile=profile.cov
 
-coverage:
-	goveralls -coverprofile=profile.cov -service=travis-ci
+coverage: goveralls
+	@$(GOVERALLS) -coverprofile=profile.cov -service=github
 
 copy-config:
 	@cp config.example.yaml config.yaml
@@ -56,4 +61,20 @@ docker-image:
 docker-docs:
 	@docker build -t darkroom-docs:latest -f build/Dockerfile.docs .
 
-test-ci: copy-config compile lint format vet test coverage
+test-ci: copy-config compile lint format vet test
+
+# find or download goveralls
+goveralls:
+ifeq (, $(shell which goveralls))
+	@{ \
+	set -e ;\
+	GOVERALLS_TMP_DIR=$$(mktemp -d) ;\
+	cd $$GOVERALLS_TMP_DIR ;\
+	go mod init tmp ;\
+	go get github.com/mattn/goveralls ;\
+	rm -rf $$GOVERALLS_TMP_DIR ;\
+	}
+GOVERALLS=$(GOBIN)/goveralls
+else
+GOVERALLS=$(shell which goveralls)
+endif

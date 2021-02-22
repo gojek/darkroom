@@ -3,7 +3,7 @@
 *.DS_Store
 
 # binaries
-out/
+.out/
 
 # releases
 dist/
