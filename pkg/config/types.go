@@ -15,6 +15,8 @@ type S3Bucket struct {
 	AccessKey string
 	// Secret key that should be used to access the bucket
 	SecretKey string
+	// Endpoint overrides the default generated endpoint for bucket client
+	Endpoint string
 }
 
 // GoogleCloudStorage contains the configuration values for GoogleCloudStorage source
@@ -73,6 +75,7 @@ func (s *Source) readValue() {
 			Region:    v.GetString("source.bucket.region"),
 			AccessKey: v.GetString("source.bucket.accessKey"),
 			SecretKey: v.GetString("source.bucket.secretKey"),
+			Endpoint:  v.GetString("source.bucket.endpoint"),
 		}
 	} else if regex.CloudfrontMatcher.MatchString(s.Kind) {
 		s.Value = Cloudfront{

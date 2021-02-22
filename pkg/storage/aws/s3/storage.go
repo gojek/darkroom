@@ -22,6 +22,7 @@ type Storage struct {
 	bucketRegion string
 	accessKey    string
 	secretKey    string
+	endpoint     string
 	service      s3iface.S3API
 	hystrixCmd   storage.HystrixCommand
 	downloader   s3manageriface.DownloaderAPI
@@ -118,9 +119,12 @@ func NewStorage(opts ...Option) *Storage {
 	for _, opt := range opts {
 		opt(&s)
 	}
-	cfg := aws.NewConfig().WithRegion(s.bucketRegion).WithCredentials(
-		credentials.NewStaticCredentials(s.accessKey, s.secretKey, ""),
-	)
+	cfg := aws.NewConfig().
+		WithRegion(s.bucketRegion).
+		WithEndpoint(s.endpoint).
+		WithCredentials(
+			credentials.NewStaticCredentials(s.accessKey, s.secretKey, ""),
+		)
 	ssn, _ := session.NewSession(cfg)
 	s.service = s3.New(ssn)
 	s.downloader = s3manager.NewDownloaderWithClient(s.service)
