@@ -4,7 +4,7 @@
 
 [![build status](https://travis-ci.com/gojek/darkroom.svg?branch=master)](https://travis-ci.com/gojek/darkroom)
 [![Coverage Status](https://coveralls.io/repos/github/gojek/darkroom/badge.svg?branch=master)](https://coveralls.io/github/gojek/darkroom?branch=master)
-[![Docs latest](https://img.shields.io/badge/Docs-latest-blue.svg)](https://www.gojek.io/darkroom/)
+[![Docs latest](https://img.shields.io/badge/Docs-latest-blue.svg)](https://gojek.github.io/darkroom/)
 [![GoDoc](https://godoc.org/github.com/gojek/darkroom?status.svg)](https://godoc.org/github.com/gojek/darkroom)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gojek/darkroom)](https://goreportcard.com/report/github.com/gojek/darkroom)
 [![GolangCI](https://golangci.com/badges/github.com/gojek/darkroom.svg)](https://golangci.com)
@@ -13,20 +13,20 @@
 
 ## Introduction
 
-[Darkroom](https://www.gojek.io/darkroom/) combines the [storage backend](pkg/storage) and the [image processor](pkg/processor) and acts as an `Image Proxy` on your image source.  
-You may [implement](https://www.gojek.io/darkroom/docs/customization#custom-storage-example) your own `Storage` and `Processor` interfaces to gain custom functionality while still keeping other Darkroom Server functionality.  
+[Darkroom](https://gojek.github.io/darkroom/) combines the [storage backend](pkg/storage) and the [image processor](pkg/processor) and acts as an `Image Proxy` on your image source.  
+You may [implement](https://gojek.github.io/darkroom/docs/customization#custom-storage-example) your own `Storage` and `Processor` interfaces to gain custom functionality while still keeping other Darkroom Server functionality.  
 The native implementations focus on speed and resiliency.
 
 ## Features
 
-Darkroom supports several image operations which are documented [here](https://www.gojek.io/darkroom/docs/usage/size).
+Darkroom supports several image operations which are documented [here](https://gojek.github.io/darkroom/docs/usage/size).
 
 ## Installation
 
 ```bash
 go get -u github.com/gojek/darkroom
 ```
-Other ways to run can be found [here](https://www.gojek.io/darkroom/docs/getting-started#running-the-image-proxy-service).
+Other ways to run can be found [here](https://gojek.github.io/darkroom/docs/getting-started#running-the-image-proxy-service).
 
 ## Metrics Support
 
