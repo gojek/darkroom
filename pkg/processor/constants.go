@@ -27,4 +27,5 @@ const (
 	ExtensionPNG  = "png"
 	ExtensionJPG  = "jpg"
 	ExtensionJPEG = "jpeg"
+	ExtensionGIF  = "gif"
 )
