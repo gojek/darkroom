@@ -27,9 +27,6 @@ GO_RUN := GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=1 go run $(LD_FLAGS)
 
 all: test-ci
 
-setup:
-	go get golang.org/x/lint/golint
-
 run: copy-config
 	@$(GO_RUN) main.go server
 
@@ -37,8 +34,8 @@ compile:
 	@mkdir -p $(BUILD_DIR)
 	@$(GO_BUILD) -o $(APP_EXECUTABLE) main.go
 
-lint:
-	@golint ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
+lint: golint
+	@$(GOLINT) ./... | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }
 
 format:
 	go fmt ./...
@@ -63,18 +60,25 @@ docker-docs:
 
 test-ci: copy-config compile lint format vet test
 
-# find or download goveralls
+### Helper functions
+
+golint:
+	$(call install-if-needed,GOLINT,golang.org/x/lint/golint,v0.0.0-20210508222113-6edffad5e616)
+
 goveralls:
-ifeq (, $(shell which goveralls))
-	@{ \
+	$(call install-if-needed,GOVERALLS,github.com/mattn/goveralls,v0.0.12)
+
+is-available = $(if $(shell command -v $(1) 2> /dev/null),yes,no)
+
+define install-if-needed
+	@if [ $(call is-available,$(notdir $(2))) = "no" ] ; then \
+	echo "Installing $(2)..." ;\
 	set -e ;\
-	GOVERALLS_TMP_DIR=$$(mktemp -d) ;\
-	cd $$GOVERALLS_TMP_DIR ;\
+	TMP_DIR=$$(mktemp -d) ;\
+	cd $$TMP_DIR ;\
 	go mod init tmp ;\
-	go get github.com/mattn/goveralls ;\
-	rm -rf $$GOVERALLS_TMP_DIR ;\
-	}
-GOVERALLS=$(GOBIN)/goveralls
-else
-GOVERALLS=$(shell which goveralls)
-endif
+	go install $(2)@$(3) ;\
+	rm -rf $$TMP_DIR ;\
+	fi
+	@$(eval $1 := $(if $(shell command -v $(notdir $(2))),$(shell command -v $(notdir $(2))),$(GOBIN)/$(notdir $(2))))
+endef
