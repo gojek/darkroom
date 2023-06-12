@@ -99,7 +99,7 @@ func DefaultParams() []string {
 	return strings.Split(getConfig().defaultParams, ";")
 }
 
-// MetricSystem returns the metrics system to be used for MetricService in dependencies from the environment
+// MetricsSystem returns the metrics system to be used for MetricService in dependencies from the environment
 func MetricsSystem() string {
 	return getConfig().metricsSystem
 }

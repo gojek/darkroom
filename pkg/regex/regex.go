@@ -13,6 +13,6 @@ var (
 	WebFolderMatcher = regexp.MustCompile("^(?i)webfolder$")
 	// PrometheusMatcher regex matches against string prometheus in any case
 	PrometheusMatcher = regexp.MustCompile("^(?i)prometheus$")
-	// StatsDMatcher regex matches against string statsd in any case
+	// StatsdMatcher regex matches against string statsd in any case
 	StatsdMatcher = regexp.MustCompile("^(?i)statsd$")
 )

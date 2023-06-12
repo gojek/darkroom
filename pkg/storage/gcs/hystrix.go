@@ -14,8 +14,8 @@ import (
 
 const userAgent = "gcloud-golang-storage/20151204"
 
-func newHeimdallHTTPClient(ctx context.Context, hc heimdall.Client, credentialsJson []byte) (*http.Client, error) {
-	t, err := newTransport(ctx, hc, credentialsJson)
+func newHeimdallHTTPClient(ctx context.Context, hc heimdall.Client, credentialsJSON []byte) (*http.Client, error) {
+	t, err := newTransport(ctx, hc, credentialsJSON)
 	if err != nil {
 		return nil, err
 	}
@@ -24,10 +24,10 @@ func newHeimdallHTTPClient(ctx context.Context, hc heimdall.Client, credentialsJ
 	}, nil
 }
 
-func newTransport(ctx context.Context, hc heimdall.Client, credentialsJson []byte) (http.RoundTripper, error) {
+func newTransport(ctx context.Context, hc heimdall.Client, credentialsJSON []byte) (http.RoundTripper, error) {
 	o := option.WithoutAuthentication()
-	if len(credentialsJson) > 0 {
-		o = option.WithCredentialsJSON(credentialsJson)
+	if len(credentialsJSON) > 0 {
+		o = option.WithCredentialsJSON(credentialsJSON)
 	}
 	return gcloud.NewTransport(ctx,
 		&hystrixTransport{client: hc},

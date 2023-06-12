@@ -182,17 +182,17 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 		name                 string
 		ctx                  context.Context
 		path                 string
-		range_               *string
+		rangeStr             *string
 		newReaderReturn      func() (Reader, error)
 		newRangeReaderReturn func() (Reader, error)
 		attrsReturn          func() (*storage.ObjectAttrs, error)
 		res                  storageTypes.IResponse
 	}{
 		{
-			name:   "Success",
-			ctx:    context.TODO(),
-			path:   validPath,
-			range_: &validRange,
+			name:     "Success",
+			ctx:      context.TODO(),
+			path:     validPath,
+			rangeStr: &validRange,
 			newRangeReaderReturn: func() (Reader, error) {
 				return ioutil.NopCloser(strings.NewReader("someData")), nil
 			},
@@ -227,10 +227,10 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 			res: storageTypes.NewResponse([]byte("someData"), http.StatusOK, nil),
 		},
 		{
-			name:   "WithEmptyRangeValue",
-			ctx:    context.TODO(),
-			path:   validPath,
-			range_: &emptyRange,
+			name:     "WithEmptyRangeValue",
+			ctx:      context.TODO(),
+			path:     validPath,
+			rangeStr: &emptyRange,
 			newReaderReturn: func() (Reader, error) {
 				return ioutil.NopCloser(strings.NewReader("someData")), nil
 			},
@@ -246,20 +246,20 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 			res: storageTypes.NewResponse(nil, http.StatusNotFound, storage.ErrObjectNotExist),
 		},
 		{
-			name:   "OnInvalidRange",
-			ctx:    context.TODO(),
-			path:   validPath,
-			range_: &invalidRange,
+			name:     "OnInvalidRange",
+			ctx:      context.TODO(),
+			path:     validPath,
+			rangeStr: &invalidRange,
 			newReaderReturn: func() (Reader, error) {
 				return ioutil.NopCloser(strings.NewReader("someData")), nil
 			},
 			res: storageTypes.NewResponse(nil, http.StatusUnprocessableEntity, ErrInvalidRange),
 		},
 		{
-			name:   "OnRangeReaderError",
-			ctx:    context.TODO(),
-			path:   validPath,
-			range_: &outOfBoundRange,
+			name:     "OnRangeReaderError",
+			ctx:      context.TODO(),
+			path:     validPath,
+			rangeStr: &outOfBoundRange,
 			newRangeReaderReturn: func() (Reader, error) {
 				return nil, &googleapi.Error{Code: 400, Message: "Bad Request"}
 			},
@@ -269,30 +269,30 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 			),
 		},
 		{
-			name:   "NotFoundWithValidRangeAndInvalidPath",
-			ctx:    context.TODO(),
-			path:   invalidPath,
-			range_: &validRange,
+			name:     "NotFoundWithValidRangeAndInvalidPath",
+			ctx:      context.TODO(),
+			path:     invalidPath,
+			rangeStr: &validRange,
 			newRangeReaderReturn: func() (Reader, error) {
 				return nil, storage.ErrObjectNotExist
 			},
 			res: storageTypes.NewResponse([]byte(nil), http.StatusNotFound, storage.ErrObjectNotExist),
 		},
 		{
-			name:   "OnBadReaderError",
-			ctx:    context.TODO(),
-			path:   unreadablePath,
-			range_: &validRange,
+			name:     "OnBadReaderError",
+			ctx:      context.TODO(),
+			path:     unreadablePath,
+			rangeStr: &validRange,
 			newRangeReaderReturn: func() (Reader, error) {
 				return &badReader{}, nil
 			},
 			res: storageTypes.NewResponse(nil, http.StatusUnprocessableEntity, io.ErrUnexpectedEOF),
 		},
 		{
-			name:   "WhenObjectAttributesAreUnreadable",
-			ctx:    context.TODO(),
-			path:   invalidPath,
-			range_: &validRange,
+			name:     "WhenObjectAttributesAreUnreadable",
+			ctx:      context.TODO(),
+			path:     invalidPath,
+			rangeStr: &validRange,
 			newRangeReaderReturn: func() (Reader, error) {
 				return ioutil.NopCloser(strings.NewReader("someData")), nil
 			},
@@ -310,12 +310,12 @@ func (s *StorageTestSuite) TestBenchForStorage_GetPartially() {
 			s.bucketHandle.On("Object", t.path).Return(mo)
 
 			var opts *storageTypes.GetPartiallyRequestOptions
-			if t.range_ != nil {
-				if o, l, err := s.storage.parseRange(*t.range_); err == nil {
+			if t.rangeStr != nil {
+				if o, l, err := s.storage.parseRange(*t.rangeStr); err == nil {
 					mo.On("NewRangeReader", t.ctx, o, l).
 						Return(t.newRangeReaderReturn())
 				}
-				opts = &storageTypes.GetPartiallyRequestOptions{Range: *t.range_}
+				opts = &storageTypes.GetPartiallyRequestOptions{Range: *t.rangeStr}
 			}
 			if t.newReaderReturn != nil {
 				mo.On("NewReader", t.ctx).Return(t.newReaderReturn())
