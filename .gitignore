@@ -24,3 +24,4 @@ profile.cov
 .env.*
 
 vendor
+.docker-creds
