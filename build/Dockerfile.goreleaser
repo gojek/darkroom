@@ -1,7 +1,11 @@
-FROM alpine
-RUN apk update && apk add --no-cache ca-certificates libc6-compat
-COPY darkroom ./darkroom
-RUN chmod +x ./darkroom
+FROM gcr.io/distroless/base:nonroot
+
+USER 65532:65532
+
+COPY darkroom .
+RUN chmod +x /darkroom
+
 ENV PORT 3000
 EXPOSE 3000
-CMD ["./darkroom", "server"]
+
+CMD ["/darkroom", "server"]
