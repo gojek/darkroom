@@ -45,14 +45,21 @@ func NewStorage(opts Options) (*Storage, error) {
 func (s *Storage) Get(ctx context.Context, path string) storage.IResponse {
 	path = strings.TrimPrefix(path, "/")
 	r, err := s.bucketHandle.Object(path).NewReader(ctx)
-	if errors.Is(err, gs.ErrObjectNotExist) {
-		return storage.NewResponse(nil, http.StatusNotFound, err)
-	}
-	var apiErr *googleapi.Error
-	if errors.As(err, &apiErr) {
-		return storage.NewResponse(nil, apiErr.Code, apiErr)
+
+	if err != nil {
+		if errors.Is(err, gs.ErrObjectNotExist) {
+			return storage.NewResponse(nil, http.StatusNotFound, err)
+		}
+
+		var apiErr *googleapi.Error
+		if errors.As(err, &apiErr) {
+			return storage.NewResponse(nil, apiErr.Code, apiErr)
+		}
+
+		return storage.NewResponse(nil, http.StatusUnprocessableEntity, err)
 	}
 	defer r.Close()
+
 	d, err := ioutil.ReadAll(r)
 	if err != nil {
 		return storage.NewResponse(nil, http.StatusUnprocessableEntity, err)
