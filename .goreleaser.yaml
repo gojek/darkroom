@@ -49,13 +49,13 @@ builds:
   - CGO_ENABLED=1
   - CC=o64-clang
   - CXX=o64-clang++
-#dockers:
-#- dockerfile: build/Dockerfile.goreleaser
-#  goos: linux
-#  goarch: amd64
-#  image_templates:
-#  - "gojektech/darkroom:latest"
-#  - "gojektech/darkroom:{{ .Tag }}"
+dockers:
+- dockerfile: build/Dockerfile.goreleaser
+  goos: linux
+  goarch: amd64
+  image_templates:
+  - "gojektech/darkroom:latest"
+  - "gojektech/darkroom:{{ .Tag }}"
 
 archives:
 - format: tar.gz
