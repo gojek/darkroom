@@ -8,7 +8,6 @@ builds:
   - linux
   goarch:
   - amd64
-  - "386"
   env:
   - CGO_ENABLED=1
   ldflags:
@@ -17,23 +16,7 @@ builds:
   - -X github.com/gojek/darkroom/internal/version.gitTag={{ .Tag }}
   - -X github.com/gojek/darkroom/internal/version.gitCommit={{ .FullCommit }}
   - -X github.com/gojek/darkroom/internal/version.buildDate={{ .Date }}
-- id: darkroom_windows_32bit
-  main: .
-  goos:
-  - windows
-  goarch:
-  - 386
-  ldflags:
-  - -w -s
-  - -X github.com/gojek/darkroom/internal/version.version={{ .Version }}
-  - -X github.com/gojek/darkroom/internal/version.gitTag={{ .Tag }}
-  - -X github.com/gojek/darkroom/internal/version.gitCommit={{ .FullCommit }}
-  - -X github.com/gojek/darkroom/internal/version.buildDate={{ .Date }}
-  env:
-  - CGO_ENABLED=1
-  - CC=i686-w64-mingw32-gcc
-  - CXX=i686-w64-mingw32-g++
-- id: darkroom_windows_64bit
+- id: darkroom_windows
   main: .
   goos:
   - windows
@@ -55,6 +38,7 @@ builds:
   - darwin
   goarch:
   - amd64
+  - arm64
   ldflags:
   - -w -s
   - -X github.com/gojek/darkroom/internal/version.version={{ .Version }}
@@ -65,16 +49,14 @@ builds:
   - CGO_ENABLED=1
   - CC=o64-clang
   - CXX=o64-clang++
-dockers:
-- dockerfile: build/Dockerfile.goreleaser
-  goos: linux
-  goarch: amd64
-  image_templates:
-  - "gojektech/darkroom:latest"
-  - "gojektech/darkroom:{{ .Tag }}"
-env:
-- CGO_ENABLED=1
-- GO111MODULE=on
+#dockers:
+#- dockerfile: build/Dockerfile.goreleaser
+#  goos: linux
+#  goarch: amd64
+#  image_templates:
+#  - "gojektech/darkroom:latest"
+#  - "gojektech/darkroom:{{ .Tag }}"
+
 archives:
 - format: tar.gz
   name_template: >-

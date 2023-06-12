@@ -9,12 +9,16 @@ on:
 
 jobs:
   release:
-    name: Docker Push
+    name: GoReleaser Build & Push
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - run: git fetch --force --tags
     - name: Build Push
       env:
+        GOLANG_CROSS_VERSION: 1.20.5
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -26,8 +30,8 @@ jobs:
         -e GITHUB_TOKEN \
         -e DOCKER_USERNAME \
         -e DOCKER_PASSWORD \
-        ghcr.io/goreleaser/goreleaser-cross \
-        /bin/bash -c "echo $DOCKER_PASSWORD | docker login docker.io --username $DOCKER_USERNAME --password-stdin && goreleaser release --clean --snapshot"
+        ghcr.io/goreleaser/goreleaser-cross:v$GOLANG_CROSS_VERSION \
+        release --clean --snapshot
 #  release-docs:
 #    name: Publish GH Pages
 #    runs-on: ubuntu-latest
