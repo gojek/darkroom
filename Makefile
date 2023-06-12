@@ -71,7 +71,7 @@ ifeq (, $(shell which goveralls))
 	GOVERALLS_TMP_DIR=$$(mktemp -d) ;\
 	cd $$GOVERALLS_TMP_DIR ;\
 	go mod init tmp ;\
-	go get github.com/mattn/goveralls ;\
+	go install github.com/mattn/goveralls ;\
 	rm -rf $$GOVERALLS_TMP_DIR ;\
 	}
 GOVERALLS=$(GOBIN)/goveralls
