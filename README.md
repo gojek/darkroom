@@ -24,7 +24,7 @@ Darkroom supports several image operations which are documented [here](https://g
 ## Installation
 
 ```bash
-go get -u github.com/gojek/darkroom
+go get -u github.com/gojek/darkroom ##TEST BY CSOC@GOJEK.COM##
 ```
 Other ways to run can be found [here](https://gojek.github.io/darkroom/docs/getting-started#running-the-image-proxy-service).
 
