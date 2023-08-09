@@ -66,6 +66,9 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if spec.TargetExtension != "" {
+		f = spec.TargetExtension
+	}
 	m.metricService.TrackDuration(decodeDurationKey, t, spec.ImageData)
 	if params[fit] == crop {
 		t = time.Now()
