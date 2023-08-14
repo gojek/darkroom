@@ -67,7 +67,7 @@ func TestManipulator_Process_ReturnsImageWithTargetFormat(t *testing.T) {
 	ext := "jpg"
 	s := NewSpecBuilder().
 		WithImageData(img).
-		WithTargetExtension(ext).
+		WithTargetFormat(ext).
 		Build()
 	img, err := m.Process(s)
 	assert.Nil(t, err)

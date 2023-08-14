@@ -17,14 +17,14 @@ func TestSpecBuilder_Build(t *testing.T) {
 		WithImageData(img).
 		WithParams(params).
 		WithFormats(formats).
-		WithTargetExtension(ext).
+		WithTargetFormat(ext).
 		Build()
 
 	assert.Equal(t, spec.Scope, scope)
 	assert.Equal(t, spec.ImageData, img)
 	assert.Equal(t, spec.Params, params)
 	assert.Equal(t, spec.formats, formats)
-	assert.Equal(t, spec.TargetExtension, ext)
+	assert.Equal(t, spec.TargetFormat, ext)
 }
 
 func TestSpec_IsWebPSupported(t *testing.T) {
@@ -39,6 +39,6 @@ func TestSpec_IsWebPSupported(t *testing.T) {
 
 func TestSpec_Build_TargetExtensionNotValid(t *testing.T) {
 	ext := "gif"
-	spec := NewSpecBuilder().WithTargetExtension(ext).Build()
-	assert.Empty(t, spec.TargetExtension)
+	spec := NewSpecBuilder().WithTargetFormat(ext).Build()
+	assert.Empty(t, spec.TargetFormat)
 }
