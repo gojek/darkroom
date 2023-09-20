@@ -12,9 +12,18 @@ type processSpec struct {
 	ImageData []byte
 	// Params hold the key-value pairs for the processing job and tells the manipulator what to do with the image
 	Params map[string]string
+	// Reformat image to target format
+	TargetFormat string
 	// Formats have the information of accepted formats, whether darkroom can return the image using webp or not
 	formats []string
 }
+
+const (
+	extJPG  = "jpg"
+	extPNG  = "png"
+	extWebP = "webp"
+	extJPEG = "jpeg"
+)
 
 func (ps *processSpec) IsWebPSupported() bool {
 	for _, f := range ps.formats {
@@ -30,6 +39,7 @@ type SpecBuilder interface {
 	WithImageData(img []byte) SpecBuilder
 	WithParams(params map[string]string) SpecBuilder
 	WithFormats(formats []string) SpecBuilder
+	WithTargetFormat(ext string) SpecBuilder
 	Build() processSpec
 }
 
@@ -38,6 +48,7 @@ type specBuilder struct {
 	imageData []byte
 	params    map[string]string
 	formats   []string
+	extension string
 }
 
 func (sb *specBuilder) WithScope(scope string) SpecBuilder {
@@ -60,12 +71,21 @@ func (sb *specBuilder) WithFormats(formats []string) SpecBuilder {
 	return sb
 }
 
+func (sb *specBuilder) WithTargetFormat(ext string) SpecBuilder {
+	switch ext {
+	case extJPG, extJPEG, extPNG, extWebP:
+		sb.extension = ext
+	}
+	return sb
+}
+
 func (sb *specBuilder) Build() processSpec {
 	return processSpec{
-		Scope:     sb.scope,
-		ImageData: sb.imageData,
-		Params:    sb.params,
-		formats:   sb.formats,
+		Scope:        sb.scope,
+		ImageData:    sb.imageData,
+		Params:       sb.params,
+		formats:      sb.formats,
+		TargetFormat: sb.extension,
 	}
 }
 

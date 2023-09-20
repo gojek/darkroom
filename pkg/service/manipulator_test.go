@@ -56,6 +56,24 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 	assert.Equal(t, expectedImg, img)
 }
 
+// Integration test to verify the flow of encoding with target format
+func TestManipulator_Process_ReturnsImageWithTargetFormat(t *testing.T) {
+	// Use real processor to ensure that right encoder is being used
+	p := native.NewBildProcessor()
+	m := NewManipulator(p, nil, metrics.NewPrometheus(prometheus.NewRegistry()))
+
+	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.png")
+	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_png_to_jpg.jpg")
+	ext := "jpg"
+	s := NewSpecBuilder().
+		WithImageData(img).
+		WithTargetFormat(ext).
+		Build()
+	img, err := m.Process(s)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedImg, img)
+}
+
 func TestManipulator_Process(t *testing.T) {
 	mp := &mockProcessor{}
 	ms := &metrics.MockMetricService{}
