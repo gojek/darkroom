@@ -2,6 +2,7 @@ package gcs
 
 import (
 	"context"
+	"golang.org/x/oauth2/google"
 	"net/http"
 
 	"cloud.google.com/go/storage"
@@ -14,8 +15,8 @@ import (
 
 const userAgent = "gcloud-golang-storage/20151204"
 
-func newHeimdallHTTPClient(ctx context.Context, hc heimdall.Client, credentialsJSON []byte) (*http.Client, error) {
-	t, err := newTransport(ctx, hc, credentialsJSON)
+func newHeimdallHTTPClient(ctx context.Context, opts *Options) (*http.Client, error) {
+	t, err := newTransport(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -24,16 +25,24 @@ func newHeimdallHTTPClient(ctx context.Context, hc heimdall.Client, credentialsJ
 	}, nil
 }
 
-func newTransport(ctx context.Context, hc heimdall.Client, credentialsJSON []byte) (http.RoundTripper, error) {
+func newTransport(ctx context.Context, opts *Options) (http.RoundTripper, error) {
 	o := option.WithoutAuthentication()
-	if len(credentialsJSON) > 0 {
-		o = option.WithCredentialsJSON(credentialsJSON)
+	if opts.UseDefaultCredential {
+		credential, err := google.FindDefaultCredentials(ctx)
+		if err != nil {
+			return nil, err
+		}
+		o = option.WithCredentials(credential)
+	} else if len(opts.CredentialsJSON) > 0 {
+		o = option.WithCredentialsJSON(opts.CredentialsJSON)
 	}
 	return gcloud.NewTransport(ctx,
-		&hystrixTransport{client: hc},
+		&hystrixTransport{client: opts.Client},
 		option.WithUserAgent(userAgent),
 		option.WithScopes(storage.ScopeReadOnly),
-		o)
+		o,
+	)
+
 }
 
 type hystrixTransport struct {

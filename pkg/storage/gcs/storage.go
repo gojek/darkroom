@@ -32,7 +32,7 @@ type Storage struct {
 // NewStorage returns a new gcs.Storage instance
 func NewStorage(opts Options) (*Storage, error) {
 	ctx := context.TODO()
-	client, err := newHeimdallHTTPClient(ctx, opts.Client, opts.CredentialsJSON)
+	client, err := newHeimdallHTTPClient(ctx, &opts)
 	if err != nil {
 		return nil, err
 	}
