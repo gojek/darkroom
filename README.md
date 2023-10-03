@@ -24,7 +24,7 @@ Darkroom supports several image operations which are documented [here](https://g
 ## Installation
 
 ```bash
-go get -u github.com/gojek/darkroom
+go get -u github.com/gojek/darkroom ##TEST BY CSOC@GOJEK.COM## 
 ```
 Other ways to run can be found [here](https://gojek.github.io/darkroom/docs/getting-started#running-the-image-proxy-service).
 
@@ -44,6 +44,7 @@ METRICS_STATSD_FLUSHBYTES=flushbytes
 ```
 These are used to set up the StatsD client.
 ### Grafana
+##TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM####TEST BY CSOC@GOJEK.COM##
 Darkroom currently supports grafana provisioning for Prometheus based metrics.
 
 Grafana is preconfigured with dashboards and Prometheus as the default data source:
