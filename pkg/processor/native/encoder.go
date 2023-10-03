@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
 
@@ -31,6 +32,10 @@ type WebPEncoder struct {
 	Option *webp.Options
 }
 
+type GifEncoder struct {
+	Option *gif.Options
+}
+
 // NopEncoder is a no-op encoder object for unsupported format and will return error
 type NopEncoder struct{}
 
@@ -52,6 +57,12 @@ func (e *WebPEncoder) Encode(img image.Image) ([]byte, error) {
 	return buff.Bytes(), err
 }
 
+func (e *GifEncoder) Encode(img image.Image) ([]byte, error) {
+	buff := &bytes.Buffer{}
+	err := gif.Encode(buff, img, nil)
+	return buff.Bytes(), err
+}
+
 func (e *NopEncoder) Encode(img image.Image) ([]byte, error) {
 	return nil, errors.New("unknown format: failed to encode image")
 }
@@ -62,6 +73,7 @@ type Encoders struct {
 	pngEncoder  *PngEncoder
 	noOpEncoder *NopEncoder
 	webPEncoder *WebPEncoder
+	gifEncoder  *GifEncoder
 }
 
 // EncodersOption represents builder function for Encoders
@@ -79,6 +91,8 @@ func (e *Encoders) GetEncoder(img image.Image, ext string) Encoder {
 		return e.pngEncoder
 	case processor.ExtensionWebP:
 		return e.webPEncoder
+	case processor.ExtensionGIF:
+		return e.gifEncoder
 	default:
 		return e.noOpEncoder
 	}
@@ -105,6 +119,12 @@ func WithWebPEncoder(webPEncoder *WebPEncoder) EncodersOption {
 	}
 }
 
+func WithGifEncoder(gifEncoder *GifEncoder) EncodersOption {
+	return func(e *Encoders) {
+		e.gifEncoder = gifEncoder
+	}
+}
+
 // NewEncoders creates a new Encoders, if called without parameter (builder), all encoders option will be default
 func NewEncoders(opts ...EncodersOption) *Encoders {
 	e := &Encoders{
@@ -112,6 +132,7 @@ func NewEncoders(opts ...EncodersOption) *Encoders {
 		pngEncoder: &PngEncoder{
 			Encoder: &png.Encoder{CompressionLevel: png.BestCompression},
 		},
+		gifEncoder:  &GifEncoder{},
 		noOpEncoder: &NopEncoder{},
 		webPEncoder: &WebPEncoder{},
 	}

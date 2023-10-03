@@ -94,6 +94,10 @@ func (s *EncoderSuite) TestEncoders_GetEncoder_GivenWebPExtensionShouldReturnWeb
 	assert.IsType(s.T(), &WebPEncoder{}, s.encoders.GetEncoder(s.transparentImage, "webp"))
 }
 
+func (s *EncoderSuite) TestEncoders_GetEncoder_GivenGifExtensionShouldReturnGifEncoder() {
+	assert.IsType(s.T(), &GifEncoder{}, s.encoders.GetEncoder(s.srcImage, "gif"))
+}
+
 func (s *EncoderSuite) TestJpgEncoder_Encode_ShouldEncodeToJpeg() {
 	encoder := JpegEncoder{Option: nil}
 	data, err := encoder.Encode(s.srcImage)
@@ -139,4 +143,13 @@ func (s *EncoderSuite) TestWebPEncoder_Encode_ShouldEncodeToWebP() {
 	_, f, err := s.processor.Decode(data)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), "webp", f)
+}
+
+func (s *EncoderSuite) TestGifEncoder_Encode_ShouldEncodeToGif() {
+	encoder := GifEncoder{}
+	data, err := encoder.Encode(s.srcImage)
+	assert.Nil(s.T(), err)
+	_, f, err := s.processor.Decode(data)
+	assert.Nil(s.T(), err)
+	assert.Equal(s.T(), "gif", f)
 }
