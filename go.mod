@@ -37,6 +37,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024 // indirect
+	github.com/kolesa-team/go-webp v1.0.4 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
