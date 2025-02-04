@@ -96,6 +96,7 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	}
 
 	autos := strings.Split(params[auto], ",")
+	originalFormat := f
 	for _, a := range autos {
 		if a == compress {
 			orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
@@ -126,6 +127,9 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 
 	t = time.Now()
 	src, err := m.processor.Encode(data, f)
+	if err != nil && f != originalFormat {
+		src, err = m.processor.Encode(data, originalFormat)
+	}
 	if err == nil {
 		m.metricService.TrackDuration(encodeDurationKey, t, spec.ImageData)
 	}
