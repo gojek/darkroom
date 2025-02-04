@@ -51,11 +51,7 @@ func (e *JpegEncoder) Encode(img image.Image) ([]byte, error) {
 
 func (e *WebPEncoder) Encode(img image.Image) ([]byte, error) {
 	buff := &bytes.Buffer{}
-	var err error
-	if err := webp.Encode(buff, img, e.Option); err != nil {
-		log.Fatalln(err)
-	}
-
+	err := webp.Encode(buff, img, e.Option)
 	return buff.Bytes(), err
 }
 
