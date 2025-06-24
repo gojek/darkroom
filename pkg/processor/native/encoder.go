@@ -9,9 +9,7 @@ import (
 	"log"
 
 	"github.com/gojek/darkroom/pkg/processor"
-
-	"github.com/kolesa-team/go-webp/encoder"
-	"github.com/kolesa-team/go-webp/webp"
+	"github.com/pixiv/go-libwebp/webp"
 )
 
 // Encoder is an interface to Encode image and return the encoded byte array or error
@@ -31,7 +29,7 @@ type PngEncoder struct {
 
 // WebPEncoder is an object to encode image to byte array with webp format
 type WebPEncoder struct {
-	Option *encoder.Options
+	Config *webp.Config
 }
 
 // NopEncoder is a no-op encoder object for unsupported format and will return error
@@ -51,7 +49,7 @@ func (e *JpegEncoder) Encode(img image.Image) ([]byte, error) {
 
 func (e *WebPEncoder) Encode(img image.Image) ([]byte, error) {
 	buff := &bytes.Buffer{}
-	err := webp.Encode(buff, img, e.Option)
+	err := webp.EncodeRGBA(buff, img.(*image.RGBA), e.Config)
 	return buff.Bytes(), err
 }
 
@@ -110,7 +108,7 @@ func WithWebPEncoder(webPEncoder *WebPEncoder) EncodersOption {
 
 // NewEncoders creates a new Encoders, if called without parameter (builder), all encoders option will be default
 func NewEncoders(opts ...EncodersOption) *Encoders {
-	webpOption, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 75)
+	config, err := webp.ConfigPreset(webp.PresetDefault, 75)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -121,7 +119,7 @@ func NewEncoders(opts ...EncodersOption) *Encoders {
 			Encoder: &png.Encoder{CompressionLevel: png.BestCompression},
 		},
 		noOpEncoder: &NopEncoder{},
-		webPEncoder: &WebPEncoder{Option: webpOption},
+		webPEncoder: &WebPEncoder{Config: config},
 	}
 	for _, opt := range opts {
 		opt(e)
