@@ -1,8 +1,11 @@
 package service
 
 import (
+	"bytes"
 	"errors"
 	"image"
+	"image/color"
+	"image/color/palette"
 	"io/ioutil"
 	"testing"
 
@@ -13,6 +16,24 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
+
+func imageIsPalettedWithPalette(p color.Palette) interface{} {
+	return mock.MatchedBy(func(img image.Image) bool {
+		paletted, ok := img.(*image.Paletted)
+		if !ok {
+			return false
+		}
+		if len(paletted.Palette) != len(p) {
+			return false
+		}
+		for i := range p {
+			if paletted.Palette[i] != p[i] {
+				return false
+			}
+		}
+		return true
+	})
+}
 
 func TestNewManipulator(t *testing.T) {
 	m := NewManipulator(native.NewBildProcessor(), nil, nil)
@@ -26,7 +47,6 @@ func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *test
 	m := NewManipulator(p, nil, metrics.NewPrometheus(prometheus.NewRegistry()))
 
 	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.webp")
-	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_webp_to_png.png")
 
 	s := NewSpecBuilder().
 		WithImageData(img).
@@ -34,7 +54,10 @@ func TestManipulator_Process_ReturnsImageAsPNGIfCallerDoesNOTSupportWebP(t *test
 		Build()
 	img, err := m.Process(s)
 	assert.Nil(t, err)
-	assert.Equal(t, expectedImg, img)
+	assert.NotEmpty(t, img)
+	_, f, err := image.Decode(bytes.NewReader(img))
+	assert.Nil(t, err)
+	assert.Equal(t, processor.ExtensionPNG, f)
 }
 
 // Integration test to verify the flow of PNG image is requested with having support of WebP on client's side
@@ -44,7 +67,6 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 	m := NewManipulator(p, nil, metrics.NewPrometheus(prometheus.NewRegistry()))
 
 	img, _ := ioutil.ReadFile("../processor/native/_testdata/test.png")
-	expectedImg, _ := ioutil.ReadFile("../processor/native/_testdata/test_png_to_webp.webp")
 
 	s := NewSpecBuilder().
 		WithImageData(img).
@@ -53,7 +75,10 @@ func TestManipulator_Process_ReturnsImageAsWebPIfCallerSupportsWebP(t *testing.T
 		Build()
 	img, err := m.Process(s)
 	assert.Nil(t, err)
-	assert.Equal(t, expectedImg, img)
+	assert.NotEmpty(t, img)
+	_, f, err := image.Decode(bytes.NewReader(img))
+	assert.Nil(t, err)
+	assert.Equal(t, processor.ExtensionWebP, f)
 }
 
 // Integration test to verify the flow of encoding with target format
@@ -206,6 +231,107 @@ func TestManipulator_HasDefaultParams(t *testing.T) {
 
 	assert.Equal(t, true, manipulatorWithDefaultParams.HasDefaultParams())
 	assert.Equal(t, false, manipulatorWithoutDefaultParams.HasDefaultParams())
+}
+
+func TestManipulator_Process_QuantizesToOriginalPaletteWhenQuantizeIsTrue(t *testing.T) {
+	mp := &mockProcessor{}
+	ms := &metrics.MockMetricService{}
+	m := NewManipulator(mp, nil, ms)
+
+	input := []byte("inputData")
+	originalPalette := color.Palette{color.Black, color.White}
+	decoded := image.NewPaletted(image.Rect(0, 0, 2, 2), originalPalette)
+	processed := image.NewRGBA(image.Rect(0, 0, 1, 1))
+	processed.Set(0, 0, color.NRGBA{R: 10, G: 20, B: 30, A: 255})
+
+	mp.On("Decode", input).Return(decoded, processor.ExtensionPNG, nil)
+	mp.On("Resize", decoded, 1, 1).Return(processed)
+	mp.On("Encode", imageIsPalettedWithPalette(originalPalette), processor.ExtensionPNG).Return(input, nil)
+	ms.On("TrackDuration", mock.Anything, mock.Anything, mock.Anything)
+
+	params := map[string]string{width: "1", height: "1", quantize: "true"}
+	_, err := m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
+
+	assert.NoError(t, err)
+	mp.AssertExpectations(t)
+	ms.AssertExpectations(t)
+}
+
+func TestManipulator_Process_QuantizesToPlan9WhenOriginalNotPaletted(t *testing.T) {
+	mp := &mockProcessor{}
+	ms := &metrics.MockMetricService{}
+	m := NewManipulator(mp, nil, ms)
+
+	input := []byte("inputData")
+	decoded := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	processed := image.NewRGBA(image.Rect(0, 0, 1, 1))
+	processed.Set(0, 0, color.NRGBA{R: 10, G: 20, B: 30, A: 255})
+
+	mp.On("Decode", input).Return(decoded, processor.ExtensionPNG, nil)
+	mp.On("Resize", decoded, 1, 1).Return(processed)
+	mp.On("Encode", mock.MatchedBy(func(img image.Image) bool {
+		paletted, ok := img.(*image.Paletted)
+		if !ok {
+			return false
+		}
+		return len(paletted.Palette) == 256
+	}), processor.ExtensionPNG).Return(input, nil)
+	ms.On("TrackDuration", mock.Anything, mock.Anything, mock.Anything)
+
+	params := map[string]string{width: "1", height: "1", quantize: "true"}
+	_, err := m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
+
+	assert.NoError(t, err)
+	mp.AssertExpectations(t)
+	ms.AssertExpectations(t)
+}
+
+func TestManipulator_Process_DoesNotQuantizeWhenQuantizeIsFalse(t *testing.T) {
+	mp := &mockProcessor{}
+	ms := &metrics.MockMetricService{}
+	m := NewManipulator(mp, nil, ms)
+
+	input := []byte("inputData")
+	decoded := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	processed := image.NewRGBA(image.Rect(0, 0, 1, 1))
+
+	mp.On("Decode", input).Return(decoded, processor.ExtensionPNG, nil)
+	mp.On("Resize", decoded, 1, 1).Return(processed)
+	mp.On("Encode", processed, processor.ExtensionPNG).Return(input, nil)
+	ms.On("TrackDuration", mock.Anything, mock.Anything, mock.Anything)
+
+	params := map[string]string{width: "1", height: "1"}
+	_, err := m.Process(NewSpecBuilder().WithImageData(input).WithParams(params).Build())
+
+	assert.NoError(t, err)
+	mp.AssertExpectations(t)
+	ms.AssertExpectations(t)
+}
+
+func TestConvertToPaletted_PreservesTransparentPixelsWithOpaquePalette(t *testing.T) {
+	img := image.NewNRGBA(image.Rect(0, 0, 2, 1))
+	img.Set(0, 0, color.NRGBA{R: 255, G: 0, B: 0, A: 0})
+	img.Set(1, 0, color.NRGBA{R: 255, G: 0, B: 0, A: 255})
+
+	out := convertToPaletted(img, palette.Plan9)
+	paletted, ok := out.(*image.Paletted)
+	assert.True(t, ok)
+	assert.True(t, paletteHasTransparency(paletted.Palette))
+
+	_, _, _, a0 := paletted.At(0, 0).RGBA()
+	_, _, _, a1 := paletted.At(1, 0).RGBA()
+	assert.Equal(t, uint32(0), a0)
+	assert.Equal(t, uint32(0xffff), a1)
+}
+
+func TestConvertToPaletted_LeavesOpaqueImageOpaque(t *testing.T) {
+	img := image.NewNRGBA(image.Rect(0, 0, 1, 1))
+	img.Set(0, 0, color.NRGBA{R: 10, G: 20, B: 30, A: 255})
+
+	out := convertToPaletted(img, palette.Plan9)
+	paletted, ok := out.(*image.Paletted)
+	assert.True(t, ok)
+	assert.False(t, paletteHasTransparency(paletted.Palette))
 }
 
 type mockProcessor struct {

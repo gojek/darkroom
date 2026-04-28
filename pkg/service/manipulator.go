@@ -3,6 +3,10 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"image"
+	"image/color"
+	"image/color/palette"
+	"image/draw"
 	"math"
 	"strconv"
 	"strings"
@@ -27,6 +31,7 @@ const (
 	compress     = "compress"
 	format       = "format"
 	scale        = "scale"
+	quantize     = "quantize"
 
 	cropDurationKey      = "cropDuration"
 	decodeDurationKey    = "decodeDuration"
@@ -39,6 +44,15 @@ const (
 	fixOrientationKey    = "fixOrientation"
 	scaleDurationKey     = "scaleDuration"
 )
+
+var plan9WithTransparency color.Palette
+
+func init() {
+	cp := make(color.Palette, len(palette.Plan9))
+	copy(cp, palette.Plan9)
+	cp[len(cp)-1] = color.NRGBA{0, 0, 0, 0}
+	plan9WithTransparency = cp
+}
 
 // Manipulator interface sets the contract on the implementation for common processing support in darkroom
 type Manipulator interface {
@@ -66,9 +80,16 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	var originalPalette color.Palette
+	if paletted, ok := data.(*image.Paletted); ok {
+		originalPalette = paletted.Palette
+	}
+
 	if spec.TargetFormat != "" {
 		f = spec.TargetFormat
 	}
+
 	m.metricService.TrackDuration(decodeDurationKey, t, spec.ImageData)
 	if params[fit] == crop {
 		t = time.Now()
@@ -125,6 +146,18 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		m.metricService.TrackDuration(rotateDurationKey, t, spec.ImageData)
 	}
 
+	if params[quantize] == "true" && strings.EqualFold(f, processor.ExtensionPNG) {
+		if _, isPal := data.(*image.Paletted); !isPal {
+			quantizePalette := palette.Plan9
+			if originalPalette != nil {
+				quantizePalette = originalPalette
+			} else if imageHasTransparency(data) {
+				quantizePalette = plan9WithTransparency
+			}
+			data = convertToPaletted(data, quantizePalette)
+		}
+	}
+
 	t = time.Now()
 	src, err := m.processor.Encode(data, f)
 	if err != nil && f != originalFormat {
@@ -134,6 +167,55 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		m.metricService.TrackDuration(encodeDurationKey, t, spec.ImageData)
 	}
 	return src, err
+}
+
+func convertToPaletted(img image.Image, p color.Palette) image.Image {
+	if _, ok := img.(*image.Paletted); ok {
+		return img
+	}
+	bounds := img.Bounds()
+	palettedImg := image.NewPaletted(bounds, p)
+	draw.FloydSteinberg.Draw(palettedImg, bounds, img, bounds.Min)
+
+	transparentIndex := paletteTransparentIndex(palettedImg.Palette)
+	if transparentIndex >= 0 {
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				_, _, _, a := img.At(x, y).RGBA()
+				if a == 0 {
+					palettedImg.SetColorIndex(x, y, uint8(transparentIndex))
+				}
+			}
+		}
+	}
+	return palettedImg
+}
+
+func imageHasTransparency(img image.Image) bool {
+	b := img.Bounds()
+	for y := b.Min.Y; y < b.Max.Y; y++ {
+		for x := b.Min.X; x < b.Max.X; x++ {
+			_, _, _, a := img.At(x, y).RGBA()
+			if a < 0xffff {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func paletteTransparentIndex(p color.Palette) int {
+	for i, c := range p {
+		_, _, _, a := c.RGBA()
+		if a == 0 {
+			return i
+		}
+	}
+	return -1
+}
+
+func paletteHasTransparency(p color.Palette) bool {
+	return paletteTransparentIndex(p) >= 0
 }
 
 // HasDefaultParams returns true if defaultParams are present, returns false otherwise
