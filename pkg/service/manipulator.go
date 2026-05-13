@@ -116,24 +116,6 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 		m.metricService.TrackDuration(blurDurationKey, t, spec.ImageData)
 	}
 
-	autos := strings.Split(params[auto], ",")
-	originalFormat := f
-	for _, a := range autos {
-		if a == compress {
-			orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
-			t = time.Now()
-			data = m.processor.FixOrientation(data, orientation)
-			m.metricService.TrackDuration(fixOrientationKey, t, spec.ImageData)
-		} else if a == format {
-			w := spec.IsWebPSupported()
-			if w {
-				f = processor.ExtensionWebP
-			} else if f == processor.ExtensionWebP {
-				f = processor.ExtensionPNG
-			}
-		}
-	}
-
 	if len(params[flip]) != 0 {
 		t = time.Now()
 		data = m.processor.Flip(data, params[flip])
@@ -155,6 +137,24 @@ func (m *manipulator) Process(spec processSpec) ([]byte, error) {
 				quantizePalette = plan9WithTransparency
 			}
 			data = convertToPaletted(data, quantizePalette)
+		}
+	}
+
+	autos := strings.Split(params[auto], ",")
+	originalFormat := f
+	for _, a := range autos {
+		if a == compress {
+			orientation, _ := native.GetOrientation(bytes.NewReader(spec.ImageData))
+			t = time.Now()
+			data = m.processor.FixOrientation(data, orientation)
+			m.metricService.TrackDuration(fixOrientationKey, t, spec.ImageData)
+		} else if a == format {
+			w := spec.IsWebPSupported()
+			if w {
+				f = processor.ExtensionWebP
+			} else if f == processor.ExtensionWebP {
+				f = processor.ExtensionPNG
+			}
 		}
 	}
 
